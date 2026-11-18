@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" role="img" aria-labelledby="t d" font-family="'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+  <title id="t">From 900 alerts to the 4 that matter</title>
+  <desc id="d">An illustrative funnel for one frontend repo. 900 raw findings from the scanner. Remove dev-only packages that never ship to users or run with secrets: 260 remain. Keep only those where the vulnerable function is reachable from your code: 45 remain. Keep those with a fix available and real exploit risk, meaning listed in CISA KEV or with a high EPSS score, or critical and internet-exposed: 4 remain, to fix today. The rest go into the normal update flow. The numbers are illustrative.</desc>
+  <style>
+    .bg{fill:#f6f4ef}.card{fill:#fffdf9;stroke:#e5e0d5}.sunk{fill:#f3f0e9}
+    .ink{fill:#1c1b22}.muted{fill:#5b5866}.onacc{fill:#ffffff}
+    .acc{fill:#2b5fd9}.accink{fill:#1d47ad}.accsoft{fill:#e6edfc}
+    .pos{fill:#168a64}.posink{fill:#0d6a4b}.possoft{fill:#dcf2e8;stroke:#168a64}
+    .neg{fill:#d24a2b}.negink{fill:#ad3417}.negsoft{fill:#fbe3da;stroke:#d24a2b}
+    .heat{fill:#fcefd2;stroke:#d08a0c}.heatink{fill:#875700}.heatfill{fill:#d08a0c}
+    .line{stroke:#5b5866;fill:none;stroke-width:2}.thin{stroke:#e5e0d5;fill:none;stroke-width:1.5}
+    .dash{stroke:#2b5fd9;fill:none;stroke-width:2;stroke-dasharray:6 5}
+    .sacc{stroke:#2b5fd9;fill:none;stroke-width:2.5}.sheat{stroke:#d08a0c;fill:none;stroke-width:2.5}
+    .spos{stroke:#168a64;fill:none;stroke-width:2.5}.sneg{stroke:#d24a2b;fill:none;stroke-width:2.5}
+    .edge{stroke:#2b5fd9;fill:none;stroke-width:1;opacity:.45}
+    .stream{stroke:#2b5fd9;fill:none;stroke-width:14;stroke-linecap:round;opacity:.35}
+    .row{fill:#f3f0e9}.hit{fill:#e6edfc;stroke:#2b5fd9}
+    .mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace}
+    .head{font-size:13px;font-weight:700;letter-spacing:.08em}
+    .arrowhead{fill:#5b5866}.arrowacc{fill:#2b5fd9}
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowhead"/></marker>
+    <marker id="aa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowacc"/></marker>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="heatfill"/></marker>
+    <marker id="an" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="neg"/></marker>
+    <marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="pos"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="500" rx="18"/>
+  <text x="40" y="52" text-anchor="start" class="ink" font-size="26" font-weight="700">From 900 alerts to the 4 that matter</text>
+  <text x="40" y="78" text-anchor="start" class="muted" font-size="15">Most scanner findings are not urgent. Context and exploit data decide what to fix today.</text>
+  <rect class="sunk" x="60.0" y="110" width="1080" height="76" rx="12" stroke-width="1.5" />
+  <text x="88.0" y="157" text-anchor="start" class="ink" font-size="28" font-weight="700">900</text>
+  <text x="190.0" y="143" text-anchor="start" class="ink" font-size="15" font-weight="700">Raw scanner findings</text>
+  <text x="190.0" y="165" text-anchor="start" class="muted" font-size="12.5">every CVE in every package and version</text>
+  <rect class="card" x="160.0" y="202" width="880" height="76" rx="12" stroke-width="1.5" />
+  <text x="188.0" y="249" text-anchor="start" class="ink" font-size="28" font-weight="700">260</text>
+  <text x="290.0" y="235" text-anchor="start" class="ink" font-size="15" font-weight="700">Ship to users or run in CI</text>
+  <text x="290.0" y="257" text-anchor="start" class="muted" font-size="12.5">drop dev-only tools that never touch prod or secrets</text>
+  <rect class="hit" x="260.0" y="294" width="680" height="76" rx="12" stroke-width="1.5" />
+  <text x="288.0" y="341" text-anchor="start" class="accink" font-size="28" font-weight="700">45</text>
+  <text x="390.0" y="327" text-anchor="start" class="accink" font-size="15" font-weight="700">Reachable</text>
+  <text x="390.0" y="349" text-anchor="start" class="muted" font-size="12.5">your code actually calls the vulnerable function</text>
+  <rect class="negsoft" x="360.0" y="386" width="480" height="76" rx="12" stroke-width="1.5" />
+  <text x="388.0" y="433" text-anchor="start" class="negink" font-size="28" font-weight="700">4</text>
+  <text x="490.0" y="419" text-anchor="start" class="negink" font-size="15" font-weight="700">Exploited or likely, with a fix</text>
+  <text x="490.0" y="441" text-anchor="start" class="muted" font-size="12.5">in CISA KEV, high EPSS, or critical + exposed</text>
+  <text x="600" y="486" text-anchor="middle" class="muted" font-size="13">Illustrative numbers. Everything else still gets fixed, through routine weekly updates.</text>
+</svg>

@@ -5,44 +5,104 @@
   "slides": [
     {
       "title": "Your app is mostly other people's code",
-      "summary": "A typical frontend pulls in hundreds of packages. Any one of them can be vulnerable or malicious.",
+      "summary": "A typical frontend pulls in hundreds of packages. Any one of them can be vulnerable, or turn malicious overnight.",
       "body": [
-        "Most of the code in a modern bundle comes from <code>node_modules</code>. Attacks on that supply chain take a few forms:",
+        "Most of the code in a modern bundle, and almost all the code that runs during <code>npm install</code>, comes from <code>node_modules</code>. You chose about a dozen packages; they chose the other thousand.",
+        {
+          "h": "Two different problems"
+        },
         {
           "ul": [
-            "<b>Known vulnerabilities</b> in an old version of a library.",
-            "<b>Compromised maintainers:</b> a phished or stolen npm token publishes a malicious version of a popular package.",
-            "<b>Self-spreading worms:</b> an install script steals tokens and uses them to infect more packages.",
-            "<b>Typosquatting:</b> <code>reqeusts</code> instead of <code>requests</code>."
+            "<b>Vulnerable packages:</b> honest code with a bug (a CVE). The fix is to update to a patched version.",
+            "<b>Malicious packages:</b> code written to attack you, published through a stolen maintainer account, a typosquat or a worm. The fix is to <i>not install it</i>, and to assume breach if you did."
           ]
         },
-        "<mark>Every dependency is code you ship with full access to your page and, at install time, to your machines.</mark>",
+        "<mark>Every dependency is code you ship with full access to your page and, at install time, to your laptops and CI.</mark>",
         {
-          "more": "2025: the year npm got attacked at scale",
-          "text": [
-            "<b>September 8:</b> a phished maintainer account pushed malicious versions of <code>chalk</code>, <code>debug</code> and other packages with billions of weekly downloads. The payload ran in browsers and swapped crypto wallet addresses.",
-            "<b>From September 14:</b> the <b>Shai-Hulud</b> worm used postinstall scripts to steal npm and cloud tokens and publish infected versions of other packages; GitHub removed 500+ packages. In response npm moved publishing towards trusted publishing, short-lived tokens and mandatory 2FA."
-          ]
+          "note": "Scanners built for CVEs often miss malware: a brand-new malicious version has no CVE yet. You need tools for both problems.",
+          "kind": "warn"
         }
       ],
       "viz": [
         {
-          "type": "stages",
-          "items": [
+          "type": "table",
+          "rows": [
             {
-              "label": "<b>your-app</b>",
-              "sub": "about a dozen direct dependencies",
-              "tone": "accent"
+              "head": "When",
+              "cells": [
+                {
+                  "text": "Incident"
+                },
+                {
+                  "text": "Lesson"
+                }
+              ]
             },
             {
-              "label": "<b>transitive dependencies</b>",
-              "sub": "often 500–1,500 packages",
-              "tone": "heat"
+              "head": "2018",
+              "cells": [
+                {
+                  "text": "event-stream: new maintainer added a wallet stealer"
+                },
+                {
+                  "text": "Trust can be handed over"
+                }
+              ]
             },
             {
-              "label": "<b>one compromised package</b>",
-              "sub": "runs in users' browsers and on your CI",
-              "tone": "neg"
+              "head": "2021",
+              "cells": [
+                {
+                  "text": "Log4Shell (Java): deep transitive dependency, exploited within hours"
+                },
+                {
+                  "text": "Know your transitive tree"
+                }
+              ]
+            },
+            {
+              "head": "2024",
+              "cells": [
+                {
+                  "text": "polyfill.io: domain sold, CDN served malware to 100k+ sites"
+                },
+                {
+                  "text": "Third-party CDNs are dependencies too"
+                }
+              ]
+            },
+            {
+              "head": "Sep 2025",
+              "cells": [
+                {
+                  "text": "chalk/debug phished; Shai-Hulud worm, 500+ packages"
+                },
+                {
+                  "text": "Install scripts steal tokens"
+                }
+              ]
+            },
+            {
+              "head": "Dec 2025",
+              "cells": [
+                {
+                  "text": "React Server Components RCE (CVE-2025-55182)"
+                },
+                {
+                  "text": "Frameworks need fast patching"
+                }
+              ]
+            },
+            {
+              "head": "Mar 2026",
+              "cells": [
+                {
+                  "text": "axios 1.14.1 / 0.30.4: hijacked account, RAT via install script"
+                },
+                {
+                  "text": "Pin, delay, and block at the proxy"
+                }
+              ]
             }
           ]
         }
@@ -56,8 +116,646 @@
       }
     },
     {
-      "title": "Keeping dependencies safe",
-      "summary": "Lock versions, delay brand-new releases, limit install scripts, audit continuously and publish with trusted publishing.",
+      "title": "Why keeping dependencies up to date matters",
+      "summary": "Attackers now exploit flaws within days, often before a patch exists. A slow update cycle leaves you exposed for weeks.",
+      "body": [
+        "When a vulnerability is published, the advisory is also a guide for attackers. The time between disclosure and exploitation has collapsed:",
+        {
+          "ul": [
+            "Mandiant measured a <b>mean time-to-exploit of 63 days</b> in 2018–19. By 2024 it was <b>−1 day</b>, and for 2025 it estimates <b>−7 days</b>: exploitation typically starts before most teams have patched.",
+            "Automated scanners probe the whole internet for a new flaw within hours of a proof of concept appearing."
+          ]
+        },
+        {
+          "h": "What staying current gets you"
+        },
+        {
+          "ul": [
+            "<b>Fixes are only released for supported versions.</b> Maintainers patch the latest line, sometimes one before it, rarely more.",
+            "<b>Small updates are cheap.</b> A patch bump is minutes; three skipped majors is a migration project.",
+            "<b>You can ship an emergency fix the same day</b>, because the path to it is already clear.",
+            "<b>Compliance asks for it:</b> PCI DSS requirement 6.3.3 wants critical patches installed within one month; the EU Cyber Resilience Act requires security updates for software products.",
+            "<b>Bonus:</b> performance improvements, bug fixes and new browser features."
+          ]
+        },
+        "<mark>Up to date doesn't mean installing every release the minute it's published. Update continuously, but let brand-new versions age a few days first.</mark>"
+      ],
+      "figure": {
+        "src": "images/sec-time-to-exploit-light.svg",
+        "darkSrc": "images/sec-time-to-exploit-dark.svg",
+        "alt": "Bar chart of mean time-to-exploit in days, as reported by Mandiant and Google Threat Intelligence. 2018 to 2019: 63 days. 2020 to 2021: 44 days. 2021 to 2022: 32 days. 2023: 5 days. 2024: minus 1 day. 2025: about minus 7 days (estimate). A negative number means exploitation typically began before a patch was available. The lesson: a monthly or quarterly update cycle is far slower than attackers.",
+        "width": 1200,
+        "height": 520
+      }
+    },
+    {
+      "title": "Upgrade debt and support windows",
+      "summary": "Every skipped release makes the next security fix more expensive. Unsupported versions get no fixes at all.",
+      "body": [
+        "Falling behind compounds. Breaking changes pile up, peer dependencies stop lining up, and the day an urgent CVE lands, you face a migration project before you can apply a one-line fix.",
+        {
+          "ul": [
+            "<b>Each major is a set of breaking changes.</b> Skipping three means doing all of them at once, under pressure.",
+            "<b>Peer dependencies lock together:</b> an old framework pins old versions of its UI kit, test runner and build tools.",
+            "<b>End of life is a hard stop.</b> Once a version leaves its support window, new CVEs in it are never fixed."
+          ]
+        },
+        "<mark>Treat upgrades as routine maintenance with a schedule, not a project you start when something breaks.</mark>",
+        {
+          "note": "Angular's <code>ng update</code> runs automatic migrations between majors. Use it one major at a time, and read the update guide at angular.dev/update-guide.",
+          "kind": "dev"
+        }
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Platform",
+              "cells": [
+                {
+                  "text": "Support policy"
+                },
+                {
+                  "text": "Practical rule"
+                }
+              ]
+            },
+            {
+              "head": "Angular",
+              "cells": [
+                {
+                  "text": "Each major: 6 months active + 12 months LTS"
+                },
+                {
+                  "text": "Stay within the last two majors"
+                }
+              ]
+            },
+            {
+              "head": "Node.js",
+              "cells": [
+                {
+                  "text": "Even-numbered LTS lines: about 30 months"
+                },
+                {
+                  "text": "Node 20 ended April 2026; use 22 or 24"
+                }
+              ]
+            },
+            {
+              "head": "React",
+              "cells": [
+                {
+                  "text": "Fixes go to recent 19.x lines"
+                },
+                {
+                  "text": "Track the latest minor"
+                }
+              ]
+            },
+            {
+              "head": "TypeScript",
+              "cells": [
+                {
+                  "text": "No LTS: only the latest release"
+                },
+                {
+                  "text": "Upgrade with your framework"
+                }
+              ]
+            },
+            {
+              "head": "Browsers",
+              "cells": [
+                {
+                  "text": "Evergreen, auto-updating"
+                },
+                {
+                  "text": "Set and review a browserslist"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "figure": {
+        "src": "images/sec-upgrade-debt-light.svg",
+        "darkSrc": "images/sec-upgrade-debt-dark.svg",
+        "alt": "Two teams receive the same critical security fix, released only in the newest major version of a framework. Team A updates every week: it is one patch behind, so it applies the fix in a small pull request the same day. Team B updates once a year: it is three major versions behind, so to get the fix it must first work through three sets of breaking changes and peer-dependency conflicts, which takes weeks while the vulnerability stays exploitable. Old majors also leave their support window and stop getting fixes at all.",
+        "width": 1200,
+        "height": 520
+      }
+    },
+    {
+      "title": "The vocabulary of vulnerabilities",
+      "summary": "CVE, GHSA, CVSS, EPSS, KEV, SBOM, VEX: what each term means and what it's for.",
+      "body": [
+        "Security tools and advisories use a shared vocabulary. You need it to read a scanner report or a vendor notice.",
+        "<mark>CVSS says how bad a flaw could be. EPSS and KEV say whether anyone is actually exploiting it. Prioritise with all three.</mark>",
+        {
+          "more": "Why the NVD isn't enough on its own",
+          "text": "The US National Vulnerability Database has had big backlogs adding details to CVEs since 2024, and NIST said in 2026 it would prioritise CVEs in CISA KEV and in software used by the federal government. For npm packages, the GitHub Advisory Database and OSV are usually faster and more precise about affected version ranges."
+        }
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Term",
+              "cells": [
+                {
+                  "text": "What it is"
+                }
+              ]
+            },
+            {
+              "head": "CVE",
+              "cells": [
+                {
+                  "text": "A unique ID for a public vulnerability, e.g. CVE-2025-55182"
+                }
+              ]
+            },
+            {
+              "head": "GHSA",
+              "cells": [
+                {
+                  "text": "GitHub Security Advisory ID; the main source for npm advisories"
+                }
+              ]
+            },
+            {
+              "head": "OSV",
+              "cells": [
+                {
+                  "text": "Open, machine-readable vulnerability database across ecosystems (osv.dev)"
+                }
+              ]
+            },
+            {
+              "head": "CVSS",
+              "cells": [
+                {
+                  "text": "Severity score 0–10: how bad it could be"
+                }
+              ]
+            },
+            {
+              "head": "EPSS",
+              "cells": [
+                {
+                  "text": "Probability (0–1) of exploitation in the next 30 days"
+                }
+              ]
+            },
+            {
+              "head": "CISA KEV",
+              "cells": [
+                {
+                  "text": "Catalogue of vulnerabilities known to be exploited in the wild"
+                }
+              ]
+            },
+            {
+              "head": "SBOM",
+              "cells": [
+                {
+                  "text": "Software bill of materials: every component and version (CycloneDX, SPDX)"
+                }
+              ]
+            },
+            {
+              "head": "VEX",
+              "cells": [
+                {
+                  "text": "A statement that a product is or isn't affected by a CVE"
+                }
+              ]
+            },
+            {
+              "head": "SCA",
+              "cells": [
+                {
+                  "text": "Software composition analysis: tools that scan your dependencies"
+                }
+              ]
+            },
+            {
+              "head": "Reachability",
+              "cells": [
+                {
+                  "text": "Whether your code can actually call the vulnerable function"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "How dependency scanners (SCA) work",
+      "summary": "They read your lockfile, match every exact version against vulnerability and malware databases, add context, and propose fixes.",
+      "body": [
+        "<b>Software composition analysis (SCA)</b> tools all follow the same pipeline. They differ in data quality, context and how well they fix things.",
+        {
+          "ul": [
+            "<b>Inventory from the lockfile</b>, not <code>package.json</code>: <code>^1.2.0</code> could mean many versions; the lockfile says exactly which one is installed, including transitive packages.",
+            "<b>Match</b> each package@version against advisory databases (GitHub Advisory Database, OSV, NVD) and malware feeds.",
+            "<b>Add context:</b> is it a devDependency? Is the vulnerable function reachable? Is the deployed service internet-facing?",
+            "<b>Fix:</b> open an upgrade pull request, or block a build or download by policy."
+          ]
+        },
+        "<mark>Most vulnerable packages are transitive: you didn't install them, something you installed did.</mark>",
+        {
+          "h": "Fixing a transitive dependency"
+        },
+        {
+          "ul": [
+            "First update the direct dependency that pulls it in; that's the clean fix.",
+            "If it has no release yet, force a patched version with <code>overrides</code> (npm), <code>pnpm.overrides</code> or <code>resolutions</code> (Yarn), and remove the override once upstream catches up."
+          ]
+        }
+      ],
+      "code": [
+        "npm explain minimist            # why is this installed?",
+        "npm ls minimist --all           # every copy in the tree",
+        "",
+        "// package.json: force a patched transitive version",
+        "\"overrides\": { \"minimist\": \"^1.2.8\" }"
+      ],
+      "figure": {
+        "src": "images/sec-sca-pipeline-light.svg",
+        "darkSrc": "images/sec-sca-pipeline-dark.svg",
+        "alt": "Five steps from left to right. 1, Inventory: read package-lock.json or an SBOM to list every package and exact version, direct and transitive. 2, Match: compare each package and version against vulnerability databases such as the GitHub Advisory Database, OSV and NVD, and against malware feeds. 3, Context: ask whether the vulnerable code ships to users or is only a dev tool, whether the vulnerable function is reachable, and whether the workload is exposed to the internet. 4, Prioritise: rank by known exploitation (CISA KEV), exploit likelihood (EPSS) and severity (CVSS). 5, Fix: open an upgrade pull request, or block the build or download by policy.",
+        "width": 1200,
+        "height": 470
+      }
+    },
+    {
+      "title": "Prioritising: fix what matters first",
+      "summary": "Hundreds of findings is normal. Rank by real exploitation and reachability, and set fix deadlines by risk.",
+      "body": [
+        "Teams that try to fix every finding at once burn out and start ignoring the scanner. Rank instead:",
+        {
+          "ul": [
+            "<b>Does it ship or run with secrets?</b> A bug in a build-time CLI that never sees untrusted input is low risk; the same bug in your SSR server is not.",
+            "<b>Is it reachable?</b> Snyk, Socket, Endor Labs and JFrog's contextual analysis check whether your code can actually hit the vulnerable path.",
+            "<b>Is it exploited?</b> Anything in CISA KEV jumps the queue. A high EPSS score means exploitation is likely soon.",
+            "<b>Is a fix available?</b> If not, mitigate (WAF rule, disable the feature) and watch for a release."
+          ]
+        },
+        "<mark>A KEV-listed, reachable vulnerability in an internet-facing service is an emergency, whatever its CVSS score.</mark>",
+        {
+          "note": "Record decisions. When you accept a finding (not reachable, dev-only), write down why and set an expiry date, so it gets reviewed again.",
+          "kind": "dev"
+        }
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Risk",
+              "cells": [
+                {
+                  "text": "Example"
+                },
+                {
+                  "text": "Fix within (example policy)"
+                }
+              ]
+            },
+            {
+              "head": "Exploited + reachable",
+              "cells": [
+                {
+                  "text": "In CISA KEV, used by your SSR server"
+                },
+                {
+                  "text": "24–48 hours"
+                }
+              ]
+            },
+            {
+              "head": "Critical, exposed",
+              "cells": [
+                {
+                  "text": "CVSS 9+, internet-facing, reachable"
+                },
+                {
+                  "text": "7 days"
+                }
+              ]
+            },
+            {
+              "head": "High",
+              "cells": [
+                {
+                  "text": "CVSS 7–8.9 in shipped code"
+                },
+                {
+                  "text": "30 days (PCI DSS: 1 month)"
+                }
+              ]
+            },
+            {
+              "head": "Medium / low / dev-only",
+              "cells": [
+                {
+                  "text": "Build tools, unreachable paths"
+                },
+                {
+                  "text": "Routine weekly updates"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "caption",
+          "html": "Example deadlines; set your own with your security team."
+        }
+      ],
+      "figure": {
+        "src": "images/sec-alert-funnel-light.svg",
+        "darkSrc": "images/sec-alert-funnel-dark.svg",
+        "alt": "An illustrative funnel for one frontend repo. 900 raw findings from the scanner. Remove dev-only packages that never ship to users or run with secrets: 260 remain. Keep only those where the vulnerable function is reachable from your code: 45 remain. Keep those with a fix available and real exploit risk, meaning listed in CISA KEV or with a high EPSS score, or critical and internet-exposed: 4 remain, to fix today. The rest go into the normal update flow. The numbers are illustrative.",
+        "width": 1200,
+        "height": 500
+      }
+    },
+    {
+      "title": "JFrog: Artifactory, Curation and Xray",
+      "summary": "JFrog puts a controlled registry between npm and your code: block bad packages before download, and scan everything you build and ship.",
+      "body": [
+        "<b>JFrog</b> is a software supply-chain platform used by many large companies. For a frontend team it does three jobs:",
+        {
+          "ul": [
+            "<b>Artifactory</b> is a private registry and proxy. A <i>remote</i> repository caches npmjs.org; a <i>virtual</i> repository combines it with your private packages. Every laptop and CI runner installs through it, so there's one place to control and audit.",
+            "<b>Curation</b> is the gate in front of the cache. Policies block package versions before they're downloaded: known malicious, critical CVEs, banned licences, or too new. JFrog is moving Xray's older “block download” feature into Curation during 2026.",
+            "<b>Xray</b> scans what's already inside: cached packages, builds, Docker images and release bundles. <i>Watches</i> choose what to scan, <i>policies</i> decide what's a violation (CVE severity, licence, malware), and violations can fail a build or block a release."
+          ]
+        },
+        {
+          "h": "Advanced Security add-ons"
+        },
+        {
+          "ul": [
+            "<b>Contextual analysis:</b> checks whether a CVE actually applies to your code and configuration, to cut false positives.",
+            "<b>Secrets, IaC and SAST scanning</b> in the same pipeline.",
+            "<b>Frogbot:</b> a Git bot that scans pull requests, comments on new vulnerable dependencies and opens fix PRs.",
+            "<b>JFrog CLI:</b> <code>jf audit</code> scans a project locally or in CI."
+          ]
+        },
+        "<mark>Because Curation blocks a bad version before it reaches a machine, its install script never runs. Scanning after install can't do that.</mark>",
+        {
+          "note": "When a malicious version is published, the registry proxy is also your fastest kill switch: block it once, and every team is protected. Remember to purge it from the cache too.",
+          "kind": "key"
+        }
+      ],
+      "code": [
+        "# .npmrc: install everything through Artifactory",
+        "registry=https://acme.jfrog.io/artifactory/api/npm/npm-virtual/",
+        "//acme.jfrog.io/artifactory/api/npm/npm-virtual/:_authToken=${JFROG_TOKEN}",
+        "",
+        "# CI",
+        "jf audit --fail=true            # scan dependencies, fail on policy"
+      ],
+      "figure": {
+        "src": "images/sec-jfrog-flow-light.svg",
+        "darkSrc": "images/sec-jfrog-flow-dark.svg",
+        "alt": "Left to right. A developer or CI runs npm install, with .npmrc pointing at the company Artifactory instead of the public npm registry. Artifactory has a remote repository that proxies and caches npmjs.org. Before a new package version is downloaded into the cache, JFrog Curation checks it against policies: known malicious, critical CVE, banned license, or too new; a blocked package never reaches the developer. JFrog Xray continuously scans what is in Artifactory and every build and release bundle, using watches and policies, and with Advanced Security checks whether a CVE is actually applicable (contextual analysis), and scans for secrets. Frogbot comments on pull requests and opens fix PRs. Builds that violate policy can be failed.",
+        "width": 1200,
+        "height": 540
+      }
+    },
+    {
+      "title": "Wiz: from vulnerable code to real cloud risk",
+      "summary": "Wiz scans code, images and running cloud workloads, then ranks a CVE by whether it's deployed, exposed and near sensitive data.",
+      "body": [
+        "<b>Wiz</b> is a cloud security platform (a CNAPP). Google completed its acquisition of Wiz in March 2026; Wiz still works across AWS, Azure, Google Cloud and other clouds.",
+        {
+          "ul": [
+            "<b>Wiz Code</b> scans repositories, pull requests and IDEs for vulnerable dependencies, secrets, infrastructure-as-code misconfigurations and code flaws, and traces each finding to where it runs in the cloud.",
+            "<b>Wiz Cloud</b> scans cloud accounts <i>agentlessly</i>, reading disks and images of VMs, containers and serverless functions to find vulnerable packages actually running in production.",
+            "<b>Wiz Defend</b> adds runtime threat detection and response.",
+            "<b>The Security Graph</b> links code, images, workloads, network exposure, identities and data. It flags <i>toxic combinations</i>: a vulnerable package in a service that's internet-facing <i>and</i> can read sensitive data."
+          ]
+        },
+        "<mark>The same CVE can be an emergency in one service and harmless in another. Wiz-style context tells you which is which.</mark>",
+        {
+          "h": "Why a frontend team should care"
+        },
+        {
+          "ul": [
+            "SSR and BFF servers are Node containers in the cloud, often internet-facing.",
+            "Static sites live in storage buckets and CDNs that can be misconfigured.",
+            "API keys leak into repos and front-end bundles.",
+            "During an incident, Wiz's inventory answers “where is axios 1.14.1 running right now?” across every account."
+          ]
+        },
+        {
+          "more": "Alternatives in the same category",
+          "text": "Palo Alto Networks Prisma Cloud, Orca Security, Microsoft Defender for Cloud, Aqua Security and Sysdig cover similar ground. Pick based on your clouds, existing vendors and how well findings route to the right owners."
+        }
+      ],
+      "figure": {
+        "src": "images/sec-wiz-graph-light.svg",
+        "darkSrc": "images/sec-wiz-graph-dark.svg",
+        "alt": "A graph from left to right. In code: a repository with a vulnerable package in package-lock.json, found by Wiz Code scanning the repo and pull requests, along with secrets and infrastructure-as-code misconfigurations. It builds into a container image, scanned in CI and the registry. The image runs as an SSR Node service in Kubernetes, which Wiz Cloud scans agentlessly. That service is exposed to the internet and its role can read a storage bucket with customer data. Wiz's security graph links these facts and flags the toxic combination: vulnerable, exposed, and with access to sensitive data, which should be fixed first. The same CVE in an internal batch job with no data access ranks much lower. Google completed its acquisition of Wiz in March 2026; Wiz still supports all major clouds.",
+        "width": 1200,
+        "height": 560
+      }
+    },
+    {
+      "title": "The tool landscape",
+      "summary": "No single tool covers everything. Combine an update bot, a CVE scanner, malware detection and a registry gate.",
+      "body": [
+        "Tools fall into a few categories. Most teams combine one from each of the first three, and larger organisations add the rest.",
+        {
+          "ul": [
+            "<b>Update bots</b> keep you current with small, frequent pull requests.",
+            "<b>CVE scanners (SCA)</b> find known vulnerabilities in what you've installed.",
+            "<b>Malware detection</b> spots packages behaving badly (install scripts, network calls, obfuscated code) before they have a CVE.",
+            "<b>Registry gates</b> stop bad versions entering your organisation at all.",
+            "<b>Cloud and runtime</b> tools show what's actually deployed and exposed.",
+            "<b>Provenance and posture</b> tools verify who built a package and how healthy the project is."
+          ]
+        },
+        "<mark>Free tools (Dependabot or Renovate, npm audit or OSV-Scanner, provenance checks) already cover the basics. Paid tools add context, malware detection and organisation-wide control.</mark>"
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Category",
+              "cells": [
+                {
+                  "text": "Tools"
+                },
+                {
+                  "text": "Cost"
+                }
+              ]
+            },
+            {
+              "head": "Update bots",
+              "cells": [
+                {
+                  "text": "Renovate, Dependabot version updates"
+                },
+                {
+                  "text": "Free"
+                }
+              ]
+            },
+            {
+              "head": "CVE scanning (SCA)",
+              "cells": [
+                {
+                  "text": "npm audit, OSV-Scanner, Dependabot alerts, Snyk, Mend, Sonatype, Endor Labs, JFrog Xray, Wiz Code"
+                },
+                {
+                  "text": "Free → paid"
+                }
+              ]
+            },
+            {
+              "head": "Malware detection",
+              "cells": [
+                {
+                  "text": "Socket, Snyk, Sonatype, JFrog Curation, Aikido"
+                },
+                {
+                  "text": "Mostly paid"
+                }
+              ]
+            },
+            {
+              "head": "Registry gate / proxy",
+              "cells": [
+                {
+                  "text": "JFrog Artifactory + Curation, Sonatype Nexus Firewall, Cloudsmith"
+                },
+                {
+                  "text": "Paid"
+                }
+              ]
+            },
+            {
+              "head": "Images & SBOM",
+              "cells": [
+                {
+                  "text": "Trivy, Grype, Syft, Docker Scout"
+                },
+                {
+                  "text": "Free → paid"
+                }
+              ]
+            },
+            {
+              "head": "Cloud & runtime (CNAPP)",
+              "cells": [
+                {
+                  "text": "Wiz, Prisma Cloud, Orca, Defender for Cloud"
+                },
+                {
+                  "text": "Paid"
+                }
+              ]
+            },
+            {
+              "head": "Provenance & posture",
+              "cells": [
+                {
+                  "text": "npm provenance, Sigstore, OpenSSF Scorecard"
+                },
+                {
+                  "text": "Free"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "caption",
+          "html": "Examples, not endorsements. Features change quickly; check each vendor's current docs."
+        }
+      ]
+    },
+    {
+      "title": "A practical update workflow",
+      "summary": "Automate small weekly updates with tests, delay brand-new versions, and fast-track security fixes.",
+      "body": [
+        "A workflow that keeps a large frontend current without drowning the team:",
+        {
+          "ul": [
+            "<b>Weekly, grouped PRs:</b> one PR for Angular packages, one for testing tools, and so on, so related packages move together.",
+            "<b>Automerge the safe ones:</b> patch updates of devDependencies when CI is green.",
+            "<b>A release-age delay</b> of a few days (Renovate's <code>minimumReleaseAge</code>, Dependabot's <code>cooldown</code>) lets the community catch malicious versions first.",
+            "<b>Security fixes skip the queue:</b> vulnerability PRs open immediately and are labelled for fast review.",
+            "<b>Majors get a ticket:</b> plan them within the support window, one major at a time.",
+            "<b>Good tests make all of this safe.</b> Without them, every update is a gamble."
+          ]
+        },
+        "<mark>The goal is boring updates: small, frequent, tested and mostly automatic.</mark>"
+      ],
+      "viz": [
+        {
+          "type": "tabs",
+          "tabs": [
+            {
+              "label": "Renovate",
+              "blocks": [
+                {
+                  "type": "code",
+                  "title": "renovate.json",
+                  "source": [
+                    "{",
+                    "  \"extends\": [\"config:recommended\"],",
+                    "  \"schedule\": [\"before 6am on monday\"],",
+                    "  \"minimumReleaseAge\": \"3 days\",",
+                    "  \"osvVulnerabilityAlerts\": true,",
+                    "  \"vulnerabilityAlerts\": { \"labels\": [\"security\"] },",
+                    "  \"packageRules\": [",
+                    "    { \"matchPackageNames\": [\"/^@angular/\"], \"groupName\": \"angular\" },",
+                    "    { \"matchDepTypes\": [\"devDependencies\"],",
+                    "      \"matchUpdateTypes\": [\"patch\"], \"automerge\": true }",
+                    "  ]",
+                    "}"
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "Dependabot",
+              "blocks": [
+                {
+                  "type": "code",
+                  "title": ".github/dependabot.yml",
+                  "source": [
+                    "version: 2",
+                    "updates:",
+                    "  - package-ecosystem: npm",
+                    "    directory: /",
+                    "    schedule: { interval: weekly }",
+                    "    cooldown: { default-days: 3 }",
+                    "    groups:",
+                    "      angular: { patterns: ['@angular/*'] }"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Hardening installs and publishing",
+      "summary": "Lock versions, don't run install scripts you don't need, and publish with trusted publishing and provenance.",
       "body": [
         {
           "h": "Consuming packages"
@@ -65,9 +763,9 @@
         {
           "ul": [
             "<b>Commit the lockfile</b> and install with <code>npm ci</code>, so CI uses exactly the reviewed versions.",
-            "<b>Don't run install scripts you don't need.</b> pnpm 10+ skips dependency lifecycle scripts unless you allow them; with npm, use <code>--ignore-scripts</code> where you can.",
-            "<b>Wait before adopting new releases.</b> Most malicious versions are caught within days; pnpm's <code>minimumReleaseAge</code> and Renovate's release-age settings enforce a delay.",
-            "<b>Audit continuously</b> with Dependabot, Renovate or <code>npm audit</code>, and update in small steps."
+            "<b>Don't run install scripts you don't need.</b> pnpm 10+ skips dependency lifecycle scripts unless you allow them (<code>onlyBuiltDependencies</code>); with npm, use <code>--ignore-scripts</code> where you can.",
+            "<b>Give CI the least access:</b> short-lived credentials, no production secrets in jobs that install packages.",
+            "<b>Review new dependencies</b> before adding them: maintainers, activity, download trend, install scripts, size, and OpenSSF Scorecard."
           ]
         },
         {
@@ -75,14 +773,11 @@
         },
         {
           "ul": [
-            "Use <b>trusted publishing</b> (OIDC from CI) instead of long-lived npm tokens, and phishing-resistant 2FA.",
+            "Use <b>trusted publishing</b> (OIDC from CI) instead of long-lived npm tokens, plus phishing-resistant 2FA. npm moved publishing in this direction after the 2025 attacks.",
             "Publish with <b>provenance</b>, so users can check which repo and workflow built the package (<code>npm audit signatures</code>)."
           ]
         },
-        {
-          "note": "npm audit reports a lot of noise from dev-only tools. Triage by whether the vulnerable code ships to users or runs in CI.",
-          "kind": "dev"
-        }
+        "<mark>Most 2025–26 npm attacks ran through install scripts and stolen long-lived tokens. Removing both closes the main path.</mark>"
       ],
       "code": [
         "npm ci --ignore-scripts      # exact lockfile, no install scripts",
@@ -90,7 +785,8 @@
         "npm audit signatures         # verify registry signatures + provenance",
         "",
         "# pnpm-workspace.yaml",
-        "minimumReleaseAge: 1440      # minutes: skip versions < 1 day old"
+        "minimumReleaseAge: 4320      # minutes: skip versions < 3 days old",
+        "onlyBuiltDependencies: [esbuild]"
       ],
       "viz": [
         {
@@ -110,9 +806,6 @@
               "text": "release-age delay"
             },
             {
-              "text": "Dependabot / Renovate"
-            },
-            {
               "text": "trusted publishing",
               "hot": true
             },
@@ -120,11 +813,51 @@
               "text": "provenance"
             },
             {
-              "text": "SRI for CDN files"
+              "text": "least-privilege CI"
             }
           ]
         }
       ]
+    },
+    {
+      "title": "SBOMs and incident response",
+      "summary": "When a package is compromised, the first question is “are we affected?”. An SBOM answers it in minutes.",
+      "body": [
+        "A <b>software bill of materials (SBOM)</b> lists every component and version in a build, in a standard format (CycloneDX or SPDX). Generate one per release and store it with the artifact.",
+        {
+          "ul": [
+            "<b>Answer “are we affected?” fast:</b> search SBOMs and lockfiles across every repo and image.",
+            "<b>Customers and regulators ask for them:</b> US federal software suppliers, and the EU Cyber Resilience Act's documentation requirements.",
+            "<b>Feed them to tools:</b> Dependency-Track, JFrog Xray and Wiz can watch SBOMs and alert when a new CVE matches."
+          ]
+        },
+        {
+          "h": "If you installed a malicious version"
+        },
+        {
+          "ul": [
+            "Assume the machine or CI runner is compromised: the install script ran with its permissions.",
+            "Rotate every credential it could reach: npm, GitHub, cloud, API keys.",
+            "Rebuild runners, check what was published or deployed from them, then pin a known-good version and block the bad one at your registry proxy."
+          ]
+        },
+        "<mark>Removing the bad package isn't enough. Its install script already ran; rotate the secrets it could see.</mark>"
+      ],
+      "code": [
+        "npm sbom --sbom-format cyclonedx > sbom.json   # from the lockfile",
+        "syft my-image:1.4.2 -o cyclonedx-json          # from a container image",
+        "",
+        "# are we affected?",
+        "npm ls axios --all",
+        "grep -rn '\"axios\": \"1.14.1\\|plain-crypto-js' --include=package-lock.json ."
+      ],
+      "figure": {
+        "src": "images/sec-incident-response-light.svg",
+        "darkSrc": "images/sec-incident-response-dark.svg",
+        "alt": "A timeline of responding to a malicious release such as axios 1.14.1 in March 2026. Minute 0: an advisory or a tool alert names the bad versions. Minutes 5 to 15: query SBOMs and lockfiles across all repos and images to find which ones resolved the bad version during the exposure window. Minutes 15 to 30: block the versions in the registry proxy, pin the last good version, and purge caches. Minutes 30 to 60: on any machine or CI runner that installed it, assume compromise: rotate npm, GitHub, cloud and API tokens, rebuild runners, and review what was published or deployed. Afterwards: write up what happened and tighten policy, for example a minimum release age.",
+        "width": 1200,
+        "height": 420
+      }
     }
   ]
 }
