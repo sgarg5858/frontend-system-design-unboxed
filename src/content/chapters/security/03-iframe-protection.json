@@ -1,0 +1,183 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "iframe-protection",
+  "name": "iFrame protection",
+  "slides": [
+    {
+      "title": "Clickjacking",
+      "summary": "An attacker loads your site in an invisible iframe and tricks the user into clicking your buttons.",
+      "body": [
+        "<b>Clickjacking</b> (UI redressing) loads your page in a transparent iframe on the attacker's site, positioned over a decoy button. The user thinks they're clicking “Play video” but actually clicks “Delete account” or “Approve payment” on your site, while logged in.",
+        "<mark>If your site can be framed by anyone, any one-click action is at risk.</mark>",
+        "The fix is to tell the browser who may frame you:",
+        {
+          "ul": [
+            "<code>Content-Security-Policy: frame-ancestors 'none'</code>: nobody may frame this page.",
+            "<code>frame-ancestors 'self' https://partner.example</code>: only these origins may.",
+            "<code>X-Frame-Options: DENY</code>: the older header. Keep it for old browsers; <code>frame-ancestors</code> wins where supported."
+          ]
+        },
+        {
+          "note": "JavaScript “frame-busting” code is unreliable and can be blocked by the framing page. Use the headers.",
+          "kind": "warn"
+        }
+      ],
+      "viz": [
+        {
+          "type": "stepper",
+          "accumulate": true,
+          "nextLabel": "Next step",
+          "steps": [
+            {
+              "item": {
+                "label": "<b>Decoy page</b>",
+                "sub": "“Click to claim your prize!”",
+                "tone": "muted"
+              },
+              "caption": "The attacker's page shows a tempting button."
+            },
+            {
+              "item": {
+                "label": "<b>Hidden iframe</b>",
+                "sub": "your-bank.example, opacity: 0",
+                "tone": "heat"
+              },
+              "caption": "Your page sits on top, invisible, with “Transfer” over the decoy."
+            },
+            {
+              "item": {
+                "label": "<b>The click lands on you</b>",
+                "sub": "Logged-in user's cookies are sent",
+                "tone": "neg"
+              },
+              "caption": "The user clicks; your site sees a genuine click from a real session."
+            },
+            {
+              "item": {
+                "label": "<b>Fix: frame-ancestors 'none'</b>",
+                "sub": "The browser refuses to render you in the frame",
+                "tone": "pos"
+              },
+              "caption": "With the header, the iframe stays blank and nothing can be clicked."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Embedding other sites safely",
+      "summary": "When you frame someone else's content, sandbox it and give it only the permissions it needs.",
+      "body": [
+        "The other direction matters too. Widgets, ads, previews and user-supplied embeds run code you don't control.",
+        {
+          "ul": [
+            "<b><code>sandbox</code></b> with no value blocks scripts, forms, popups, top navigation and same-origin access. Add back only what's needed, e.g. <code>sandbox=\"allow-scripts\"</code>.",
+            "Never combine <code>allow-scripts</code> and <code>allow-same-origin</code> for same-origin content: the frame can then remove its own sandbox.",
+            "<b><code>allow</code></b> grants powerful features (camera, payment, fullscreen) per frame.",
+            "<b><code>referrerpolicy</code></b> and <code>loading=\"lazy\"</code> limit what leaks and when it loads."
+          ]
+        },
+        "<mark>Treat any iframe as untrusted: start from a full sandbox and add permissions one at a time.</mark>"
+      ],
+      "code": [
+        "<iframe",
+        "  src=\"https://widget.example/embed\"",
+        "  sandbox=\"allow-scripts allow-popups\"",
+        "  allow=\"fullscreen\"",
+        "  referrerpolicy=\"no-referrer\"",
+        "  loading=\"lazy\"",
+        "  title=\"Product reviews\"",
+        "></iframe>"
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "sandbox token",
+              "cells": [
+                {
+                  "text": "Allows"
+                }
+              ]
+            },
+            {
+              "head": "(none)",
+              "cells": [
+                {
+                  "text": "Static content only"
+                }
+              ]
+            },
+            {
+              "head": "allow-scripts",
+              "cells": [
+                {
+                  "text": "JavaScript"
+                }
+              ]
+            },
+            {
+              "head": "allow-forms",
+              "cells": [
+                {
+                  "text": "Form submission"
+                }
+              ]
+            },
+            {
+              "head": "allow-popups",
+              "cells": [
+                {
+                  "text": "window.open and target=_blank"
+                }
+              ]
+            },
+            {
+              "head": "allow-same-origin",
+              "cells": [
+                {
+                  "text": "Keeps its real origin (cookies, storage)"
+                }
+              ]
+            },
+            {
+              "head": "allow-top-navigation",
+              "cells": [
+                {
+                  "text": "Redirecting your whole page"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Talking to iframes with postMessage",
+      "summary": "postMessage crosses origins safely only if both sides check who they're talking to.",
+      "body": [
+        "<code>window.postMessage</code> is the safe way to talk across origins, but it's a common source of DOM XSS when origins aren't checked.",
+        {
+          "ul": [
+            "<b>Sending:</b> always pass an exact <code>targetOrigin</code>, never <code>'*'</code> for sensitive data.",
+            "<b>Receiving:</b> check <code>event.origin</code> against an allowlist before using <code>event.data</code>.",
+            "<b>Validate the data</b> like any other input. Never pass it to <code>innerHTML</code> or <code>eval</code>."
+          ]
+        },
+        "<mark>A message listener with no origin check accepts data from every site that can open or frame your page.</mark>"
+      ],
+      "code": [
+        "// parent → child",
+        "frame.contentWindow.postMessage({ type: 'theme', value: 'dark' },",
+        "  'https://widget.example');",
+        "",
+        "// child",
+        "addEventListener('message', (e) => {",
+        "  if (e.origin !== 'https://app.example') return;",
+        "  if (e.data?.type === 'theme') applyTheme(e.data.value);",
+        "});"
+      ]
+    }
+  ]
+}

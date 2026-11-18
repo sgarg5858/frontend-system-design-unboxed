@@ -1,0 +1,106 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "ssji",
+  "name": "Server-side JavaScript injection (SSJI)",
+  "slides": [
+    {
+      "title": "When user input runs on your Node server",
+      "summary": "SSJI is XSS on the server: user data reaches eval or a similar sink and runs with your server's privileges.",
+      "body": [
+        "Node.js powers SSR frameworks, BFFs and build tools. If user input reaches a function that evaluates code, the attacker runs JavaScript <i>on the server</i>: reading files, environment variables and secrets, or starting processes.",
+        "Dangerous sinks:",
+        {
+          "ul": [
+            "<code>eval()</code>, <code>new Function()</code>, <code>vm.runInContext()</code>;",
+            "<code>setTimeout</code> / <code>setInterval</code> with a <b>string</b>;",
+            "<code>child_process.exec</code> with string-built commands (command injection);",
+            "template engines compiling user-supplied templates;",
+            "NoSQL queries built from raw request objects (<code>{ \"$where\": \"…\" }</code>)."
+          ]
+        },
+        "<mark>Never evaluate user input as code. There is no safe way to sanitize JavaScript.</mark>"
+      ],
+      "viz": [
+        {
+          "type": "tabs",
+          "tabs": [
+            {
+              "label": "Vulnerable",
+              "blocks": [
+                {
+                  "type": "code",
+                  "title": "calculator.js",
+                  "source": [
+                    "app.get('/calc', (req, res) => {",
+                    "  // ?expr=require('fs').readFileSync('/etc/passwd','utf8')",
+                    "  res.send(String(eval(req.query.expr)));",
+                    "});"
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "Fixed",
+              "blocks": [
+                {
+                  "type": "code",
+                  "title": "calculator.js",
+                  "source": [
+                    "import { evaluate } from 'mathjs'; // a real parser, no eval",
+                    "app.get('/calc', (req, res) => {",
+                    "  const expr = z.string().max(100).parse(req.query.expr);",
+                    "  res.send(String(evaluate(expr)));",
+                    "});"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Related server-side injections",
+      "summary": "Prototype pollution and command injection follow the same pattern: untrusted data steering code.",
+      "body": [
+        {
+          "ul": [
+            "<b>Prototype pollution:</b> merging untrusted JSON like <code>{\"__proto__\": {\"isAdmin\": true}}</code> into objects changes every object in the process. Use <code>Object.create(null)</code>, <code>Map</code>, or schema-validated objects, and keep merge libraries updated.",
+            "<b>Command injection:</b> use <code>execFile</code> / <code>spawn</code> with an argument array instead of <code>exec</code> with a string.",
+            "<b>NoSQL injection:</b> validate types so <code>{ \"$gt\": \"\" }</code> can't arrive where a string was expected."
+          ]
+        },
+        {
+          "note": "Run Node with the least privilege it needs, and consider Node's permission model (<code>--permission</code>) to restrict file system and child process access.",
+          "kind": "dev"
+        }
+      ],
+      "viz": [
+        {
+          "type": "chips",
+          "items": [
+            {
+              "text": "eval",
+              "hot": true
+            },
+            {
+              "text": "new Function"
+            },
+            {
+              "text": "vm"
+            },
+            {
+              "text": "exec(string)"
+            },
+            {
+              "text": "__proto__"
+            },
+            {
+              "text": "$where"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,132 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "ssrf",
+  "name": "Server-side request forgery (SSRF)",
+  "slides": [
+    {
+      "title": "What SSRF is",
+      "summary": "The attacker makes your server fetch a URL of their choice, reaching systems only your server can see.",
+      "body": [
+        "Features like “import from URL”, link previews, webhooks and image proxies make the server fetch a URL the user supplies. In <b>SSRF</b>, the attacker points that URL inwards:",
+        {
+          "ul": [
+            "<code>http://169.254.169.254/</code>: the cloud metadata service, which can hand out credentials;",
+            "<code>http://localhost:6379</code>: internal databases and admin panels;",
+            "<code>http://10.0.0.5/admin</code>: services behind the firewall."
+          ]
+        },
+        "It matters to frontend engineers because SSR servers, BFFs and edge functions all fetch URLs, often from request data.",
+        "<mark>Your server is inside the network. An SSRF bug lets an outsider borrow that position.</mark>"
+      ],
+      "viz": [
+        {
+          "type": "stepper",
+          "accumulate": true,
+          "nextLabel": "Next step",
+          "steps": [
+            {
+              "item": {
+                "label": "<b>Link preview feature</b>",
+                "sub": "POST /preview { url }",
+                "tone": "muted",
+                "mono": true
+              },
+              "caption": "The app fetches a URL to show its title and image."
+            },
+            {
+              "item": {
+                "label": "<b>Attacker's URL</b>",
+                "sub": "http://169.254.169.254/latest/meta-data/iam/…",
+                "tone": "heat",
+                "mono": true
+              },
+              "caption": "They submit an internal address."
+            },
+            {
+              "item": {
+                "label": "<b>Server fetches it</b>",
+                "sub": "Request comes from inside the cloud network",
+                "tone": "neg"
+              },
+              "caption": "Firewalls don't stop requests from your own server."
+            },
+            {
+              "item": {
+                "label": "<b>Credentials leak</b>",
+                "sub": "Response shown back as the “preview”",
+                "tone": "neg"
+              },
+              "caption": "The attacker reads cloud keys."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Defending against SSRF",
+      "summary": "Allowlist destinations, resolve and check IPs, and block redirects to private ranges.",
+      "body": [
+        {
+          "ul": [
+            "<b>Allowlist</b> hosts when you can (e.g. only your image CDN).",
+            "<b>Parse the URL</b> and allow only <code>https:</code>.",
+            "<b>Resolve DNS and check the IP</b> isn't private, loopback or link-local, then connect to that IP, so DNS rebinding can't swap it.",
+            "<b>Re-check on every redirect</b>, or turn redirects off.",
+            "<b>Isolate the fetcher</b> in a network segment with no access to internal services, and require IMDSv2 on AWS."
+          ]
+        },
+        {
+          "note": "Blocking the string “localhost” isn't enough: <code>127.1</code>, <code>[::1]</code>, decimal IPs and DNS names that resolve to internal addresses all get around it.",
+          "kind": "warn"
+        }
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Range",
+              "cells": [
+                {
+                  "text": "Why block it"
+                }
+              ]
+            },
+            {
+              "head": "127.0.0.0/8, ::1",
+              "cells": [
+                {
+                  "text": "Loopback"
+                }
+              ]
+            },
+            {
+              "head": "10/8, 172.16/12, 192.168/16",
+              "cells": [
+                {
+                  "text": "Private networks"
+                }
+              ]
+            },
+            {
+              "head": "169.254.0.0/16",
+              "cells": [
+                {
+                  "text": "Link-local, cloud metadata"
+                }
+              ]
+            },
+            {
+              "head": "fc00::/7, fe80::/10",
+              "cells": [
+                {
+                  "text": "IPv6 private and link-local"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

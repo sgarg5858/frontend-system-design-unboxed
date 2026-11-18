@@ -1,0 +1,199 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "client-side-security",
+  "name": "Client-side security",
+  "slides": [
+    {
+      "title": "No secrets in the bundle",
+      "summary": "Anything shipped to the browser is public: API keys, internal URLs, feature flags and comments.",
+      "body": [
+        "Build tools inline environment variables into JavaScript. If a variable is in the bundle, it's public.",
+        {
+          "ul": [
+            "<b>Publishable keys only:</b> keys meant to be public (Stripe publishable key, a map key restricted by referrer) are fine.",
+            "<b>Secret keys stay on a server:</b> proxy calls through your backend, which adds the key.",
+            "<b>Source maps</b> expose your original code. Upload them to your error tracker instead of serving them publicly, if that matters to you.",
+            "<b>Hidden UI isn't access control:</b> hiding an admin button doesn't stop someone calling the admin API."
+          ]
+        },
+        "<mark>If the browser can read a value, so can the user and any script on the page.</mark>"
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Kind of value",
+              "cells": [
+                {
+                  "text": "OK in the frontend?"
+                }
+              ]
+            },
+            {
+              "head": "Publishable / restricted API key",
+              "cells": [
+                {
+                  "text": "Yes"
+                }
+              ]
+            },
+            {
+              "head": "OpenAI / AWS / database secret",
+              "cells": [
+                {
+                  "text": "No: proxy through a server"
+                }
+              ]
+            },
+            {
+              "head": "Feature flags",
+              "cells": [
+                {
+                  "text": "Yes, but assume users can flip them"
+                }
+              ]
+            },
+            {
+              "head": "Authorisation rules",
+              "cells": [
+                {
+                  "text": "Mirror them for UX; enforce on the server"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Where to keep auth tokens",
+      "summary": "localStorage is readable by any XSS. HttpOnly cookies aren't, but need CSRF protection.",
+      "body": [
+        "Every storage option is a trade-off between XSS and CSRF exposure.",
+        {
+          "ul": [
+            "<b>localStorage / sessionStorage:</b> easy, but any script on the page can read the token and send it anywhere.",
+            "<b>In memory:</b> gone on reload; still usable by XSS while the page is open, but not easily stolen for later.",
+            "<b>HttpOnly cookie:</b> JavaScript can't read it at all. The browser sends it automatically, so you must defend against CSRF."
+          ]
+        },
+        "<mark>Prefer HttpOnly, Secure, SameSite cookies for session tokens, and keep tokens short-lived.</mark>",
+        {
+          "more": "The backend-for-frontend (BFF) pattern",
+          "text": "A small server on your own origin does the OAuth flow, keeps the access and refresh tokens server-side, and gives the browser only an HttpOnly session cookie. Current OAuth guidance for browser apps recommends this as the most secure option."
+        }
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Storage",
+              "cells": [
+                {
+                  "text": "Stolen by XSS?"
+                },
+                {
+                  "text": "Sent by CSRF?"
+                }
+              ]
+            },
+            {
+              "head": "localStorage",
+              "cells": [
+                {
+                  "text": "Yes"
+                },
+                {
+                  "text": "No"
+                }
+              ]
+            },
+            {
+              "head": "Memory (JS variable)",
+              "cells": [
+                {
+                  "text": "Usable, harder to steal"
+                },
+                {
+                  "text": "No"
+                }
+              ]
+            },
+            {
+              "head": "HttpOnly cookie",
+              "cells": [
+                {
+                  "text": "No"
+                },
+                {
+                  "text": "Yes, unless SameSite / token"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "OAuth in single-page apps",
+      "summary": "Use the Authorization Code flow with PKCE. The implicit flow is deprecated.",
+      "body": [
+        "A browser app can't keep a client secret, so it uses <b>PKCE</b> (Proof Key for Code Exchange) to prove the app that started the login is the one finishing it.",
+        {
+          "ul": [
+            "Never use the old <b>implicit flow</b>, which put tokens in the URL.",
+            "Keep access tokens short-lived (minutes) and use <b>refresh token rotation</b>.",
+            "Validate the <code>state</code> parameter to stop login CSRF."
+          ]
+        }
+      ],
+      "viz": [
+        {
+          "type": "stepper",
+          "accumulate": true,
+          "nextLabel": "Next step",
+          "steps": [
+            {
+              "item": {
+                "label": "<b>Create verifier</b>",
+                "sub": "random code_verifier; code_challenge = SHA-256(verifier)",
+                "tone": "muted",
+                "mono": true
+              },
+              "caption": "The app makes a one-time secret and sends only its hash."
+            },
+            {
+              "item": {
+                "label": "<b>Redirect to login</b>",
+                "sub": "/authorize?code_challenge=…&state=…",
+                "tone": "accent",
+                "mono": true
+              },
+              "caption": "The user signs in on the identity provider."
+            },
+            {
+              "item": {
+                "label": "<b>Get a code</b>",
+                "sub": "/callback?code=abc&state=…",
+                "tone": "heat",
+                "mono": true
+              },
+              "caption": "A short-lived code comes back, not a token."
+            },
+            {
+              "item": {
+                "label": "<b>Exchange code + verifier</b>",
+                "sub": "POST /token { code, code_verifier }",
+                "tone": "pos",
+                "mono": true
+              },
+              "caption": "Only the app holding the verifier can turn the code into tokens."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

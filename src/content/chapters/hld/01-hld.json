@@ -1,0 +1,40 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "hld",
+  "name": "High-level design",
+  "slides": [
+    {
+      "title": "Coming soon: High Level Design",
+      "summary": "Designing whole frontend systems: requirements, architecture, data, APIs and optimizations. This section is on its way.",
+      "body": [
+        "Designing whole frontend systems: requirements, architecture, data, APIs and optimizations.",
+        {
+          "h": "What this section will cover"
+        },
+        {
+          "ul": [
+            "A framework: requirements → architecture → data → API → optimizations",
+            "Rendering and app architecture choices",
+            "Micro-frontends and monorepos",
+            "Case study: news feed",
+            "Case study: chat app",
+            "Case study: collaborative editor"
+          ]
+        }
+      ],
+      "viz": [
+        {
+          "type": "widget",
+          "name": "coming-soon",
+          "props": {
+            "num": "11",
+            "title": "High Level Design",
+            "orbit": ["Requirements", "Architecture", "Data model", "APIs", "News feed", "Chat"],
+            "status": ["Drafting the slides", "Drawing the diagrams", "Writing the examples"],
+            "progress": 0.05
+          }
+        }
+      ]
+    }
+  ]
+}

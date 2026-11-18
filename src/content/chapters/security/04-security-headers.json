@@ -1,0 +1,231 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "security-headers",
+  "name": "Security headers",
+  "slides": [
+    {
+      "title": "Headers: free defence from the server",
+      "summary": "A handful of HTTP response headers turn on browser protections with no change to your app code.",
+      "body": [
+        "Browsers ship many protections that are off by default for compatibility. Security headers switch them on for your site.",
+        "<mark>Set security headers once, at the CDN or server, so every response gets them, including error pages.</mark>",
+        {
+          "note": "Check a deployed site with your browser's DevTools (Network → response headers) or a public scanner such as securityheaders.com.",
+          "kind": "dev"
+        }
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Header",
+              "cells": [
+                {
+                  "text": "Protects against"
+                },
+                {
+                  "text": "Typical value"
+                }
+              ]
+            },
+            {
+              "head": "Content-Security-Policy",
+              "cells": [
+                {
+                  "text": "XSS, clickjacking, data exfiltration"
+                },
+                {
+                  "text": "see next slide"
+                }
+              ]
+            },
+            {
+              "head": "Strict-Transport-Security",
+              "cells": [
+                {
+                  "text": "Downgrade to HTTP"
+                },
+                {
+                  "text": "max-age=63072000; includeSubDomains; preload"
+                }
+              ]
+            },
+            {
+              "head": "X-Content-Type-Options",
+              "cells": [
+                {
+                  "text": "MIME sniffing"
+                },
+                {
+                  "text": "nosniff"
+                }
+              ]
+            },
+            {
+              "head": "Referrer-Policy",
+              "cells": [
+                {
+                  "text": "Leaking URLs to other sites"
+                },
+                {
+                  "text": "strict-origin-when-cross-origin"
+                }
+              ]
+            },
+            {
+              "head": "Permissions-Policy",
+              "cells": [
+                {
+                  "text": "Unwanted use of camera, mic, etc."
+                },
+                {
+                  "text": "camera=(), geolocation=()"
+                }
+              ]
+            },
+            {
+              "head": "Cross-Origin-Opener-Policy",
+              "cells": [
+                {
+                  "text": "Cross-window attacks, Spectre"
+                },
+                {
+                  "text": "same-origin"
+                }
+              ]
+            },
+            {
+              "head": "X-Frame-Options",
+              "cells": [
+                {
+                  "text": "Clickjacking (legacy)"
+                },
+                {
+                  "text": "DENY"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "caption",
+          "html": "<code>X-XSS-Protection</code> is obsolete. Omit it or set it to <code>0</code>."
+        }
+      ]
+    },
+    {
+      "title": "Content Security Policy (CSP)",
+      "summary": "CSP tells the browser which scripts, styles and connections are allowed, so injected code doesn't run.",
+      "body": [
+        "A <b>CSP</b> is an allowlist for what the page may load and run. Its biggest job is to stop XSS payloads from executing even if they get into the HTML.",
+        "Domain allowlists (<code>script-src cdn.example.com</code>) are easy to bypass through JSONP endpoints and open redirects on those domains. A <b>strict CSP</b> uses nonces or hashes instead:",
+        {
+          "ul": [
+            "the server generates a random <b>nonce</b> per response and puts it on each legitimate <code>&lt;script&gt;</code>;",
+            "<code>'strict-dynamic'</code> lets those trusted scripts load further scripts;",
+            "injected inline scripts and event handlers have no nonce, so they're blocked."
+          ]
+        },
+        "<mark>Start with Content-Security-Policy-Report-Only, collect violation reports, fix them, then enforce.</mark>"
+      ],
+      "code": [
+        "Content-Security-Policy:",
+        "  script-src 'nonce-r4nd0m' 'strict-dynamic';",
+        "  object-src 'none';",
+        "  base-uri 'none';",
+        "  frame-ancestors 'none';",
+        "  require-trusted-types-for 'script';",
+        "  report-to csp-endpoint"
+      ],
+      "viz": [
+        {
+          "type": "stepper",
+          "accumulate": true,
+          "nextLabel": "Next step",
+          "steps": [
+            {
+              "item": {
+                "label": "<b>Report-only</b>",
+                "sub": "Nothing breaks; violations are reported",
+                "tone": "muted"
+              },
+              "caption": "Deploy the policy in report-only mode first."
+            },
+            {
+              "item": {
+                "label": "<b>Fix violations</b>",
+                "sub": "Move inline handlers to code, add nonces",
+                "tone": "heat"
+              },
+              "caption": "Most reports point at inline scripts and onclick attributes."
+            },
+            {
+              "item": {
+                "label": "<b>Enforce</b>",
+                "sub": "Content-Security-Policy",
+                "tone": "pos"
+              },
+              "caption": "Switch to the enforcing header and keep reporting on."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "HSTS, nosniff, Referrer-Policy and COOP",
+      "summary": "The other headers each close one specific gap. Most are one line.",
+      "body": [
+        {
+          "ul": [
+            "<b>Strict-Transport-Security</b> makes the browser use HTTPS for your domain for <code>max-age</code> seconds, even if the user types <code>http://</code>.",
+            "<b>X-Content-Type-Options: nosniff</b> stops the browser guessing a file's type, so an uploaded “image” can't run as a script.",
+            "<b>Referrer-Policy</b> controls how much of the current URL is sent to other sites. URLs often contain IDs and tokens.",
+            "<b>Cross-Origin-Opener-Policy: same-origin</b> cuts the link between your window and pages that open it or that it opens."
+          ]
+        },
+        {
+          "more": "Cross-origin isolation (COOP + COEP)",
+          "text": "Adding <code>Cross-Origin-Embedder-Policy: require-corp</code> to COOP makes the page <b>cross-origin isolated</b>. That unlocks <code>SharedArrayBuffer</code> and precise timers, which are otherwise restricted because of Spectre-style attacks."
+        },
+        {
+          "more": "Where's Permissions-Policy?",
+          "text": "It has its own chapter.",
+          "goto": {
+            "chapter": "permissions-policy",
+            "slide": 1
+          },
+          "link": "Feature Policy | Permissions-Policy"
+        }
+      ],
+      "viz": [
+        {
+          "type": "chips",
+          "items": [
+            {
+              "text": "HSTS",
+              "sub": "HTTPS only",
+              "hot": true
+            },
+            {
+              "text": "nosniff",
+              "sub": "no type guessing"
+            },
+            {
+              "text": "Referrer-Policy",
+              "sub": "less URL leakage"
+            },
+            {
+              "text": "COOP",
+              "sub": "window isolation"
+            },
+            {
+              "text": "COEP",
+              "sub": "opt-in isolation"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+# CLAUDE.md
+
+**Frontend System Design, Unboxed** is an interactive course on frontend system design (security, networking, performance, caching, accessibility, offline support, low- and high-level design), built as an Angular 22 static site and deployed to GitHub Pages. Read [ARCHITECTURE.md](ARCHITECTURE.md) before making structural changes.
+
+## Commands
+
+```bash
+npm start                    # dev server, http://localhost:4200
+npm test -- --watch=false    # Vitest: schema-validates all content + renders every slide
+npm run build                # production build → dist/frontend-system-design-unboxed/browser
+npx prettier --write <files> # format (printWidth 100, single quotes)
+```
+
+Before calling a task done:
+
+1. `npm test -- --watch=false` passes.
+2. `npm run build` passes with no new budget warnings.
+3. For UI changes, the slide has been checked in the browser in **both light and dark** themes.
+
+## Golden rule
+
+**Content and layout go in JSON. Behaviour goes in code.**
+
+- **Text or slides:** edit `src/content/chapters/<section>/*.json` only. Use generic blocks (stages, chips, bars, table, stat, panel, tabs, stepper, caption, code).
+- **Widgets:** write one only when the interaction computes something. To add one:
+  1. Add the component to `src/app/widgets/<topic>.widgets.ts`.
+  2. Register it in `widgets/registry.ts` as a lazy loader: `'name': () => import('./topic.widgets').then((m) => m.MyWidget)`.
+  3. Add its name to the widget `enum` in `src/content/schema/chapter.schema.json`.
+- **Highlights:** wrap the points a reader must understand in `<mark>` (amber). Use `<mark class="info">` (light blue) for helpful context rather than a key point. It renders as an outlined block, so always wrap a complete sentence (never part of one, never a bold bullet label). Use them only for what's critical, at most 3 or 4 per slide, so they keep their meaning.
+- **Images:** draw the SVG in `src/content/figures/` using the shared class names and a `<!--theme-->` marker, run `npm run figures` to build the light/dark files in `public/images/`, then add a slide-level `figure` (one figure, or a list of them shown in order) (`src`, optional `darkSrc`, `alt`, `width`, `height`, `caption`) with files in `public/images/`. Paths have no leading slash (the base href varies). Provide a light and a dark variant; `SlideFigure` swaps them using `Theme.dark()`, so they follow the site toggle. Prefer SVG and write a real `alt`.
+- **Videos (Watch mode):** up to 3–4 per chapter, each covering a range of slides. Put the file in `src/content/videos/` (served at `videos/`) and add it to the chapter-level `videos` list: `src: "videos/<file>.mp4"`, `title`, optional `description` and `poster`, `slides: [first, last]` (1-based), `at: { "<slide>": seconds }` (where each covered slide's topic starts) and **`marks`** (`[{ at: seconds, label }]`, the timestamps). **Every video must have `marks`**, one per section, in the order they play, starting at 0. Watch mode shows the video for the current slide, its timestamps (clickable, and as ticks on the seek bar) and a playlist; each covered slide gets a "Watch this part" button that starts at its `at` time. The same file may be listed in more than one chapter. Chapters without videos show a "no video yet" page. See ARCHITECTURE.md §8.
+- **Cross-chapter links:** use `goto: { chapter: "<id>", slide: n }` and refer to the chapter by **name** in prose, never by number.
+- **New chapter:** add the JSON file with its `$schema` line, add an entry `{ id, name, load: () => json(import('./chapters/…json')) }` to a section in `src/content/course.ts` (id and name must match the JSON; a test checks), and update the chapter table in `README.md`. Never import chapter JSON statically in app code: it would pull every chapter back into the initial bundle.
+
+## Angular 22 conventions (follow strictly)
+
+Based on angular.dev's official best-practices guide (`/assets/context/best-practices.md`) and the zoneless guide, adapted to this repo.
+
+### Components
+
+- Standalone only. **Do not** write `standalone: true`; it has been the default since v20.
+- **Always set `changeDetection: ChangeDetectionStrategy.OnPush`.** Keep it explicit even though v22 changed the default, so intent is clear in every file; never use `ChangeDetectionStrategy.Eager`.
+- Use `input()`, `input.required()`, `output()` and `model()`. Never use `@Input`, `@Output` or `@HostBinding`/`@HostListener`. Put host bindings and listeners in the `host: {}` object.
+- Expose template-only members as `protected readonly`, and public inputs as `readonly`.
+- Use inline templates for small components and widgets. Use `templateUrl`/`styleUrl` once a template or stylesheet grows large (see `course-shell/`).
+- Use `[class.x]` and `[style.x]` bindings. Never use `ngClass`, `ngStyle` or `CommonModule`; import only what the template uses (for example `NgComponentOutlet`).
+- Keep each component small and single-purpose, and keep logic out of templates: move it into `computed()`.
+- Accessibility: meet WCAG AA and pass AXE checks.
+  - Interactive non-buttons need `role`, `tabindex` and keyboard handlers.
+  - Tabs use `role="tab"` and `aria-selected`.
+  - Every SVG diagram needs `role="img"` and an `aria-label`.
+
+### State: signals only (the app is zoneless)
+
+- There is no zone.js. The UI updates only when a template-read signal changes, an input is set, or a bound event fires. Plain mutable fields read by a template **will not re-render**.
+- Use `signal()` for local state, `computed()` for derived state, `linkedSignal()` for state that resets when an input changes, and `model()` for two-way binding.
+- Update with `.set()` or `.update()` and new objects or arrays. Never mutate a signal's value in place.
+- Use `effect()` only for syncing to the outside world (DOM attributes, `localStorage`); see `shared/theme/theme.ts`. Never use it to copy one signal into another; use `computed` or `linkedSignal` instead.
+- Bridge RxJS with `toSignal()` (see `course/course-nav.ts`). Never subscribe manually in components.
+- Don't use `NgZone.onStable`/`onMicrotaskEmpty`. Use `afterNextRender` or `afterEveryRender` for DOM work.
+
+### Templates
+
+- Use built-in control flow: `@if`, `@for` (always with `track`), `@switch` and `@let`. Never use `*ngIf` or `*ngFor`.
+- Prefer `@defer` for heavy widgets if the initial bundle nears the 500 kB budget.
+
+### Services and DI
+
+- Use `inject()`, never constructor-parameter injection.
+- Use `@Injectable({ providedIn: 'root' })` for singletons, each with one responsibility.
+- Swap data through `InjectionToken`s (for example `COURSE_CONTENT`, which tests override).
+
+### Navigation
+
+- The **URL is the only source of truth** for the current slide. Navigate through `CourseNav` (`goto`, `gotoSlide`, `step`). Never store "current slide" in a component.
+- Routing uses hash URLs (`#/chapterId/slide`, 1-based slide number) so GitHub Pages works without rewrites. The `:chapter/:slide` route's `chapterResolver` loads that chapter's JSON and widget code (via `ChapterStore`) before the shell renders, so `CourseNav.chapter()` is always loaded inside the shell. Other chapters prefetch in the background after the first render.
+
+### TypeScript
+
+- Strict mode and `strictTemplates` are on. Never use `any`; use `unknown` and narrow it. `$any` is allowed only for `$event.target` casts in templates.
+- Rely on inference when a type is obvious. Use the discriminated `Block` union in `content.model.ts` for content types.
+- Put pure logic (math, formatting, position) in plain functions under `shared/lib/` or `course/course-position.ts`, and unit-test it without TestBed.
+
+## Styling rules
+
+- **Global (`src/styles.css`) holds only:** design tokens (light and dark), reset, shared primitives (`.panel`, `.btn`, `.stage`, `.chip`, `.cap`, `.stat`, `.row`…), and rules for `[innerHTML]` content that Angular can't scope.
+- **Everything else** goes in the component's own styles. Component stylesheets have a budget of 4 kB (warning) and 8 kB (error).
+- **Never hard-code colours.** Use tokens.
+  - Text uses the `*-ink` tokens (`--accent-ink`, `--pos-ink`, `--neg-ink`, `--heat-ink`) or `--ink` and `--muted`.
+  - The bare `--accent`, `--pos`, etc. are for fills and strokes only.
+  - Map content tones with `toneColor()` from `blocks/tone.ts`.
+- **New tokens** must be defined in the light `:root` block **and** both dark blocks (`@media (prefers-color-scheme: dark) :root:not([data-theme=light])` and `[data-theme=dark]`).
+- **Theme switching:** the `Theme` service and the inline script in `index.html` share the `frontend-system-design-unboxed:theme` key. Keep them in sync.
+
+## Testing
+
+- Vitest runs through `ng test` (jsdom). Spec files sit next to their source as `*.spec.ts`.
+- `course.spec.ts` checks:
+  - every chapter against the JSON Schema;
+  - unique chapter ids;
+  - that every chapter belongs to exactly one section;
+  - that used widgets are registered;
+  - that the schema enum matches the registry.
+- `course-shell.spec.ts` renders every slide. Counts come from `COURSE`, so **don't hard-code chapter or slide counts**.
+- Zoneless TestBed: prefer `await fixture.whenStable()`. jsdom lacks some DOM APIs (`scrollIntoView`), so guard optional calls with `?.`.
+
+## Gotchas
+
+- JSON imports are widened, so `course.ts` casts them through `json()`. The tests, not the compiler, catch content mistakes. Specs load every chapter with top-level `await` before defining per-slide tests.
+- Prettier may reformat files after edits. Re-read a file before making exact-match edits.
+- `dist/` is build output. Never edit it.
+- The deploy workflow sets `--base-href` from the repo name. Don't hard-code `/frontend-system-design-unboxed/` anywhere in the source.
+- Prose and caption strings allow inline HTML (`<b>`, `<code>`, `<span class="k">`), which is rendered with `[innerHTML]`. Keep it to simple formatting tags.

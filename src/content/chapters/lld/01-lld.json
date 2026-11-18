@@ -1,0 +1,40 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "lld",
+  "name": "Low-level design",
+  "slides": [
+    {
+      "title": "Coming soon: Low Level Design",
+      "summary": "Designing individual components and modules: APIs, state and patterns, with classic interview problems. This section is on its way.",
+      "body": [
+        "Designing individual components and modules: APIs, state and patterns, with classic interview problems.",
+        {
+          "h": "What this section will cover"
+        },
+        {
+          "ul": [
+            "Component API design",
+            "State management patterns",
+            "Design patterns in the frontend",
+            "Module boundaries and data models",
+            "Case studies: autocomplete, carousel, infinite scroll",
+            "Case studies: modal, data table, file uploader"
+          ]
+        }
+      ],
+      "viz": [
+        {
+          "type": "widget",
+          "name": "coming-soon",
+          "props": {
+            "num": "10",
+            "title": "Low Level Design",
+            "orbit": ["Components", "State", "Patterns", "APIs", "Autocomplete", "Data table"],
+            "status": ["Drafting the slides", "Drawing the diagrams", "Writing the examples"],
+            "progress": 0.05
+          }
+        }
+      ]
+    }
+  ]
+}

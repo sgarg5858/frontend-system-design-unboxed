@@ -1,0 +1,73 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "sri",
+  "name": "Subresource Integrity (SRI)",
+  "slides": [
+    {
+      "title": "Pinning third-party files by hash",
+      "summary": "SRI lets the browser refuse a script or stylesheet whose contents don't match the hash you expected.",
+      "body": [
+        "When you load a script from a CDN, you trust whoever controls that CDN. If it's compromised, every site using it runs the attacker's code.",
+        "<b>Subresource Integrity</b> adds an <code>integrity</code> attribute with a cryptographic hash of the file. The browser downloads it, hashes it, and refuses to run it if the hash doesn't match.",
+        {
+          "ul": [
+            "Use <code>sha384</code> or <code>sha512</code>.",
+            "Add <code>crossorigin=\"anonymous\"</code>, so the browser can read a cross-origin response to check it.",
+            "Pin exact versions in the URL. A floating <code>@latest</code> URL changes, and the hash then blocks it."
+          ]
+        },
+        "<mark>SRI only works for files that never change. It suits versioned library builds, not analytics tags that update themselves.</mark>"
+      ],
+      "code": [
+        "<script",
+        "  src=\"https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js\"",
+        "  integrity=\"sha384-…base64 hash…\"",
+        "  crossorigin=\"anonymous\"></script>",
+        "",
+        "# generate a hash",
+        "curl -s URL | openssl dgst -sha384 -binary | openssl base64 -A"
+      ],
+      "viz": [
+        {
+          "type": "stepper",
+          "accumulate": true,
+          "nextLabel": "Next step",
+          "steps": [
+            {
+              "item": {
+                "label": "<b>Download</b>",
+                "sub": "lodash.min.js from the CDN",
+                "tone": "muted"
+              },
+              "caption": "The browser fetches the file as usual."
+            },
+            {
+              "item": {
+                "label": "<b>Hash</b>",
+                "sub": "sha384 of the bytes received",
+                "tone": "accent"
+              },
+              "caption": "It computes the hash itself."
+            },
+            {
+              "item": {
+                "label": "<b>Match → run</b>",
+                "sub": "Same as integrity attribute",
+                "tone": "pos"
+              },
+              "caption": "Unchanged files run normally."
+            },
+            {
+              "item": {
+                "label": "<b>Mismatch → block</b>",
+                "sub": "Network error, script never runs",
+                "tone": "neg"
+              },
+              "caption": "A tampered file is refused."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

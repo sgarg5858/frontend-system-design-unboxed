@@ -1,0 +1,40 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "accessibility",
+  "name": "Accessibility",
+  "slides": [
+    {
+      "title": "Coming soon: Accessibility",
+      "summary": "Building interfaces that everyone can use, with any input device or assistive technology. This section is on its way.",
+      "body": [
+        "Building interfaces that everyone can use, with any input device or assistive technology.",
+        {
+          "h": "What this section will cover"
+        },
+        {
+          "ul": [
+            "Semantic HTML first",
+            "Keyboard navigation and focus management",
+            "ARIA: when and how",
+            "Screen readers and live regions",
+            "Colour, contrast and motion",
+            "Testing with axe and real assistive tech"
+          ]
+        }
+      ],
+      "viz": [
+        {
+          "type": "widget",
+          "name": "coming-soon",
+          "props": {
+            "num": "08",
+            "title": "Accessibility",
+            "orbit": ["Semantics", "Keyboard", "Focus", "ARIA", "Contrast", "Screen readers"],
+            "status": ["Drafting the slides", "Drawing the diagrams", "Writing the examples"],
+            "progress": 0.05
+          }
+        }
+      ]
+    }
+  ]
+}

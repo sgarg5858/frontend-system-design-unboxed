@@ -1,0 +1,40 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "communication",
+  "name": "Real-time communication",
+  "slides": [
+    {
+      "title": "Coming soon: Communication",
+      "summary": "How a frontend talks to servers and to itself in real time: from polling to WebSockets, and between tabs and workers. This section is on its way.",
+      "body": [
+        "How a frontend talks to servers and to itself in real time: from polling to WebSockets, and between tabs and workers.",
+        {
+          "h": "What this section will cover"
+        },
+        {
+          "ul": [
+            "Short polling and long polling",
+            "Server-sent events (SSE)",
+            "WebSockets",
+            "WebTransport and WebRTC",
+            "postMessage, BroadcastChannel and workers",
+            "Choosing the right channel"
+          ]
+        }
+      ],
+      "viz": [
+        {
+          "type": "widget",
+          "name": "coming-soon",
+          "props": {
+            "num": "03",
+            "title": "Communication",
+            "orbit": ["Polling", "SSE", "WebSockets", "WebRTC", "Workers", "BroadcastChannel"],
+            "status": ["Drafting the slides", "Drawing the diagrams", "Writing the examples"],
+            "progress": 0.05
+          }
+        }
+      ]
+    }
+  ]
+}

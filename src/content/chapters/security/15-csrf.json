@@ -1,0 +1,143 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "csrf",
+  "name": "Cross-site request forgery (CSRF)",
+  "slides": [
+    {
+      "title": "How CSRF works",
+      "summary": "Another site makes the user's browser send a request to yours, and the browser attaches the user's cookies.",
+      "body": [
+        "Browsers attach cookies to requests based on where they're <i>going</i>, not where they came from. A malicious page can submit a form to your site, and the logged-in user's session cookie goes with it.",
+        "The attacker can't read the response (the same-origin policy stops that), but they don't need to: the damage is the action itself.",
+        "<mark>Any state-changing request authenticated only by cookies is a CSRF target.</mark>",
+        {
+          "note": "Using GET for actions (<code>/delete?id=5</code>) makes it worse: a simple <code>&lt;img&gt;</code> tag is enough to trigger it.",
+          "kind": "warn"
+        }
+      ],
+      "viz": [
+        {
+          "type": "stepper",
+          "accumulate": true,
+          "nextLabel": "Next step",
+          "steps": [
+            {
+              "item": {
+                "label": "<b>User is logged in</b>",
+                "sub": "bank.example sets session cookie",
+                "tone": "muted"
+              },
+              "caption": "A normal session in another tab."
+            },
+            {
+              "item": {
+                "label": "<b>Visits evil.example</b>",
+                "sub": "&lt;form action=\"https://bank.example/transfer\" method=\"POST\"&gt;",
+                "tone": "heat",
+                "mono": true
+              },
+              "caption": "The page contains a hidden form."
+            },
+            {
+              "item": {
+                "label": "<b>Form auto-submits</b>",
+                "sub": "Cookie: session=… is attached",
+                "tone": "neg"
+              },
+              "caption": "The browser sends the user's cookie along."
+            },
+            {
+              "item": {
+                "label": "<b>Bank sees a valid session</b>",
+                "sub": "Transfer done",
+                "tone": "neg"
+              },
+              "caption": "Nothing in the request tells the bank it was forged."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Defending against CSRF",
+      "summary": "SameSite cookies are the baseline; add tokens or origin checks for anything sensitive.",
+      "body": [
+        {
+          "ul": [
+            "<b>SameSite cookies:</b> <code>Lax</code> stops cookies on cross-site POSTs and subresource requests; <code>Strict</code> also drops them on cross-site links. Set it explicitly rather than relying on browser defaults.",
+            "<b>CSRF tokens:</b> a random value tied to the session, sent in a header or hidden field. A cross-site page can't read it, so it can't include it.",
+            "<b>Check <code>Origin</code> / <code>Sec-Fetch-Site</code>:</b> reject state-changing requests from other sites.",
+            "<b>Never change state on GET.</b>"
+          ]
+        },
+        "<mark>Combine SameSite cookies with tokens or origin checks: each covers gaps in the other.</mark>",
+        {
+          "more": "Angular's built-in support",
+          "text": "Angular's <code>HttpClient</code> reads an <code>XSRF-TOKEN</code> cookie and sends it back as an <code>X-XSRF-TOKEN</code> header on mutating requests to the same origin (the double-submit pattern). The server sets the cookie and checks they match."
+        }
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Defence",
+              "cells": [
+                {
+                  "text": "Stops"
+                },
+                {
+                  "text": "Watch out for"
+                }
+              ]
+            },
+            {
+              "head": "SameSite=Lax",
+              "cells": [
+                {
+                  "text": "Cross-site POST, iframes, fetch"
+                },
+                {
+                  "text": "Same-site subdomains can still attack"
+                }
+              ]
+            },
+            {
+              "head": "CSRF token",
+              "cells": [
+                {
+                  "text": "Any forged request"
+                },
+                {
+                  "text": "Must not leak via XSS or URLs"
+                }
+              ]
+            },
+            {
+              "head": "Origin / Sec-Fetch-Site check",
+              "cells": [
+                {
+                  "text": "Cross-site requests"
+                },
+                {
+                  "text": "Handle missing headers carefully"
+                }
+              ]
+            },
+            {
+              "head": "Re-authentication",
+              "cells": [
+                {
+                  "text": "High-value actions"
+                },
+                {
+                  "text": "Friction: use sparingly"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

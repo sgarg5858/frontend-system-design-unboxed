@@ -1,0 +1,128 @@
+<a class="skip" href="#slide-main" (click)="skipTo($event, 'slide-main')">Skip to slide</a>
+@if (sidebar.wide() && sidebar.open()) {
+  <a class="skip" href="#course-sidebar" (click)="skipTo($event, 'course-sidebar')"
+    >Skip to chapters</a
+  >
+}
+<div class="wrap" [class.nav-hidden]="!sidebar.open()">
+  <header class="top">
+    <!-- Narrow screens: no sidebar, so the same panel icon opens the contents drawer. -->
+    <button
+      type="button"
+      class="toc-btn"
+      aria-haspopup="dialog"
+      aria-label="Open contents"
+      title="Contents"
+      (click)="drawer.open()"
+    >
+      <svg
+        viewBox="0 0 20 20"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        aria-hidden="true"
+      >
+        <rect x="2.5" y="3.5" width="15" height="13" rx="2.5" />
+        <path d="M7.5 3.5v13" />
+        <path d="M11 8l2.2 2-2.2 2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+    <div class="brand">
+      <h1>Frontend, <span>Unboxed</span></h1>
+      <app-mode-switch />
+    </div>
+    <div class="tools">
+      <button
+        type="button"
+        class="searchbox"
+        aria-label="Search slides"
+        aria-haspopup="dialog"
+        aria-keyshortcuts="/ Control+K Meta+K"
+        (click)="palette.open()"
+      >
+        <span class="icon" aria-hidden="true">⌕</span>
+        <span class="ph" aria-hidden="true">Search slides…</span>
+        <span class="kbd" aria-hidden="true">/</span>
+      </button>
+      <app-theme-switch />
+    </div>
+  </header>
+
+  <app-section-tabs class="tabs" />
+
+  <app-contents-drawer #drawer />
+  <app-command-palette #palette />
+  <app-shortcuts-help #keys />
+
+  <div class="layout">
+    <aside
+      class="sidebar"
+      id="course-sidebar"
+      [class.rail]="!sidebar.open()"
+      tabindex="-1"
+      aria-label="Chapters in this section"
+    >
+      @if (sidebar.open()) {
+        <div class="side-top"><app-sidebar-toggle /></div>
+        <app-course-outline scope="section" />
+      } @else {
+        <app-sidebar-toggle />
+        <span class="rail-num" [title]="nav.chapter().name">{{ nav.chapterNumber() }}</span>
+      }
+    </aside>
+    <main class="main" id="slide-main" tabindex="-1">
+      <div class="chapter-bar">
+        <span class="num">{{ nav.chapterNumber() }}</span>
+        <span class="name">{{ nav.chapter().name }}</span>
+        <span class="of">
+          @if (nav.section().chapters.length > 1) {
+            {{ nav.section().name }} ·
+          }
+          @if (watching()) {
+            video
+          } @else {
+            slide {{ nav.position().slide + 1 }} of {{ nav.chapter().slides.length }}
+          }
+        </span>
+      </div>
+
+      <div #stage>
+        @if (watching()) {
+          <app-watch-view />
+        } @else {
+          <!-- track by slide identity so widget state resets when the slide changes -->
+          @for (s of [nav.slide()]; track s) {
+            <app-slide-view [content]="s" />
+          }
+        }
+      </div>
+
+      <p class="sr-only" aria-live="polite">{{ announcement() }}</p>
+
+      <nav
+        class="foot"
+        [attr.aria-label]="watching() ? 'Previous and next chapter' : 'Previous and next slide'"
+      >
+        <button
+          type="button"
+          class="btn"
+          [disabled]="isFirst()"
+          [attr.aria-keyshortcuts]="watching() ? null : 'ArrowLeft'"
+          (click)="move(-1)"
+        >
+          ← Back
+        </button>
+        <span class="cnt">{{ counter() }}</span>
+        <button
+          type="button"
+          class="btn next"
+          [attr.aria-label]="nextAria()"
+          [attr.aria-keyshortcuts]="watching() ? null : 'ArrowRight'"
+          (click)="move(1)"
+        >
+          {{ nextText() }}
+        </button>
+      </nav>
+    </main>
+  </div>
+</div>

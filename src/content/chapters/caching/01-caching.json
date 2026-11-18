@@ -1,0 +1,40 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "caching",
+  "name": "Client storage & caching",
+  "slides": [
+    {
+      "title": "Coming soon: Database & Caching",
+      "summary": "Where frontend data lives and how to cache it without serving stale results. This section is on its way.",
+      "body": [
+        "Where frontend data lives and how to cache it without serving stale results.",
+        {
+          "h": "What this section will cover"
+        },
+        {
+          "ul": [
+            "HTTP caching: Cache-Control and ETags",
+            "CDN and edge caching",
+            "Service worker caches",
+            "In-memory caches and stale-while-revalidate",
+            "localStorage, IndexedDB and OPFS",
+            "Normalized client stores and cache invalidation"
+          ]
+        }
+      ],
+      "viz": [
+        {
+          "type": "widget",
+          "name": "coming-soon",
+          "props": {
+            "num": "06",
+            "title": "Database & Caching",
+            "orbit": ["Cache-Control", "ETag", "SWR", "IndexedDB", "CDN", "Invalidation"],
+            "status": ["Drafting the slides", "Drawing the diagrams", "Writing the examples"],
+            "progress": 0.05
+          }
+        }
+      ]
+    }
+  ]
+}

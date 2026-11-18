@@ -1,0 +1,97 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "https",
+  "name": "Secure communication (HTTPS)",
+  "slides": [
+    {
+      "title": "What HTTPS gives you",
+      "summary": "TLS encrypts traffic, proves the server's identity and detects tampering.",
+      "body": [
+        "<b>HTTPS</b> is HTTP over <b>TLS</b>. It gives three guarantees between the browser and the server:",
+        {
+          "ul": [
+            "<b>Confidentiality:</b> nobody on the network (café Wi-Fi, ISP) can read the traffic.",
+            "<b>Integrity:</b> nobody can change it in flight, e.g. inject ads or scripts.",
+            "<b>Authentication:</b> the certificate proves you're talking to the real domain."
+          ]
+        },
+        "<mark>Many modern browser features (service workers, geolocation, camera, HTTP/2 in practice) only work on secure origins.</mark>",
+        {
+          "note": "TLS 1.3 needs only one round trip to set up a new connection, and session resumption can make repeat visits faster still.",
+          "kind": "dev"
+        }
+      ],
+      "viz": [
+        {
+          "type": "stepper",
+          "accumulate": true,
+          "nextLabel": "Next step",
+          "steps": [
+            {
+              "item": {
+                "label": "<b>ClientHello</b>",
+                "sub": "Supported ciphers + key share",
+                "tone": "muted"
+              },
+              "caption": "The browser starts the handshake."
+            },
+            {
+              "item": {
+                "label": "<b>ServerHello + certificate</b>",
+                "sub": "Key share, cert chain, signature",
+                "tone": "accent"
+              },
+              "caption": "The server proves who it is."
+            },
+            {
+              "item": {
+                "label": "<b>Verify</b>",
+                "sub": "Chain to a trusted CA, name matches, not expired",
+                "tone": "heat"
+              },
+              "caption": "The browser checks the certificate."
+            },
+            {
+              "item": {
+                "label": "<b>Encrypted HTTP</b>",
+                "sub": "Shared keys protect every request",
+                "tone": "pos"
+              },
+              "caption": "From here on, all traffic is encrypted."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Getting HTTPS right",
+      "summary": "Redirect to HTTPS, add HSTS, avoid mixed content and keep cookies Secure.",
+      "body": [
+        {
+          "ul": [
+            "<b>Redirect</b> every <code>http://</code> request to <code>https://</code>.",
+            "<b>HSTS</b> tells browsers never to try HTTP again; add the domain to the preload list to protect the very first visit.",
+            "<b>No mixed content:</b> an HTTPS page loading <code>http://</code> scripts undoes the protection. Browsers block or auto-upgrade most of it.",
+            "<b>Secure cookies:</b> mark them <code>Secure</code> so they're never sent over HTTP.",
+            "<b>Automate certificates</b> (e.g. Let's Encrypt / ACME) so they never expire unnoticed."
+          ]
+        },
+        "<mark>Without HSTS, the first plain-HTTP request can be intercepted and the user kept on a fake HTTP version of your site.</mark>"
+      ],
+      "viz": [
+        {
+          "type": "code",
+          "title": "Response headers",
+          "source": [
+            "Strict-Transport-Security: max-age=63072000; includeSubDomains; preload",
+            "Set-Cookie: session=…; Secure; HttpOnly; SameSite=Lax"
+          ]
+        },
+        {
+          "type": "caption",
+          "html": "<code>upgrade-insecure-requests</code> in your CSP rewrites leftover http:// subresource URLs to https://."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,145 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "compliance",
+  "name": "Compliance & regulation",
+  "slides": [
+    {
+      "title": "Laws that shape frontend code",
+      "summary": "Privacy, accessibility and payment rules all have concrete requirements for the UI.",
+      "body": [
+        "Compliance isn't only a legal team's job. Many requirements land directly in frontend code: what you store, what you track, and how you ask for consent.",
+        "<mark>Collect the least personal data you need, and don't load trackers before the user agrees.</mark>",
+        {
+          "note": "This is an engineering overview, not legal advice. Check what applies to your product and users with your legal team.",
+          "kind": "warn"
+        }
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Rule",
+              "cells": [
+                {
+                  "text": "Where"
+                },
+                {
+                  "text": "Frontend impact"
+                }
+              ]
+            },
+            {
+              "head": "GDPR / UK GDPR",
+              "cells": [
+                {
+                  "text": "EU / UK"
+                },
+                {
+                  "text": "Consent, data minimisation, right to delete and export"
+                }
+              ]
+            },
+            {
+              "head": "ePrivacy (cookie rules)",
+              "cells": [
+                {
+                  "text": "EU"
+                },
+                {
+                  "text": "Ask before non-essential cookies and trackers"
+                }
+              ]
+            },
+            {
+              "head": "CCPA / CPRA",
+              "cells": [
+                {
+                  "text": "California"
+                },
+                {
+                  "text": "“Do not sell or share” link, honour Global Privacy Control"
+                }
+              ]
+            },
+            {
+              "head": "PCI DSS",
+              "cells": [
+                {
+                  "text": "Card payments"
+                },
+                {
+                  "text": "Use hosted payment fields; control scripts on payment pages"
+                }
+              ]
+            },
+            {
+              "head": "HIPAA",
+              "cells": [
+                {
+                  "text": "US health data"
+                },
+                {
+                  "text": "No PHI in URLs, logs or analytics"
+                }
+              ]
+            },
+            {
+              "head": "WCAG / EAA / ADA",
+              "cells": [
+                {
+                  "text": "Accessibility"
+                },
+                {
+                  "text": "Accessible UI is a legal requirement in many markets"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Privacy by design in the UI",
+      "summary": "Consent before tracking, no personal data in URLs or logs, and clear controls for users.",
+      "body": [
+        {
+          "ul": [
+            "<b>Consent first:</b> load analytics and ad scripts only after opt-in where required, and make “reject” as easy as “accept”.",
+            "<b>Keep PII out of URLs:</b> URLs end up in logs, analytics and <code>Referer</code> headers.",
+            "<b>Scrub logs and error reports:</b> mask emails, tokens and form values before they leave the browser.",
+            "<b>Short retention</b> for anything you keep client-side; clear it on logout.",
+            "<b>Payment pages:</b> PCI DSS 4.0 asks you to inventory and justify every script on them and detect unauthorised changes, which CSP and SRI help with."
+          ]
+        }
+      ],
+      "viz": [
+        {
+          "type": "stages",
+          "items": [
+            {
+              "label": "<b>Collect less</b>",
+              "sub": "Only fields you really need",
+              "tone": "pos"
+            },
+            {
+              "label": "<b>Ask first</b>",
+              "sub": "Consent before trackers",
+              "tone": "accent"
+            },
+            {
+              "label": "<b>Leak less</b>",
+              "sub": "No PII in URLs, logs or analytics",
+              "tone": "heat"
+            },
+            {
+              "label": "<b>Let users control it</b>",
+              "sub": "Export, delete, opt out",
+              "tone": "pos"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

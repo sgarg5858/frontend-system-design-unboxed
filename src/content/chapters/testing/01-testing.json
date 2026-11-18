@@ -1,0 +1,40 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "testing",
+  "name": "Testing strategy",
+  "slides": [
+    {
+      "title": "Coming soon: Testing",
+      "summary": "What to test in a large frontend, at which level, and how to keep tests fast and trustworthy. This section is on its way.",
+      "body": [
+        "What to test in a large frontend, at which level, and how to keep tests fast and trustworthy.",
+        {
+          "h": "What this section will cover"
+        },
+        {
+          "ul": [
+            "The test pyramid and trophy",
+            "Unit and component tests",
+            "Integration tests with mocked networks",
+            "End-to-end tests with Playwright",
+            "Visual regression and accessibility tests",
+            "Contract tests and flaky-test hygiene"
+          ]
+        }
+      ],
+      "viz": [
+        {
+          "type": "widget",
+          "name": "coming-soon",
+          "props": {
+            "num": "04",
+            "title": "Testing",
+            "orbit": ["Unit", "Component", "Integration", "E2E", "Visual", "Contracts"],
+            "status": ["Drafting the slides", "Drawing the diagrams", "Writing the examples"],
+            "progress": 0.05
+          }
+        }
+      ]
+    }
+  ]
+}

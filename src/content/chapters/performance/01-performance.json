@@ -1,0 +1,40 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "performance",
+  "name": "Web performance",
+  "slides": [
+    {
+      "title": "Coming soon: Performance",
+      "summary": "How to measure and improve load speed, responsiveness and visual stability. This section is on its way.",
+      "body": [
+        "How to measure and improve load speed, responsiveness and visual stability.",
+        {
+          "h": "What this section will cover"
+        },
+        {
+          "ul": [
+            "Core Web Vitals: LCP, INP and CLS",
+            "The critical rendering path",
+            "Code splitting and lazy loading",
+            "Images, fonts and preloading",
+            "Rendering strategies: CSR, SSR, SSG, streaming",
+            "Long tasks, virtualization and the main thread"
+          ]
+        }
+      ],
+      "viz": [
+        {
+          "type": "widget",
+          "name": "coming-soon",
+          "props": {
+            "num": "05",
+            "title": "Performance",
+            "orbit": ["LCP", "INP", "CLS", "Bundles", "SSR", "Hydration"],
+            "status": ["Drafting the slides", "Drawing the diagrams", "Writing the examples"],
+            "progress": 0.05
+          }
+        }
+      ]
+    }
+  ]
+}

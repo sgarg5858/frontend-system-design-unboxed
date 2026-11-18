@@ -1,0 +1,79 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "permissions-policy",
+  "name": "Feature Policy | Permissions-Policy",
+  "slides": [
+    {
+      "title": "Turning browser features off",
+      "summary": "Permissions-Policy declares which powerful features your page and its iframes may use.",
+      "body": [
+        "<b>Permissions-Policy</b> (formerly <b>Feature-Policy</b>) is a response header that enables or disables browser features such as the camera, microphone, geolocation, payment and fullscreen, for your page and for each iframe.",
+        {
+          "ul": [
+            "<b>Least privilege:</b> if your app never uses the camera, turn it off. An XSS payload or a third-party script then can't ask for it.",
+            "<b>Control embeds:</b> a feature disabled for your page is disabled for every iframe inside it too.",
+            "<b>Per-frame grants:</b> the iframe <code>allow</code> attribute delegates a feature to one specific frame."
+          ]
+        },
+        "<mark>Disable every powerful feature you don't use, and delegate the rest only to the frames that need them.</mark>",
+        {
+          "more": "Feature-Policy vs Permissions-Policy",
+          "text": "Feature-Policy was the original name with a different syntax (<code>camera 'none'</code>). It was renamed to Permissions-Policy with structured-header syntax (<code>camera=()</code>). Use the new header; the old one is legacy."
+        }
+      ],
+      "code": [
+        "Permissions-Policy: camera=(), microphone=(), geolocation=(self),",
+        "  payment=(self \"https://pay.example\"), fullscreen=(self)",
+        "",
+        "<iframe src=\"https://pay.example/checkout\" allow=\"payment\"></iframe>"
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Value",
+              "cells": [
+                {
+                  "text": "Meaning"
+                }
+              ]
+            },
+            {
+              "head": "camera=()",
+              "cells": [
+                {
+                  "text": "Nobody, not even your page"
+                }
+              ]
+            },
+            {
+              "head": "geolocation=(self)",
+              "cells": [
+                {
+                  "text": "Your origin only"
+                }
+              ]
+            },
+            {
+              "head": "payment=(self \"https://pay.example\")",
+              "cells": [
+                {
+                  "text": "You and that origin"
+                }
+              ]
+            },
+            {
+              "head": "fullscreen=*",
+              "cells": [
+                {
+                  "text": "Any origin (avoid)"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

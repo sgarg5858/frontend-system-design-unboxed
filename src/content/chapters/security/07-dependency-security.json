@@ -1,0 +1,96 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "dependency-security",
+  "name": "Dependency security",
+  "slides": [
+    {
+      "title": "Your app is mostly other people's code",
+      "summary": "A typical frontend pulls in hundreds of packages. Any one of them can be vulnerable or malicious.",
+      "body": [
+        "Most of the code in a modern bundle comes from <code>node_modules</code>. Attacks on that supply chain take a few forms:",
+        {
+          "ul": [
+            "<b>Known vulnerabilities</b> in an old version of a library.",
+            "<b>Compromised maintainers:</b> a stolen npm token publishes a malicious version of a popular package.",
+            "<b>Typosquatting:</b> <code>reqeusts</code> instead of <code>requests</code>.",
+            "<b>Install scripts</b> that run code on developer and CI machines during <code>npm install</code>."
+          ]
+        },
+        "<mark>Every dependency is code you ship with full access to your page. Add them as deliberately as you'd add your own code.</mark>"
+      ],
+      "viz": [
+        {
+          "type": "stages",
+          "items": [
+            {
+              "label": "<b>your-app</b>",
+              "sub": "12 direct dependencies",
+              "tone": "accent"
+            },
+            {
+              "label": "<b>transitive dependencies</b>",
+              "sub": "often 500–1,500 packages",
+              "tone": "heat"
+            },
+            {
+              "label": "<b>one compromised package</b>",
+              "sub": "runs in your users' browsers or your CI",
+              "tone": "neg"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Keeping dependencies safe",
+      "summary": "Lock versions, audit continuously, update in small steps and limit what installs can do.",
+      "body": [
+        {
+          "ul": [
+            "<b>Commit the lockfile</b> and install with <code>npm ci</code> in CI, so builds use exactly the reviewed versions.",
+            "<b>Audit:</b> <code>npm audit</code>, Dependabot or Renovate flag known vulnerabilities and open update PRs.",
+            "<b>Update often, in small steps</b>, so a fix is never stuck behind a painful major upgrade.",
+            "<b>Review new packages:</b> maintenance, downloads, number of maintainers, install scripts, size.",
+            "<b>Limit install scripts</b> (<code>--ignore-scripts</code> where possible) and use a delay before adopting brand-new releases."
+          ]
+        },
+        {
+          "note": "npm audit reports a lot of noise from dev-only tools. Triage by whether the vulnerable code actually ships to users or runs in CI.",
+          "kind": "dev"
+        }
+      ],
+      "code": [
+        "npm ci                   # exact lockfile versions",
+        "npm audit --omit=dev     # what ships to users",
+        "npm outdated             # what's behind",
+        "npx npm-check-updates    # plan upgrades"
+      ],
+      "viz": [
+        {
+          "type": "chips",
+          "items": [
+            {
+              "text": "lockfile",
+              "hot": true
+            },
+            {
+              "text": "npm ci"
+            },
+            {
+              "text": "Dependabot / Renovate"
+            },
+            {
+              "text": "npm audit"
+            },
+            {
+              "text": "SRI for CDN scripts"
+            },
+            {
+              "text": "provenance"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

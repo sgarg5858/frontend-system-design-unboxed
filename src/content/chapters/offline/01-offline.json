@@ -1,0 +1,40 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "offline",
+  "name": "Offline support",
+  "slides": [
+    {
+      "title": "Coming soon: Offline Support",
+      "summary": "Making web apps work on flaky networks or none at all. This section is on its way.",
+      "body": [
+        "Making web apps work on flaky networks or none at all.",
+        {
+          "h": "What this section will cover"
+        },
+        {
+          "ul": [
+            "Service worker lifecycle",
+            "Caching strategies: cache-first, network-first, SWR",
+            "Progressive web apps and the manifest",
+            "Storing data offline with IndexedDB",
+            "Background sync and queued writes",
+            "Conflict resolution and optimistic UI"
+          ]
+        }
+      ],
+      "viz": [
+        {
+          "type": "widget",
+          "name": "coming-soon",
+          "props": {
+            "num": "09",
+            "title": "Offline Support",
+            "orbit": ["Service workers", "PWA", "IndexedDB", "Sync", "Conflicts", "Optimistic UI"],
+            "status": ["Drafting the slides", "Drawing the diagrams", "Writing the examples"],
+            "progress": 0.05
+          }
+        }
+      ]
+    }
+  ]
+}

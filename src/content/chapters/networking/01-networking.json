@@ -1,0 +1,40 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "networking",
+  "name": "Networking for frontend engineers",
+  "slides": [
+    {
+      "title": "Coming soon: Networking",
+      "summary": "How requests travel from the browser to your servers and back, and how to make that fast and reliable. This section is on its way.",
+      "body": [
+        "How requests travel from the browser to your servers and back, and how to make that fast and reliable.",
+        {
+          "h": "What this section will cover"
+        },
+        {
+          "ul": [
+            "DNS, TCP and TLS: the cost of a connection",
+            "HTTP/1.1 vs HTTP/2 vs HTTP/3",
+            "REST, GraphQL and gRPC-web",
+            "CDNs and edge networks",
+            "Retries, timeouts and backoff",
+            "Request deduplication and batching"
+          ]
+        }
+      ],
+      "viz": [
+        {
+          "type": "widget",
+          "name": "coming-soon",
+          "props": {
+            "num": "02",
+            "title": "Networking",
+            "orbit": ["HTTP/3", "DNS", "CDN", "REST", "GraphQL", "Retries"],
+            "status": ["Drafting the slides", "Drawing the diagrams", "Writing the examples"],
+            "progress": 0.05
+          }
+        }
+      ]
+    }
+  ]
+}

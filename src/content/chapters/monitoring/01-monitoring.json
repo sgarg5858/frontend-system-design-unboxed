@@ -1,0 +1,40 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "monitoring",
+  "name": "Logging & monitoring",
+  "slides": [
+    {
+      "title": "Coming soon: Logging & Monitoring",
+      "summary": "How to see what happens in real users' browsers: errors, performance and behaviour. This section is on its way.",
+      "body": [
+        "How to see what happens in real users' browsers: errors, performance and behaviour.",
+        {
+          "h": "What this section will cover"
+        },
+        {
+          "ul": [
+            "Error tracking and source maps",
+            "Real user monitoring (RUM)",
+            "Structured client logs",
+            "Distributed tracing with OpenTelemetry",
+            "Dashboards and alerting",
+            "Privacy and sampling"
+          ]
+        }
+      ],
+      "viz": [
+        {
+          "type": "widget",
+          "name": "coming-soon",
+          "props": {
+            "num": "07",
+            "title": "Logging & Monitoring",
+            "orbit": ["Errors", "RUM", "Source maps", "Tracing", "Alerts", "Sampling"],
+            "status": ["Drafting the slides", "Drawing the diagrams", "Writing the examples"],
+            "progress": 0.05
+          }
+        }
+      ]
+    }
+  ]
+}

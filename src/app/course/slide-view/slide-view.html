@@ -1,0 +1,80 @@
+@let slide = content();
+@let tops = topFigures();
+<ng-template #head>
+  <h2 tabindex="-1">{{ slide.title }}</h2>
+  @if (watchHere(); as w) {
+    <button type="button" class="watch-part" (click)="mode.watchAt(w.start)">
+      <span class="play" aria-hidden="true">▶</span> Watch this part
+      <span class="meta">{{ w.title }} · {{ w.slides }}</span>
+    </button>
+  }
+  @if (slide.summary) {
+    <p class="lead" [innerHTML]="slide.summary"></p>
+  }
+</ng-template>
+<article class="slide" [class.solo]="!slide.viz?.length">
+  @if (tops.length) {
+    <!-- A top figure spans both columns, so the title moves above it. -->
+    <header class="wide prose">
+      <ng-container [ngTemplateOutlet]="head" />
+    </header>
+    @for (f of tops; track f.src) {
+      <app-slide-figure class="wide" [figure]="f" />
+    }
+  }
+  <div class="prose">
+    @if (!tops.length) {
+      <ng-container [ngTemplateOutlet]="head" />
+    }
+    @for (p of slide.body; track $index) {
+      @switch (kindOf(p)) {
+        @case ('ul') {
+          <ul>
+            @for (li of $any(p).ul; track $index) {
+              <li [innerHTML]="li"></li>
+            }
+          </ul>
+        }
+        @case ('h') {
+          <h3>{{ $any(p).h }}</h3>
+        }
+        @case ('more') {
+          <details class="more">
+            <summary [innerHTML]="$any(p).more"></summary>
+            @for (para of paragraphsOf(p); track $index) {
+              <p [innerHTML]="para"></p>
+            }
+            @if ($any(p).goto; as g) {
+              <button type="button" class="more-link" (click)="go(g)">
+                {{ $any(p).link ?? 'Read more' }} →
+              </button>
+            }
+          </details>
+        }
+        @case ('note') {
+          <aside class="note" [attr.data-kind]="$any(p).kind">
+            <span class="note-label">{{ noteLabelOf(p) }}</span>
+            <span [innerHTML]="$any(p).note"></span>
+          </aside>
+        }
+        @default {
+          <p [innerHTML]="p"></p>
+        }
+      }
+    }
+    @if (slide.code) {
+      <app-code-block [source]="slide.code.join('\n')" />
+    }
+  </div>
+  @if (slide.viz?.length) {
+    <div class="viz">
+      <!-- track by slide identity so widget state resets when the slide changes -->
+      @for (v of [slide]; track v) {
+        <app-blocks [blocks]="v.viz!" />
+      }
+    </div>
+  }
+  @for (f of bottomFigures(); track f.src) {
+    <app-slide-figure class="wide" [figure]="f" />
+  }
+</article>

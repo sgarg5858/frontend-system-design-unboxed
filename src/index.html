@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Frontend System Design, Unboxed</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="An interactive guide to frontend system design: security, networking, performance, caching, accessibility, offline support and how to design large web apps."
+    />
+    <script>
+      // Apply a saved theme choice before first paint (same key as shared/theme/theme.ts).
+      try {
+        var t = localStorage.getItem('frontend-system-design-unboxed:theme');
+        if (t === 'light' || t === 'dark' || t === 'glass')
+          document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    </script>
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+  </head>
+  <body>
+    <app-root></app-root>
+  </body>
+</html>

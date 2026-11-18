@@ -1,0 +1,132 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "input-validation",
+  "name": "Input validation and sanitization",
+  "slides": [
+    {
+      "title": "Validate on the way in, encode on the way out",
+      "summary": "Validation rejects bad data; sanitization cleans it; encoding makes it safe for where it's displayed.",
+      "body": [
+        "Three different jobs that are often confused:",
+        {
+          "ul": [
+            "<b>Validation</b> checks input matches what you expect (type, length, format, range) and rejects it otherwise.",
+            "<b>Sanitization</b> removes or rewrites dangerous parts, e.g. stripping <code>&lt;script&gt;</code> from rich text.",
+            "<b>Encoding</b> converts data so it's inert in its output context: HTML, URL, SQL parameter."
+          ]
+        },
+        "<mark>Frontend validation is for user experience. The server must validate again, because attackers skip your UI.</mark>",
+        {
+          "note": "Prefer allowlists (what's permitted) over blocklists (what's forbidden). Attackers are better at finding things you forgot to block.",
+          "kind": "key"
+        }
+      ],
+      "viz": [
+        {
+          "type": "stages",
+          "items": [
+            {
+              "label": "<b>Browser</b>",
+              "sub": "Validate for fast feedback",
+              "tone": "muted"
+            },
+            {
+              "label": "<b>API</b>",
+              "sub": "Validate again with a schema (authoritative)",
+              "tone": "accent"
+            },
+            {
+              "label": "<b>Storage</b>",
+              "sub": "Parameterised queries, never string-built",
+              "tone": "heat"
+            },
+            {
+              "label": "<b>Output</b>",
+              "sub": "Encode for the context it's shown in",
+              "tone": "pos"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Validating in practice",
+      "summary": "Use one schema for both client and server, and validate everything that crosses a trust boundary.",
+      "body": [
+        {
+          "ul": [
+            "<b>Share a schema</b> (Zod, Valibot, JSON Schema) between frontend and backend so rules don't drift.",
+            "<b>Validate all inputs</b>, not just form fields: URL parameters, <code>postMessage</code> data, <code>localStorage</code>, and API responses.",
+            "<b>Constrain URLs</b> by parsing them with <code>new URL()</code> and checking the protocol and host.",
+            "<b>Limit sizes</b> of text and files, and check file types by content on the server, not by extension."
+          ]
+        }
+      ],
+      "code": [
+        "const Signup = z.object({",
+        "  email: z.string().email().max(254),",
+        "  name: z.string().trim().min(1).max(80),",
+        "  website: z.string().url()",
+        "    .refine((u) => ['https:', 'http:'].includes(new URL(u).protocol)),",
+        "});",
+        "",
+        "const result = Signup.safeParse(formValue);"
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Input source",
+              "cells": [
+                {
+                  "text": "Trust it?"
+                }
+              ]
+            },
+            {
+              "head": "Form fields",
+              "cells": [
+                {
+                  "text": "No"
+                }
+              ]
+            },
+            {
+              "head": "URL query and hash",
+              "cells": [
+                {
+                  "text": "No"
+                }
+              ]
+            },
+            {
+              "head": "postMessage data",
+              "cells": [
+                {
+                  "text": "No, and check event.origin"
+                }
+              ]
+            },
+            {
+              "head": "localStorage",
+              "cells": [
+                {
+                  "text": "No: XSS or users can change it"
+                }
+              ]
+            },
+            {
+              "head": "Your own API responses",
+              "cells": [
+                {
+                  "text": "Mostly, but still validate shape"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

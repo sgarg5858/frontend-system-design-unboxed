@@ -1,0 +1,236 @@
+/* Styles owned by the course page: header, rails, slide layout, prose, callouts, footer.
+   Shared primitives (.panel, .btn, .stage …) and rules for injected HTML live in src/styles.css. */
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 48px;
+}
+.chapter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin-bottom: 4px;
+}
+.chapter-bar .num,
+.chapter-bar .of {
+  font-family: var(--f-mono);
+  font-size: 12.5px;
+  color: var(--accent-ink);
+}
+.chapter-bar .name {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 18px;
+}
+.chapter-bar .of {
+  color: var(--muted);
+}
+.sidebar {
+  display: none;
+}
+@media (min-width: 1360px) {
+  .wrap {
+    max-width: 1500px;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+  .sidebar {
+    display: block;
+    position: sticky;
+    top: 16px;
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    padding: var(--rail-pad) calc(var(--rail-pad) + 4px) var(--rail-pad) var(--rail-pad);
+    background: var(--rail-bg);
+    backdrop-filter: var(--glass-fx);
+    -webkit-backdrop-filter: var(--glass-fx);
+    border: var(--rail-border);
+    border-radius: var(--glass-radius);
+    box-shadow: var(--rail-shadow);
+  }
+  /* The open sidebar already shows the chapter and slide, so don't repeat them above the slide. */
+  .wrap:not(.nav-hidden) .chapter-bar {
+    display: none;
+  }
+  /* Hidden: the sidebar shrinks to a slim rail with a button to bring it back. */
+  .nav-hidden .layout {
+    grid-template-columns: 52px minmax(0, 1fr);
+  }
+  .sidebar.rail {
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    overflow: visible;
+  }
+  .rail-num {
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    color: var(--accent-ink);
+  }
+  .side-top {
+    display: flex;
+    justify-content: flex-end;
+    margin: -4px -4px 0 0;
+  }
+}
+/* Contents button | title with the Read/Watch switch | search and theme. */
+header.top {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 14px;
+  margin-bottom: 18px;
+}
+.brand {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  min-width: 0;
+}
+h1 {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: clamp(28px, 4vw, 40px);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 0;
+  text-wrap: balance;
+}
+h1 span {
+  color: var(--accent);
+}
+/* Same look as the sidebar's panel toggle on wide screens. */
+.toc-btn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+}
+.toc-btn:hover {
+  color: var(--ink);
+}
+.toc-btn:focus-visible {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 2px;
+}
+.toc-btn svg {
+  width: 20px;
+  height: 20px;
+}
+@media (max-width: 600px) {
+  header.top {
+    gap: 8px;
+  }
+  h1 {
+    font-size: 24px;
+    white-space: nowrap;
+  }
+  .brand {
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+  .toc-btn {
+    width: 44px;
+    height: 44px;
+  }
+}
+.kbd {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 0 5px;
+  color: var(--muted);
+}
+/* Contents | title | Search + theme */
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* Looks like a field, opens the search dialog. */
+.searchbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 230px;
+  min-height: 40px;
+  padding: 6px 10px 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--muted);
+  font: inherit;
+  font-size: 14.5px;
+  cursor: text;
+}
+.searchbox:hover {
+  border-color: var(--muted);
+}
+.searchbox:focus-visible {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 2px;
+}
+.searchbox .ph {
+  flex: 1;
+  text-align: left;
+}
+.tabs {
+  margin: -6px 0 18px;
+}
+/* Phones: the search field shrinks to an icon button. */
+@media (max-width: 600px) {
+  .searchbox {
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+  }
+  .searchbox .ph,
+  .searchbox .kbd {
+    display: none;
+  }
+}
+.foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+.foot .cnt {
+  font-family: var(--f-mono);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.foot .btn {
+  min-height: 44px;
+  padding: 9px 16px;
+}
+/* Wide screens: the sidebar has its own toggle, so the header drops the Contents button. */
+@media (min-width: 1360px) {
+  header.top {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .toc-btn {
+    display: none;
+  }
+}
+main:focus,
+.sidebar:focus {
+  outline: none;
+}

@@ -1,0 +1,216 @@
+{
+  "$schema": "../../schema/chapter.schema.json",
+  "id": "security-overview",
+  "name": "Security overview",
+  "slides": [
+    {
+      "title": "Why frontend security is different",
+      "summary": "Your code runs on a machine you don't control, next to code you didn't write. The browser is the security boundary.",
+      "body": [
+        "On the server, you control the machine. In the browser, you ship your code to the user and it runs alongside extensions, other tabs, third-party scripts and whatever an attacker can get onto the page.",
+        {
+          "ul": [
+            "<b>Nothing in the bundle is secret.</b> Anyone can read your JavaScript, API keys and feature flags in DevTools.",
+            "<b>Every check can be skipped.</b> A user can edit requests, call your API directly or change any value in memory.",
+            "<b>The page mixes trust levels.</b> Your code, user content, ads, analytics and npm packages all share one origin."
+          ]
+        },
+        "<mark>Client-side checks are for user experience. Every security decision must be enforced again on the server.</mark>",
+        {
+          "note": "A shop window: you decide what's on display, but anyone walking past can look at it, and the till must still be behind the counter.",
+          "kind": "analogy"
+        }
+      ],
+      "viz": [
+        {
+          "type": "stages",
+          "items": [
+            {
+              "label": "<b>Confidentiality</b>",
+              "sub": "Keep data away from people who shouldn't see it: tokens, PII, other users' data.",
+              "tone": "accent"
+            },
+            {
+              "label": "<b>Integrity</b>",
+              "sub": "Make sure only the user and your code can change things: no injected scripts, no forged requests.",
+              "tone": "heat"
+            },
+            {
+              "label": "<b>Availability</b>",
+              "sub": "Keep the app usable: no malicious script that freezes the page or locks users out.",
+              "tone": "pos"
+            }
+          ]
+        },
+        {
+          "type": "caption",
+          "html": "The classic CIA triad applies in the browser too."
+        }
+      ]
+    },
+    {
+      "title": "Origins: the browser's unit of trust",
+      "summary": "An origin is scheme + host + port. The same-origin policy stops one origin reading another's data.",
+      "body": [
+        "Browsers isolate sites by <b>origin</b>: the scheme, host and port of a URL. Two URLs share an origin only if all three match.",
+        "The <b>same-origin policy (SOP)</b> lets a page freely read data from its own origin, but blocks it from reading responses, storage and DOM that belong to another origin.",
+        {
+          "ul": [
+            "<b>Blocked:</b> reading a cross-origin <code>fetch</code> response, another origin's <code>localStorage</code>, or the DOM of a cross-origin iframe.",
+            "<b>Allowed:</b> <i>sending</i> requests, form posts, and embedding images, scripts, styles and iframes from other origins."
+          ]
+        },
+        "<mark>The SOP stops reads, not writes. That gap is why CSRF exists, and why CORS is needed to relax reads safely.</mark>",
+        {
+          "more": "Origin vs site",
+          "text": "A <b>site</b> is the scheme plus the registrable domain (eTLD+1), so <code>app.example.com</code> and <code>api.example.com</code> are the same site but different origins. Cookies' <code>SameSite</code> attribute works on sites; the SOP works on origins."
+        }
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "URL compared with https://app.example.com",
+              "cells": [
+                {
+                  "text": "Same origin?"
+                }
+              ]
+            },
+            {
+              "head": "https://app.example.com/settings",
+              "cells": [
+                {
+                  "text": "Yes: only the path differs"
+                }
+              ]
+            },
+            {
+              "head": "http://app.example.com",
+              "cells": [
+                {
+                  "text": "No: different scheme"
+                }
+              ]
+            },
+            {
+              "head": "https://api.example.com",
+              "cells": [
+                {
+                  "text": "No: different host"
+                }
+              ]
+            },
+            {
+              "head": "https://app.example.com:8443",
+              "cells": [
+                {
+                  "text": "No: different port"
+                }
+              ]
+            },
+            {
+              "head": "https://example.com",
+              "cells": [
+                {
+                  "text": "No: different host"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "The map of this section",
+      "summary": "Frontend security is defence in depth: several independent layers, so one mistake isn't fatal.",
+      "body": [
+        "No single control stops every attack. Good frontends stack layers, so an attacker has to beat several of them at once.",
+        {
+          "ul": [
+            "<b>Keep attackers' code out:</b> encode output, sanitize HTML, validate input.",
+            "<b>Limit what injected code can do:</b> CSP, Trusted Types, Permissions-Policy, HttpOnly cookies.",
+            "<b>Control who can embed or call you:</b> frame-ancestors, CORS, SameSite cookies, CSRF tokens.",
+            "<b>Trust your supply chain:</b> lockfiles, audits, SRI.",
+            "<b>Protect data in transit and at rest:</b> HTTPS, HSTS, careful client storage, and the law around personal data."
+          ]
+        },
+        {
+          "note": "Open any row on the right to jump to its chapter.",
+          "kind": "dev"
+        }
+      ],
+      "viz": [
+        {
+          "type": "stages",
+          "items": [
+            {
+              "label": "<b>Cross-site scripting (XSS)</b>",
+              "sub": "Untrusted data running as code",
+              "tone": "neg",
+              "goto": {
+                "chapter": "xss",
+                "slide": 1
+              }
+            },
+            {
+              "label": "<b>iFrame protection</b>",
+              "sub": "Clickjacking and framing",
+              "tone": "heat",
+              "goto": {
+                "chapter": "iframe-protection",
+                "slide": 1
+              }
+            },
+            {
+              "label": "<b>Security headers</b>",
+              "sub": "CSP, HSTS, nosniff and friends",
+              "tone": "accent",
+              "goto": {
+                "chapter": "security-headers",
+                "slide": 1
+              }
+            },
+            {
+              "label": "<b>Client-side security</b>",
+              "sub": "Storage, tokens, secrets",
+              "tone": "accent",
+              "goto": {
+                "chapter": "client-side-security",
+                "slide": 1
+              }
+            },
+            {
+              "label": "<b>HTTPS</b>",
+              "sub": "Secure communication",
+              "tone": "pos",
+              "goto": {
+                "chapter": "https",
+                "slide": 1
+              }
+            },
+            {
+              "label": "<b>Dependencies</b>",
+              "sub": "npm and the supply chain",
+              "tone": "heat",
+              "goto": {
+                "chapter": "dependency-security",
+                "slide": 1
+              }
+            },
+            {
+              "label": "<b>CORS & CSRF</b>",
+              "sub": "Who may call you, and with whose cookies",
+              "tone": "neg",
+              "goto": {
+                "chapter": "cors",
+                "slide": 1
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

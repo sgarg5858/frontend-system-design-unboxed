@@ -1,0 +1,798 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Frontend System Design, Unboxed chapter",
+  "description": "One chapter of the course. Register new files in src/content/course.ts.",
+  "type": "object",
+  "required": ["id", "name", "slides"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "URL segment, e.g. #/assistant/3"
+    },
+    "name": {
+      "type": "string",
+      "description": "Label in the chapter rail"
+    },
+    "slides": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/slide"
+      }
+    },
+    "videos": {
+      "type": "array",
+      "minItems": 1,
+      "description": "A chapter's videos (3\u20134 at most), each covering a range of slides. Put the files in src/content/videos/.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["src", "title"],
+        "description": "One video: shown in Watch mode, and as a \"Watch this part\" button on the slides it covers.",
+        "properties": {
+          "src": {
+            "type": "string",
+            "pattern": "^videos/[^/]+\\.(mp4|webm)$",
+            "description": "e.g. videos/tokens.mp4 (no leading slash)"
+          },
+          "title": {
+            "type": "string",
+            "description": "Heading above the player"
+          },
+          "description": {
+            "type": "string",
+            "description": "One or two sentences under the heading. Inline HTML allowed, as in prose."
+          },
+          "poster": {
+            "type": "string",
+            "pattern": "^videos/[^/]+\\.(jpg|png|webp)$",
+            "description": "Optional still shown before playing"
+          },
+          "slides": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "minItems": 2,
+            "maxItems": 2,
+            "description": "First and last slide it covers, 1-based and inclusive, e.g. [6, 8]. Omit for the whole chapter."
+          },
+          "at": {
+            "type": "object",
+            "propertyNames": {
+              "pattern": "^[1-9][0-9]*$"
+            },
+            "additionalProperties": {
+              "type": "number",
+              "minimum": 0
+            },
+            "description": "Seconds into the video where a slide's topic starts, keyed by slide number, e.g. { \"7\": 157 }."
+          },
+          "marks": {
+            "type": "array",
+            "description": "Timestamps: ticks on the seek bar and a clickable list under the player.",
+            "items": {
+              "type": "object",
+              "required": ["at", "label"],
+              "additionalProperties": false,
+              "properties": {
+                "at": { "type": "number", "minimum": 0, "description": "Seconds from the start" },
+                "label": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "slide": {
+      "type": "object",
+      "required": ["title", "body"],
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "body": {
+          "type": "array",
+          "description": "Paragraph strings, {\"ul\": [...]} lists, {\"h\": \"...\"} subheadings, {\"note\": \"...\", \"kind\": \"key|analogy|dev|warn|example\"} callouts or {\"more\": \"label\", \"text\": \"...\"} accordions (collapsed until clicked)",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string",
+                "description": "Inline HTML allowed (b, i, code, span class, a href (with target _blank and rel noopener noreferrer), and <mark> around the few points that are critical to understand). Inline style attributes are stripped."
+              },
+              {
+                "type": "object",
+                "required": ["ul"],
+                "additionalProperties": false,
+                "properties": {
+                  "ul": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "description": "Inline HTML allowed (b, i, code, span class, a href (with target _blank and rel noopener noreferrer), and <mark> around the few points that are critical to understand). Inline style attributes are stripped."
+                    }
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["h"],
+                "additionalProperties": false,
+                "properties": {
+                  "h": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["note", "kind"],
+                "additionalProperties": false,
+                "properties": {
+                  "note": {
+                    "type": "string",
+                    "description": "Inline HTML allowed (b, i, code, span class, a href (with target _blank and rel noopener noreferrer), and <mark> around the few points that are critical to understand). Inline style attributes are stripped."
+                  },
+                  "kind": {
+                    "enum": ["key", "analogy", "dev", "warn", "example"]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["more", "text"],
+                "additionalProperties": false,
+                "properties": {
+                  "more": {
+                    "type": "string",
+                    "description": "Accordion label, always visible. Inline HTML allowed."
+                  },
+                  "text": {
+                    "oneOf": [
+                      { "type": "string" },
+                      { "type": "array", "minItems": 1, "items": { "type": "string" } }
+                    ],
+                    "description": "Shown when the accordion is expanded: one paragraph, or a list of paragraphs. Inline HTML allowed (b, i, code, span class, and <mark> around the few points that are critical to understand)."
+                  },
+                  "goto": {
+                    "$ref": "#/definitions/goto",
+                    "description": "Optional link to the slide that covers this in full."
+                  },
+                  "link": {
+                    "type": "string",
+                    "description": "Text for the goto button, e.g. \"Full count in The transformer block\"."
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "code": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Code sample under the prose, one string per line"
+        },
+        "viz": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/block"
+          },
+          "description": "Right-hand column, rendered top to bottom"
+        },
+        "summary": {
+          "type": "string",
+          "description": "One-sentence takeaway shown under the title. Inline HTML allowed."
+        },
+        "figure": {
+          "description": "A wide image under both columns, or a list of them shown in order.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/figure"
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/figure"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "goto": {
+      "type": "object",
+      "required": ["chapter"],
+      "additionalProperties": false,
+      "properties": {
+        "chapter": {
+          "type": "string"
+        },
+        "slide": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "stageItem": {
+      "type": "object",
+      "required": ["label"],
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Inline HTML allowed (b, i, code, span class, a href (with target _blank and rel noopener noreferrer), and <mark> around the few points that are critical to understand). Inline style attributes are stripped."
+        },
+        "sub": {
+          "type": "string",
+          "description": "Inline HTML allowed (b, i, code, span class, a href (with target _blank and rel noopener noreferrer), and <mark> around the few points that are critical to understand). Inline style attributes are stripped."
+        },
+        "value": {
+          "type": "string"
+        },
+        "tone": {
+          "enum": ["pos", "neg", "muted", "accent", "heat"]
+        },
+        "highlight": {
+          "type": "boolean"
+        },
+        "dim": {
+          "type": "boolean"
+        },
+        "strike": {
+          "type": "boolean"
+        },
+        "mono": {
+          "type": "boolean"
+        },
+        "spacer": {
+          "type": "boolean"
+        },
+        "goto": {
+          "$ref": "#/definitions/goto"
+        }
+      }
+    },
+    "block": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "enum": [
+            "caption",
+            "text",
+            "stages",
+            "chips",
+            "bars",
+            "table",
+            "stat",
+            "code",
+            "shape",
+            "panel",
+            "tabs",
+            "stepper",
+            "widget",
+            "embed"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "text"
+              }
+            }
+          },
+          "then": {
+            "required": ["html"],
+            "properties": {
+              "type": {
+                "const": "text"
+              },
+              "html": {
+                "type": "string",
+                "description": "One paragraph of normal-size text (captions are small and muted). Inline HTML allowed, as in prose."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "caption"
+              }
+            }
+          },
+          "then": {
+            "required": ["html"],
+            "properties": {
+              "type": {
+                "const": "caption"
+              },
+              "html": {
+                "type": "string",
+                "description": "Inline HTML allowed (b, i, code, span class, a href (with target _blank and rel noopener noreferrer), and <mark> around the few points that are critical to understand). Inline style attributes are stripped."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "stages"
+              }
+            }
+          },
+          "then": {
+            "required": ["items"],
+            "properties": {
+              "type": {
+                "const": "stages"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/stageItem"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "chips"
+              }
+            }
+          },
+          "then": {
+            "required": ["items"],
+            "properties": {
+              "type": {
+                "const": "chips"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["text"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "sub": {
+                      "type": "string"
+                    },
+                    "hot": {
+                      "type": "boolean"
+                    },
+                    "dim": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "bars"
+              }
+            }
+          },
+          "then": {
+            "required": ["items"],
+            "properties": {
+              "type": {
+                "const": "bars"
+              },
+              "layout": {
+                "enum": ["inline", "stacked"]
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["label", "value"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "label": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "display": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "table"
+              }
+            }
+          },
+          "then": {
+            "required": ["rows"],
+            "properties": {
+              "type": {
+                "const": "table"
+              },
+              "rows": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["head", "cells"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "head": {
+                      "type": "string"
+                    },
+                    "cells": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["text"],
+                        "additionalProperties": false,
+                        "properties": {
+                          "text": {
+                            "type": "string"
+                          },
+                          "tone": {
+                            "enum": ["accent", "heat"]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "stat"
+              }
+            }
+          },
+          "then": {
+            "required": ["items"],
+            "properties": {
+              "type": {
+                "const": "stat"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["value", "label"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "value": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "code"
+              }
+            }
+          },
+          "then": {
+            "required": ["source"],
+            "properties": {
+              "type": {
+                "const": "code"
+              },
+              "source": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "shape"
+              }
+            }
+          },
+          "then": {
+            "required": ["text"],
+            "properties": {
+              "type": {
+                "const": "shape"
+              },
+              "text": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "panel"
+              }
+            }
+          },
+          "then": {
+            "required": ["blocks"],
+            "properties": {
+              "type": {
+                "const": "panel"
+              },
+              "tone": {
+                "enum": ["neg"],
+                "description": "neg draws the panel as a red warning box, for limits and caveats."
+              },
+              "title": {
+                "type": "string",
+                "description": "Makes the panel collapsible, with this as the always-visible heading. Inline HTML allowed."
+              },
+              "open": {
+                "type": "boolean",
+                "description": "Start expanded. Only applies with a title. Defaults to false."
+              },
+              "blocks": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/block"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "tabs"
+              }
+            }
+          },
+          "then": {
+            "required": ["tabs"],
+            "properties": {
+              "type": {
+                "const": "tabs"
+              },
+              "selected": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "tabs": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": ["label", "blocks"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "label": {
+                      "type": "string"
+                    },
+                    "blocks": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/block"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "stepper"
+              }
+            }
+          },
+          "then": {
+            "required": ["steps"],
+            "properties": {
+              "type": {
+                "const": "stepper"
+              },
+              "accumulate": {
+                "type": "boolean"
+              },
+              "nextLabel": {
+                "type": "string"
+              },
+              "restartLabel": {
+                "type": "string"
+              },
+              "steps": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "item": {
+                      "$ref": "#/definitions/stageItem"
+                    },
+                    "blocks": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/block"
+                      }
+                    },
+                    "caption": {
+                      "type": "string",
+                      "description": "Inline HTML allowed (b, i, code, span class, a href (with target _blank and rel noopener noreferrer), and <mark> around the few points that are critical to understand). Inline style attributes are stripped."
+                    }
+                  }
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "widget"
+              }
+            }
+          },
+          "then": {
+            "required": ["name"],
+            "properties": {
+              "type": {
+                "const": "widget"
+              },
+              "name": {
+                "enum": ["coming-soon"],
+                "description": "Key in src/app/widgets/registry.ts"
+              },
+              "props": {
+                "type": "object"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "embed"
+              }
+            }
+          },
+          "then": {
+            "required": ["src", "title"],
+            "properties": {
+              "type": {
+                "const": "embed"
+              },
+              "src": {
+                "type": "string",
+                "pattern": "^https://",
+                "description": "External tool URL. Loaded in a sandboxed iframe only when the reader clicks."
+              },
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 300,
+                "maximum": 1200
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      ]
+    },
+    "figure": {
+      "type": "object",
+      "description": "A wide image shown under both columns. Paths are relative to public/, e.g. images/x.svg.",
+      "required": ["src", "alt", "width", "height"],
+      "additionalProperties": false,
+      "properties": {
+        "src": {
+          "type": "string",
+          "pattern": "^[^/].*"
+        },
+        "darkSrc": {
+          "type": "string",
+          "pattern": "^[^/].*"
+        },
+        "alt": {
+          "type": "string",
+          "minLength": 20
+        },
+        "width": {
+          "type": "integer"
+        },
+        "height": {
+          "type": "integer"
+        },
+        "caption": {
+          "type": "string",
+          "description": "Inline HTML allowed (b, i, code, span class, a href (with target _blank and rel noopener noreferrer), and <mark> around the few points that are critical to understand)."
+        },
+        "placement": {
+          "enum": ["top", "bottom"],
+          "description": "top: under the slide title, before the text (good for a short 'where it sits' strip). Default bottom: under both columns."
+        },
+        "animated": {
+          "type": "boolean",
+          "description": "The SVG has CSS animations: embed it as a live document with a Play/Pause button (an <img> may not animate). It starts paused when the reader's system asks for reduced motion."
+        }
+      }
+    }
+  }
+}
