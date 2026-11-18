@@ -28,17 +28,17 @@
     "videos": {
       "type": "array",
       "minItems": 1,
-      "description": "A chapter's videos (3\u20134 at most), each covering a range of slides. Put the files in src/content/videos/.",
+      "description": "A chapter's videos (3\u20134 at most), each covering a range of slides. Put the files in src/content/videos/<chapter-id>/.",
       "items": {
         "type": "object",
         "additionalProperties": false,
         "required": ["src", "title"],
-        "description": "One video: shown in Watch mode, and as a \"Watch this part\" button on the slides it covers.",
+        "description": "One video: shown in Watch mode for the slides it covers; switching to Watch from one of them starts at that slide's moment.",
         "properties": {
           "src": {
             "type": "string",
-            "pattern": "^videos/([^/]+/)?[^/]+\\.(mp4|webm)$",
-            "description": "e.g. videos/xss/xss_explained.mp4 (no leading slash; one folder per chapter)"
+            "pattern": "^videos/[a-z0-9-]+/[^/]+\\.(mp4|webm)$",
+            "description": "In the chapter's folder, e.g. videos/tokens/tokenizers_explained.mp4 (no leading slash)"
           },
           "title": {
             "type": "string",
@@ -50,7 +50,7 @@
           },
           "poster": {
             "type": "string",
-            "pattern": "^videos/([^/]+/)?[^/]+\\.(jpg|png|webp)$",
+            "pattern": "^videos/[a-z0-9-]+/[^/]+\\.(jpg|png|webp)$",
             "description": "Optional still shown before playing"
           },
           "slides": {
@@ -72,7 +72,7 @@
               "type": "number",
               "minimum": 0
             },
-            "description": "Seconds into the video where a slide's topic starts, keyed by slide number, e.g. { \"7\": 157 }."
+            "description": "Seconds into the video where a slide's topic starts, keyed by slide number, e.g. { \"7\": 157 }. A slide listed here is covered even outside the slides range (so a video can cover slides 1, 2 and 6), and goes with this video first."
           },
           "marks": {
             "type": "array",

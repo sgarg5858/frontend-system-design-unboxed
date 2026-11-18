@@ -97,12 +97,13 @@ Slides link to other chapters with `goto: { chapter: "<id>", slide: n }` and ref
 
 ### 8. Videos: a few per chapter, each covering a range of slides
 
-A chapter can list a few videos (`videos` in its JSON). Each covers a range of slides (`slides: [first, last]`), says where each slide's topic starts (`at`), and has timestamps (`marks`). The URL still decides everything:
+A chapter can list a few videos (`videos` in its JSON). Each covers a range of slides (`slides: [first, last]`) plus any slide listed in `at` (where each slide's topic starts), so one video can cover slides that aren't next to each other; it also has timestamps (`marks`). The URL still decides everything:
 
-- **Read mode:** a slide inside a video's range shows a "Watch this part" button (`SlideView`). It calls `ViewModeState.watchAt(seconds)`, which switches to Watch mode and asks the player to start at that slide's timestamp.
+- **Mode in the URL:** Read or Watch is `?mode=read|watch` on the slide URL (`CourseNav.mode`, set through `ViewModeState.set`), so a reload or a shared link opens the same view. Every `CourseNav` move keeps it. With no `?mode=`, a chapter with a video opens in Watch and one without opens in Read. Search hits and slides picked in the outline open with `mode=read`.
+- **Starting point:** when `WatchView` opens on a slide (from the switch, a reload or a shared link), the video starts at that slide's `at` time, where its topic begins. Reading slides show no video controls.
 - **Watch mode:** `CourseNav.video()` is the video that covers the current slide (`videoIndexAt` in `course/chapter-videos.ts`, a pure, unit-tested helper). `WatchView` shows it, its timestamps (`marks`) as a clickable list, and a playlist when the chapter has more than one. Back/Next and "Up next" step video by video (`CourseNav.stepVideo`), then move to the next chapter; opening a video navigates to the first slide it covers, so links and reloads land on the same video.
 - **Player:** `shared/video-player` takes `src`, `start` (applied once, then reported with `startApplied`) and `marks`, drawn as ticks on the seek bar (`video-range`); hovering names the section. It remembers where each video was stopped.
-- **Files:** `src/content/videos/<chapter-id>/` is copied to `videos/` by an `assets` glob in `angular.json`. The same file can be listed in more than one chapter (it stays in the folder of the chapter it was made for). Keep files small (GitHub rejects files over 100 MB); a `src` can later point to a CDN.
+- **Files:** one folder per chapter, `src/content/videos/<chapter-id>/`, copied to `videos/` by an `assets` glob in `angular.json`. The same file can be listed in more than one chapter; it lives in the folder of the chapter it was made for . `course.spec.ts` checks every `src` exists. Keep files small (GitHub rejects files over 100 MB); a `src` can later point to a CDN.
 
 **Making a video: one at a time, in sequence.** Videos are narrated, animated explainers. The toolkit is kept outside the repo (as in AI, Unboxed); only the finished MP4s are committed. Voice generation and rendering each load a model or a browser and use a lot of memory, so run them strictly one after another, never in parallel. For each video, finish every step before starting the next video:
 

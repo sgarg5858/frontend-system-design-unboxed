@@ -16,7 +16,7 @@ import { ViewModeState } from '../view-mode';
         aria-label="Read"
         title="Read the slides"
         [attr.aria-pressed]="state.mode() === 'read'"
-        (click)="state.mode.set('read')"
+        (click)="state.set('read')"
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path
@@ -30,7 +30,7 @@ import { ViewModeState } from '../view-mode';
         [attr.aria-label]="hasVideo() ? 'Watch (this chapter has a video)' : 'Watch'"
         [attr.aria-pressed]="state.mode() === 'watch'"
         [attr.title]="hasVideo() ? 'Watch this chapter’s video' : 'No video for this chapter yet'"
-        (click)="state.mode.set('watch')"
+        (click)="state.set('watch')"
       >
         <svg viewBox="0 0 24 24" aria-hidden="true" class="solid">
           <path d="M8 5.5v13l10.5-6.5z" />
@@ -48,7 +48,7 @@ import { ViewModeState } from '../view-mode';
       class="cycle"
       [attr.aria-label]="watching ? 'Mode: Watch. Switch to Read' : 'Mode: Read. Switch to Watch'"
       [attr.title]="watching ? 'Watching. Tap to read' : 'Reading. Tap to watch'"
-      (click)="state.mode.set(watching ? 'read' : 'watch')"
+      (click)="state.set(watching ? 'read' : 'watch')"
     >
       @if (watching) {
         <svg viewBox="0 0 24 24" aria-hidden="true" class="solid">

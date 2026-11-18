@@ -136,13 +136,22 @@ h1 span {
   header.top {
     gap: 8px;
   }
+  /* "Frontend, Unboxed" is long: let it scale and wrap to two lines instead of running under the buttons. */
   h1 {
-    font-size: 24px;
-    white-space: nowrap;
+    min-width: 0;
+    font-size: clamp(17px, 5.4vw, 24px);
+    line-height: 1.02;
+    text-wrap: balance;
   }
   .brand {
     flex-wrap: nowrap;
     gap: 8px;
+  }
+  .brand > * {
+    flex: none;
+  }
+  .brand > h1 {
+    flex: 0 1 auto;
   }
   .toc-btn {
     width: 44px;

@@ -6,6 +6,11 @@ import schema from './schema/chapter.schema.json';
 
 // The app loads chapters on demand; the tests load them all up front.
 const COURSE = await Promise.all(CHAPTERS.map((c) => c.load()));
+// Node's fs, to check video files exist (the specs don't include Node's types).
+const fs = 'node:fs';
+const { existsSync } = (await import(/* @vite-ignore */ fs)) as {
+  existsSync: (path: string) => boolean;
+};
 
 describe('course content', () => {
   const validate = new Ajv({ allErrors: true, strict: false }).compile(schema);
@@ -60,10 +65,20 @@ describe('course content', () => {
         const [first, last] = v.slides ?? [1, c.slides.length];
         expect(first >= 1 && first <= last && last <= c.slides.length, where).toBe(true);
         for (const k of Object.keys(v.at ?? {}))
-          expect(+k >= first && +k <= last, `${where}: "at" slide ${k} is outside its range`).toBe(
+          expect(+k >= 1 && +k <= c.slides.length, `${where}: "at" slide ${k} doesn't exist`).toBe(
             true,
           );
       }
+  });
+
+  it('points every video at a file in src/content/videos/<chapter>/', () => {
+    const missing = COURSE.flatMap((c) =>
+      (c.videos ?? [])
+        .map((v) => v.src)
+        .filter((src) => !/^https?:/.test(src) && !existsSync(`src/content/${src}`))
+        .map((src) => `${c.id}: ${src}`),
+    );
+    expect(missing).toEqual([]);
   });
 
   it('has goto links that point at real slides', () => {
