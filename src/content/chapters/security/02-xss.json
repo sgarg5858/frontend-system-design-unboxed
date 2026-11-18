@@ -2,6 +2,76 @@
   "$schema": "../../schema/chapter.schema.json",
   "id": "xss",
   "name": "When data turns into code (XSS)",
+  "videos": [
+    {
+      "src": "videos/xss/xss_explained.mp4",
+      "title": "Cross-site scripting, explained",
+      "description": "How attacker text becomes code in your page, what an attacker can do with it, the three ways a payload gets in, and the layers that stop it: text bindings, sanitizing, Trusted Types and a strict CSP.",
+      "slides": [1, 6],
+      "at": {
+        "1": 0,
+        "2": 40,
+        "3": 84,
+        "4": 119,
+        "5": 169,
+        "6": 221
+      },
+      "marks": [
+        {
+          "at": 0,
+          "label": "Intro"
+        },
+        {
+          "at": 12,
+          "label": "What XSS is"
+        },
+        {
+          "at": 40,
+          "label": "What an attacker can do"
+        },
+        {
+          "at": 72,
+          "label": "No <script> tag needed"
+        },
+        {
+          "at": 84,
+          "label": "Stored, reflected, DOM-based"
+        },
+        {
+          "at": 119,
+          "label": "Keep data as text"
+        },
+        {
+          "at": 141,
+          "label": "Framework escape hatches"
+        },
+        {
+          "at": 157,
+          "label": "Safe URLs"
+        },
+        {
+          "at": 169,
+          "label": "When you must render HTML"
+        },
+        {
+          "at": 188,
+          "label": "Trusted Types and setHTML"
+        },
+        {
+          "at": 212,
+          "label": "Strict CSP"
+        },
+        {
+          "at": 221,
+          "label": "In a real codebase"
+        },
+        {
+          "at": 241,
+          "label": "Up next: headers & CSP"
+        }
+      ]
+    }
+  ],
   "slides": [
     {
       "title": "What XSS is",

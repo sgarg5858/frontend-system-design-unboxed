@@ -2,6 +2,62 @@
   "$schema": "../../schema/chapter.schema.json",
   "id": "security-overview",
   "name": "Thinking like an attacker",
+  "videos": [
+    {
+      "src": "videos/security-overview/security_overview.mp4",
+      "title": "Security overview",
+      "description": "Why the browser is a different security environment, how origins and the same-origin policy draw trust boundaries, how layers of defence stop real attacks, and how to talk about security in a design interview.",
+      "slides": [1, 4],
+      "at": {
+        "1": 0,
+        "2": 70,
+        "3": 141,
+        "4": 207
+      },
+      "marks": [
+        {
+          "at": 0,
+          "label": "Intro"
+        },
+        {
+          "at": 19,
+          "label": "Who runs code in your page"
+        },
+        {
+          "at": 52,
+          "label": "Every browser check can be skipped"
+        },
+        {
+          "at": 70,
+          "label": "Origins: scheme, host, port"
+        },
+        {
+          "at": 96,
+          "label": "Blocks reads, not writes"
+        },
+        {
+          "at": 127,
+          "label": "Site vs origin"
+        },
+        {
+          "at": 141,
+          "label": "Four layers of defence"
+        },
+        {
+          "at": 174,
+          "label": "Watching attacks get stopped"
+        },
+        {
+          "at": 207,
+          "label": "Security in a design interview"
+        },
+        {
+          "at": 263,
+          "label": "Up next: XSS"
+        }
+      ]
+    }
+  ],
   "slides": [
     {
       "title": "Why frontend security is different",

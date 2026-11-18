@@ -37,8 +37,8 @@
         "properties": {
           "src": {
             "type": "string",
-            "pattern": "^videos/[^/]+\\.(mp4|webm)$",
-            "description": "e.g. videos/tokens.mp4 (no leading slash)"
+            "pattern": "^videos/([^/]+/)?[^/]+\\.(mp4|webm)$",
+            "description": "e.g. videos/xss/xss_explained.mp4 (no leading slash; one folder per chapter)"
           },
           "title": {
             "type": "string",
@@ -50,7 +50,7 @@
           },
           "poster": {
             "type": "string",
-            "pattern": "^videos/[^/]+\\.(jpg|png|webp)$",
+            "pattern": "^videos/([^/]+/)?[^/]+\\.(jpg|png|webp)$",
             "description": "Optional still shown before playing"
           },
           "slides": {
