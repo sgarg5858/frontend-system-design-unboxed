@@ -820,6 +820,114 @@
       ]
     },
     {
+      "title": "Scanning your own code and the running app",
+      "summary": "Dependency scans cover other people's code. SAST checks yours, DAST attacks the running app, and penetration testers find what tools miss.",
+      "body": [
+        "A complete programme scans at several layers:",
+        {
+          "ul": [
+            "<b>SAST (static analysis)</b> reads your source for dangerous patterns: user input reaching <code>innerHTML</code>, <code>eval</code> or a SQL query. Examples: GitHub CodeQL, Semgrep, SonarQube.",
+            "<b>DAST (dynamic testing)</b> attacks a running build like an outsider: it crawls pages, fuzzes inputs and checks headers and cookies. Examples: ZAP (formerly OWASP ZAP), Burp Suite, HCL AppScan.",
+            "<b>Penetration testing</b> is skilled people chaining issues together, such as business-logic flaws, IDOR and auth bypasses, that scanners rarely find.",
+            "<b>Bug bounties</b> pay outside researchers to keep looking after launch."
+          ]
+        },
+        {
+          "h": "Automate the basics in CI"
+        },
+        {
+          "ul": [
+            "Run SAST on every pull request and block new high-severity findings.",
+            "Run a ZAP baseline scan against the staging deployment nightly.",
+            "<code>npm audit</code> already runs on every <code>npm install</code> (the <code>audit</code> setting is on by default); make CI fail on it with <code>npm audit --audit-level=high --omit=dev</code>."
+          ]
+        },
+        "<mark>Tools find the common bugs cheaply. People find the clever ones. You need both.</mark>"
+      ],
+      "code": [
+        "# .github/workflows/codeql.yml (excerpt)",
+        "- uses: github/codeql-action/init@v3",
+        "  with: { languages: javascript-typescript }",
+        "- uses: github/codeql-action/analyze@v3",
+        "",
+        "# nightly DAST against staging",
+        "docker run -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t https://staging.shop.example"
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Type",
+              "cells": [
+                {
+                  "text": "Finds"
+                },
+                {
+                  "text": "Examples"
+                }
+              ]
+            },
+            {
+              "head": "SCA",
+              "cells": [
+                {
+                  "text": "Vulnerable / malicious dependencies"
+                },
+                {
+                  "text": "Dependabot, Snyk, Socket, JFrog Xray"
+                }
+              ]
+            },
+            {
+              "head": "SAST",
+              "cells": [
+                {
+                  "text": "Dangerous patterns in your code"
+                },
+                {
+                  "text": "CodeQL, Semgrep, SonarQube"
+                }
+              ]
+            },
+            {
+              "head": "DAST",
+              "cells": [
+                {
+                  "text": "Issues in the running app"
+                },
+                {
+                  "text": "ZAP, Burp Suite, AppScan"
+                }
+              ]
+            },
+            {
+              "head": "Secrets scanning",
+              "cells": [
+                {
+                  "text": "Keys committed to git"
+                },
+                {
+                  "text": "GitHub secret scanning, gitleaks"
+                }
+              ]
+            },
+            {
+              "head": "Pen test / bug bounty",
+              "cells": [
+                {
+                  "text": "Logic flaws, chained attacks"
+                },
+                {
+                  "text": "Specialist firms, HackerOne, Bugcrowd"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "SBOMs and incident response",
       "summary": "When a package is compromised, the first question is “are we affected?”. An SBOM answers it in minutes.",
       "body": [

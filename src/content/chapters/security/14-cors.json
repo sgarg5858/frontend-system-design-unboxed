@@ -78,6 +78,106 @@
       }
     },
     {
+      "title": "Configuring CORS on your server",
+      "summary": "Allowlist exact origins, list the methods and headers you accept, and only enable credentials when you need cookies.",
+      "body": [
+        "Say an admin dashboard on <code>https://admin.shop.example</code> calls <code>https://api.shop.example</code> with cookies, and a public status page on <code>https://status.shop.example</code> reads one endpoint without them.",
+        {
+          "ul": [
+            "<b><code>Access-Control-Allow-Origin</code></b>: one exact origin (or <code>*</code> for public, cookie-less data).",
+            "<b><code>Access-Control-Allow-Methods</code></b> and <b><code>-Headers</code></b>: what the preflight may approve.",
+            "<b><code>Access-Control-Allow-Credentials: true</code></b>: lets cookies be sent and the response read. Never with <code>*</code>.",
+            "<b><code>Access-Control-Expose-Headers</code></b>: response headers your JavaScript may read beyond the basic ones (e.g. <code>X-Request-Id</code>).",
+            "<b><code>Access-Control-Max-Age</code></b>: how long the preflight answer is cached."
+          ]
+        },
+        "<mark>Never “fix” a CORS error with a browser extension or by allowing every origin. Configure the server, or use a dev proxy so the app and API share an origin.</mark>",
+        {
+          "note": "Locally, Angular's <code>proxy.conf.json</code> or Vite's <code>server.proxy</code> forwards <code>/api</code> to your backend, so the browser sees one origin and no CORS is needed during development.",
+          "kind": "dev"
+        }
+      ],
+      "code": [
+        "import cors from 'cors';",
+        "",
+        "const ALLOWED = new Set(['https://admin.shop.example']);",
+        "",
+        "app.use('/api', cors({",
+        "  origin: (origin, cb) => cb(null, !origin || ALLOWED.has(origin)),",
+        "  methods: ['GET', 'POST', 'PATCH', 'DELETE'],",
+        "  allowedHeaders: ['Content-Type', 'X-CSRF-Token'],",
+        "  exposedHeaders: ['X-Request-Id'],",
+        "  credentials: true,",
+        "  maxAge: 600,",
+        "}));",
+        "",
+        "app.use('/public/status', cors({ origin: '*' })); // no cookies, public data"
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Header",
+              "cells": [
+                {
+                  "text": "Purpose"
+                }
+              ]
+            },
+            {
+              "head": "Access-Control-Allow-Origin",
+              "cells": [
+                {
+                  "text": "Which origin may read the response"
+                }
+              ]
+            },
+            {
+              "head": "Access-Control-Allow-Methods",
+              "cells": [
+                {
+                  "text": "Methods approved in preflight"
+                }
+              ]
+            },
+            {
+              "head": "Access-Control-Allow-Headers",
+              "cells": [
+                {
+                  "text": "Request headers approved in preflight"
+                }
+              ]
+            },
+            {
+              "head": "Access-Control-Allow-Credentials",
+              "cells": [
+                {
+                  "text": "Allow cookies / auth, exact origin only"
+                }
+              ]
+            },
+            {
+              "head": "Access-Control-Expose-Headers",
+              "cells": [
+                {
+                  "text": "Response headers JS may read"
+                }
+              ]
+            },
+            {
+              "head": "Access-Control-Max-Age",
+              "cells": [
+                {
+                  "text": "Preflight cache time"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "CORS mistakes",
       "summary": "Reflecting any origin with credentials hands your users' data to every website.",
       "body": [

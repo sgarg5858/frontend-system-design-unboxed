@@ -116,6 +116,61 @@
       }
     },
     {
+      "title": "Writing CSP directives",
+      "summary": "Directives say where each type of resource may come from. default-src is the fallback; 'unsafe-inline' undoes most of the protection.",
+      "body": [
+        "Take a news site that serves its own scripts, loads photos from <code>img.newsroom.example</code>, embeds videos from <code>player.videohost.example</code> and sends analytics to <code>collect.metrics.example</code>.",
+        {
+          "ul": [
+            "<b><code>default-src 'self'</code></b> is the fallback for every resource type you don't list.",
+            "<b>Add only what each feature needs:</b> <code>img-src</code> for the photo CDN, <code>frame-src</code> for the video player, <code>connect-src</code> for analytics.",
+            "<b>Source keywords:</b> <code>'self'</code> (your origin), <code>'none'</code> (nothing), a scheme (<code>https:</code>), a host, <code>'nonce-…'</code> or <code>'sha256-…'</code>.",
+            "<b>Avoid <code>'unsafe-inline'</code> and <code>'unsafe-eval'</code></b> in <code>script-src</code>: they let injected inline scripts and <code>eval</code> run. When a nonce or hash is present, browsers ignore <code>'unsafe-inline'</code>, which is why it's sometimes kept only as a fallback for very old browsers."
+          ]
+        },
+        {
+          "h": "Nonce rules"
+        },
+        {
+          "ul": [
+            "A new nonce for <b>every response</b>; never reuse or hard-code one.",
+            "Generated with a <b>cryptographically secure</b> random generator, at least 128 bits, base64-encoded.",
+            "Never put untrusted data inside a nonced <code>&lt;script&gt;</code>: the nonce would bless it.",
+            "Browsers hide the nonce from the DOM after parsing, so injected code can't read it from the page."
+          ]
+        },
+        "<mark>A policy with 'unsafe-inline' in script-src gives almost no XSS protection. Use nonces or hashes instead.</mark>",
+        {
+          "note": "Violations appear in the DevTools console with the exact directive that blocked them, e.g. “Refused to load the image … because it violates img-src”. That message tells you which directive to adjust.",
+          "kind": "dev"
+        }
+      ],
+      "code": [
+        "import crypto from 'node:crypto';",
+        "",
+        "app.use((req, res, next) => {",
+        "  res.locals.nonce = crypto.randomBytes(16).toString('base64');",
+        "  res.setHeader('Content-Security-Policy', [",
+        "    \"default-src 'self'\",",
+        "    `script-src 'nonce-${res.locals.nonce}' 'strict-dynamic'`,",
+        "    \"img-src 'self' https://img.newsroom.example\",",
+        "    \"frame-src https://player.videohost.example\",",
+        "    \"connect-src 'self' https://collect.metrics.example\",",
+        "    \"object-src 'none'; base-uri 'none'; frame-ancestors 'none'\",",
+        "  ].join('; '));",
+        "  next();",
+        "});",
+        "// template: <script nonce=\"<%= nonce %>\" src=\"/app.js\"></script>"
+      ],
+      "figure": {
+        "src": "images/sec-csp-directives-light.svg",
+        "darkSrc": "images/sec-csp-directives-dark.svg",
+        "alt": "default-src sits at the top as the fallback. Under it are fetch directives, each controlling one kind of resource: script-src for JavaScript, style-src for CSS, img-src for images, connect-src for fetch, XHR and WebSockets, font-src for fonts, media-src for audio and video, and frame-src for iframes you embed. If a directive is missing, the browser uses default-src. A second group does not fall back to default-src at all: frame-ancestors (who may frame you), form-action (where forms may submit), base-uri (what the base tag may be) and upgrade-insecure-requests. Example: with default-src self and img-src self https://images.example, images may come from the image CDN, but a script from that CDN is still blocked because script-src falls back to default-src self.",
+        "width": 1200,
+        "height": 560
+      }
+    },
+    {
       "title": "HSTS, nosniff, Referrer-Policy and COOP",
       "summary": "The other headers each close one specific gap. Most are one line.",
       "body": [

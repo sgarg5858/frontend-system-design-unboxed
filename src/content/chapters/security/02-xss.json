@@ -64,6 +64,86 @@
       ]
     },
     {
+      "title": "What an attacker can do with XSS",
+      "summary": "Once their script runs in your page, attackers can steal sessions, act as the user, record keystrokes, read data and fake your UI.",
+      "body": [
+        "Take a recipe site that shows each cook's display name with <code>innerHTML</code>. An attacker sets their name to a payload, and every visitor who opens one of their recipes runs it. From there:",
+        {
+          "ul": [
+            "<b>Session hijacking:</b> read any cookie that isn't <code>HttpOnly</code>, or a token in <code>localStorage</code>, and send it to the attacker's server.",
+            "<b>Actions as the user:</b> call your own APIs with the user's session: post spam, change the email address, delete the account.",
+            "<b>Keylogging:</b> listen to <code>keydown</code> on the whole page and send what the user types, including passwords on the next form they fill in.",
+            "<b>Data theft:</b> copy <code>document.body.innerHTML</code>, which can include saved addresses, orders or messages.",
+            "<b>Phishing inside your page:</b> inject a fake “Session expired, please sign in” form that posts the password to the attacker. The address bar still shows your domain, so users trust it."
+          ]
+        },
+        "<mark>An XSS bug gives the attacker everything your own JavaScript can do. That's why it's treated as critical.</mark>",
+        {
+          "note": "Payloads rarely need a <code>&lt;script&gt;</code> tag. Event handlers (<code>onerror</code>, <code>onfocus</code> with <code>autofocus</code>), <code>&lt;svg onload&gt;</code> and <code>javascript:</code> URLs all run code, so filtering the word “script” protects nothing.",
+          "kind": "warn"
+        }
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Impact",
+              "cells": [
+                {
+                  "text": "Blocked by"
+                }
+              ]
+            },
+            {
+              "head": "Steal session cookie",
+              "cells": [
+                {
+                  "text": "HttpOnly cookies"
+                }
+              ]
+            },
+            {
+              "head": "Steal token from storage",
+              "cells": [
+                {
+                  "text": "No tokens in JS-readable storage"
+                }
+              ]
+            },
+            {
+              "head": "Act as the user",
+              "cells": [
+                {
+                  "text": "Only by preventing the XSS (encode, sanitize, CSP)"
+                }
+              ]
+            },
+            {
+              "head": "Send data to attacker",
+              "cells": [
+                {
+                  "text": "CSP connect-src / img-src allowlists"
+                }
+              ]
+            },
+            {
+              "head": "Fake login form",
+              "cells": [
+                {
+                  "text": "Only by preventing the XSS"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "caption",
+          "html": "Some defences limit the damage; only preventing the injection stops all of it."
+        }
+      ]
+    },
+    {
       "title": "Three kinds of XSS",
       "summary": "Stored, reflected and DOM-based XSS differ in where the payload travels. The fix is the same: never let data become code.",
       "body": [
@@ -270,6 +350,80 @@
         "width": 1200,
         "height": 460
       }
+    },
+    {
+      "title": "XSS defence checklist",
+      "summary": "A layered checklist: find every input, keep data as text, sanitize when HTML is unavoidable, never evaluate strings, and back it all with CSP.",
+      "body": [
+        {
+          "ul": [
+            "<b>Inventory every input:</b> form fields, URL query and hash, <code>postMessage</code>, storage, third-party APIs, file names, even HTTP headers you echo back.",
+            "<b>Render as text:</b> framework bindings or <code>textContent</code>. Treat <code>innerHTML</code> and its relatives as code review red flags.",
+            "<b>Encode for the context</b> when you build markup on the server: HTML body, attribute, URL and JavaScript contexts each need different escaping.",
+            "<b>Sanitize when HTML is required:</b> DOMPurify, Angular's sanitizer or <code>setHTML()</code>, with an allowlist.",
+            "<b>Never evaluate strings:</b> no <code>eval</code>, <code>new Function</code>, or <code>setTimeout</code> / <code>setInterval</code> with a string.",
+            "<b>Validate URLs</b> before putting them in <code>href</code> or <code>src</code>.",
+            "<b>Defence in depth:</b> strict CSP with nonces, Trusted Types, HttpOnly cookies, and no secrets in the page."
+          ]
+        },
+        "<mark>Encoding and sanitizing prevent XSS. CSP and Trusted Types make the bugs you miss far less harmful.</mark>",
+        {
+          "more": "Writing the CSP",
+          "text": "Directives, fallbacks, nonces and rollout are covered in the Security headers chapter.",
+          "goto": {
+            "chapter": "security-headers",
+            "slide": 3
+          },
+          "link": "Writing CSP directives"
+        }
+      ],
+      "code": [
+        "// A cook's profile card, safely",
+        "nameEl.textContent = cook.displayName;          // text, never HTML",
+        "",
+        "const url = new URL(cook.website, location.origin);",
+        "if (url.protocol === 'https:') linkEl.href = url.href; // no javascript:",
+        "",
+        "bioEl.innerHTML = DOMPurify.sanitize(cook.bioHtml, {",
+        "  ALLOWED_TAGS: ['p', 'b', 'i', 'ul', 'li'],",
+        "});"
+      ],
+      "viz": [
+        {
+          "type": "stages",
+          "items": [
+            {
+              "label": "<b>Find</b>",
+              "sub": "every input source",
+              "tone": "muted"
+            },
+            {
+              "label": "<b>Text</b>",
+              "sub": "bindings, textContent",
+              "tone": "pos"
+            },
+            {
+              "label": "<b>Sanitize</b>",
+              "sub": "only where HTML is needed",
+              "tone": "accent"
+            },
+            {
+              "label": "<b>No eval</b>",
+              "sub": "no string-to-code",
+              "tone": "heat"
+            },
+            {
+              "label": "<b>CSP + Trusted Types</b>",
+              "sub": "limit what slips through",
+              "tone": "accent",
+              "goto": {
+                "chapter": "security-headers",
+                "slide": 2
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }

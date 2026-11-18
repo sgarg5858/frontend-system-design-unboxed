@@ -152,6 +152,88 @@
       ]
     },
     {
+      "title": "Choosing client storage",
+      "summary": "Pick storage by size, lifetime and exposure. Anything JavaScript can read, an XSS bug can read too.",
+      "body": [
+        "Browsers offer several stores, each with different limits and risks:",
+        {
+          "ul": [
+            "<b>Cookies</b> are small and sent with requests: right for a session ID (HttpOnly), wrong for app data.",
+            "<b>localStorage / sessionStorage</b> are synchronous key-value strings, about 5 MB per origin. Fine for preferences like theme or a draft; not for tokens or personal data.",
+            "<b>IndexedDB</b> holds large, structured data asynchronously, for offline apps and caches. Its quota is a share of free disk space.",
+            "<b>Cache Storage</b> holds HTTP responses for service workers."
+          ]
+        },
+        {
+          "h": "Limits are real"
+        },
+        {
+          "ul": [
+            "Writes beyond the quota throw <code>QuotaExceededError</code>; catch it rather than losing data silently.",
+            "<code>navigator.storage.estimate()</code> reports usage and quota; <code>navigator.storage.persist()</code> asks the browser not to evict your data.",
+            "Large synchronous <code>localStorage</code> reads block the main thread on every page load."
+          ]
+        },
+        "<mark>Store the minimum, for the shortest time, in the least exposed place. Clear it on logout.</mark>"
+      ],
+      "code": [
+        "// Check space before caching 200 MB of offline maps",
+        "const { usage = 0, quota = 0 } = await navigator.storage.estimate();",
+        "if (quota - usage < 200 * 1024 ** 2) showLowSpaceWarning();",
+        "",
+        "const persisted = await navigator.storage.persist(); // ask: don't evict",
+        "",
+        "try { localStorage.setItem('draft', bigText); }",
+        "catch (e) { if (e.name === 'QuotaExceededError') saveDraftToServer(bigText); }"
+      ],
+      "figure": {
+        "src": "images/sec-client-storage-light.svg",
+        "darkSrc": "images/sec-client-storage-dark.svg",
+        "alt": "Five storage options compared. Cookies: about 4 KB each, lifetime set by Expires or Max-Age, readable by JavaScript unless HttpOnly, and sent to the server with every matching request. localStorage: about 5 MB per origin, kept until cleared, readable by any script on the page, never sent automatically. sessionStorage: about 5 MB, cleared when the tab closes, readable by scripts. IndexedDB: large, a share of free disk space, kept until cleared or evicted under storage pressure unless persistence is granted, readable by scripts, asynchronous and structured. Cache Storage: also quota-based, used by service workers for HTTP responses. The rule: anything a script can read, an XSS bug can read. Sessions belong in HttpOnly cookies.",
+        "width": 1200,
+        "height": 520
+      }
+    },
+    {
+      "title": "Expiry, integrity and sessions done right",
+      "summary": "Expiry and integrity must be enforced by the server. Client-side timers, encryption and checksums are conveniences, not security.",
+      "body": [
+        {
+          "h": "Common advice that doesn't hold up"
+        },
+        {
+          "ul": [
+            "<b>“Encrypt data before putting it in localStorage.”</b> The key has to be in your JavaScript too, so XSS can decrypt it. Don't store the secret at all. If you must keep a key client-side, a non-extractable WebCrypto key in IndexedDB at least stops it being copied out.",
+            "<b>“Delete the token with setTimeout when it expires.”</b> An attacker who copied it keeps using it. Expiry must be checked by the server: a short <code>exp</code> claim on JWTs, or a server-side session timeout.",
+            "<b>“Store a checksum next to the data to detect tampering.”</b> Anyone who can change the data can recompute the checksum. Integrity needs a secret the client doesn't have: an HMAC or signature verified by the server.",
+            "<b>“Set HttpOnly from JavaScript.”</b> Browsers ignore <code>HttpOnly</code> in <code>document.cookie</code>; only the server's <code>Set-Cookie</code> header can set it."
+          ]
+        },
+        {
+          "h": "What good session management looks like"
+        },
+        {
+          "ul": [
+            "Short-lived access (minutes), with an idle timeout and an absolute timeout on sessions.",
+            "Logout destroys the session on the server, not just in the browser.",
+            "Re-authenticate before sensitive actions (change email, payout details).",
+            "Multi-factor authentication, ideally <b>passkeys</b> (WebAuthn), which can't be phished like passwords and codes."
+          ]
+        },
+        "<mark>If the security check runs in the browser, an attacker can skip it. Expiry, integrity and permissions are server jobs.</mark>"
+      ],
+      "code": [
+        "// Server: session cookie the browser can't read or send cross-site",
+        "res.cookie('__Host-sid', sessionId, {",
+        "  httpOnly: true, secure: true, sameSite: 'lax', path: '/',",
+        "  maxAge: 30 * 60 * 1000,          // 30 min idle timeout, renewed on use",
+        "});",
+        "",
+        "// Server: integrity with a secret the client never sees",
+        "const sig = crypto.createHmac('sha256', SECRET).update(payload).digest('base64url');"
+      ]
+    },
+    {
       "title": "OAuth in single-page apps",
       "summary": "Use the Authorization Code flow with PKCE, ideally through a backend-for-frontend so tokens never reach JavaScript.",
       "body": [

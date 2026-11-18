@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-labelledby="t d" font-family="'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+  <title id="t">Where data can live in the browser</title>
+  <desc id="d">Five storage options compared. Cookies: about 4 KB each, lifetime set by Expires or Max-Age, readable by JavaScript unless HttpOnly, and sent to the server with every matching request. localStorage: about 5 MB per origin, kept until cleared, readable by any script on the page, never sent automatically. sessionStorage: about 5 MB, cleared when the tab closes, readable by scripts. IndexedDB: large, a share of free disk space, kept until cleared or evicted under storage pressure unless persistence is granted, readable by scripts, asynchronous and structured. Cache Storage: also quota-based, used by service workers for HTTP responses. The rule: anything a script can read, an XSS bug can read. Sessions belong in HttpOnly cookies.</desc>
+  <style>
+    .bg{fill:#0f1413}.card{fill:#171e1c;stroke:#2c3835}.sunk{fill:#1f2826}
+    .ink{fill:#e4ece9}.muted{fill:#9aa9a4}.onacc{fill:#0f1413}
+    .acc{fill:#4db3d1}.accink{fill:#8fd3e6}.accsoft{fill:#163742}
+    .pos{fill:#3fc4a3}.posink{fill:#3fc4a3}.possoft{fill:#123a30;stroke:#3fc4a3}
+    .neg{fill:#f07d60}.negink{fill:#f07d60}.negsoft{fill:#42221a;stroke:#f07d60}
+    .heat{fill:#3d2e14;stroke:#f0ac40}.heatink{fill:#f0ac40}.heatfill{fill:#f0ac40}
+    .line{stroke:#9aa9a4;fill:none;stroke-width:2}.thin{stroke:#2c3835;fill:none;stroke-width:1.5}
+    .dash{stroke:#4db3d1;fill:none;stroke-width:2;stroke-dasharray:6 5}
+    .sacc{stroke:#4db3d1;fill:none;stroke-width:2.5}.sheat{stroke:#f0ac40;fill:none;stroke-width:2.5}
+    .spos{stroke:#3fc4a3;fill:none;stroke-width:2.5}.sneg{stroke:#f07d60;fill:none;stroke-width:2.5}
+    .edge{stroke:#4db3d1;fill:none;stroke-width:1;opacity:.45}
+    .stream{stroke:#4db3d1;fill:none;stroke-width:14;stroke-linecap:round;opacity:.35}
+    .row{fill:#1f2826}.hit{fill:#163742;stroke:#4db3d1}
+    .mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace}
+    .head{font-size:13px;font-weight:700;letter-spacing:.08em}
+    .arrowhead{fill:#9aa9a4}.arrowacc{fill:#4db3d1}
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowhead"/></marker>
+    <marker id="aa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowacc"/></marker>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="heatfill"/></marker>
+    <marker id="an" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="neg"/></marker>
+    <marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="pos"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="520" rx="18"/>
+  <text x="40" y="52" text-anchor="start" class="ink" font-size="26" font-weight="700">Where data can live in the browser</text>
+  <text x="40" y="78" text-anchor="start" class="muted" font-size="15">Each storage option differs in size, lifetime, who can read it, and whether it travels to the server.</text>
+  <text x="50" y="120" text-anchor="start" class="muted head" font-size="11.5"></text>
+  <text x="260" y="120" text-anchor="start" class="muted head" font-size="11.5">SIZE</text>
+  <text x="480" y="120" text-anchor="start" class="muted head" font-size="11.5">LIFETIME</text>
+  <text x="700" y="120" text-anchor="start" class="muted head" font-size="11.5">READ BY JS?</text>
+  <text x="930" y="120" text-anchor="start" class="muted head" font-size="11.5">SENT TO SERVER?</text>
+  <rect class="card" x="40" y="136" width="1120" height="50" rx="10" stroke-width="1" />
+  <text x="50" y="167" text-anchor="start" class="ink mono" font-size="14" font-weight="700" xml:space="preserve">Cookie</text>
+  <text x="260" y="167" text-anchor="start" class="ink" font-size="14">~4 KB each</text>
+  <text x="480" y="167" text-anchor="start" class="ink" font-size="14">Expires / Max-Age</text>
+  <text x="700" y="167" text-anchor="start" class="posink" font-size="14" font-weight="700">Unless HttpOnly</text>
+  <text x="930" y="167" text-anchor="start" class="negink" font-size="14" font-weight="700">Every request</text>
+  <rect class="sunk" x="40" y="196" width="1120" height="50" rx="10" stroke-width="0" />
+  <text x="50" y="227" text-anchor="start" class="ink mono" font-size="14" font-weight="700" xml:space="preserve">localStorage</text>
+  <text x="260" y="227" text-anchor="start" class="ink" font-size="14">~5 MB / origin</text>
+  <text x="480" y="227" text-anchor="start" class="ink" font-size="14">Until cleared</text>
+  <text x="700" y="227" text-anchor="start" class="negink" font-size="14" font-weight="700">Yes</text>
+  <text x="930" y="227" text-anchor="start" class="ink" font-size="14">No</text>
+  <rect class="card" x="40" y="256" width="1120" height="50" rx="10" stroke-width="1" />
+  <text x="50" y="287" text-anchor="start" class="ink mono" font-size="14" font-weight="700" xml:space="preserve">sessionStorage</text>
+  <text x="260" y="287" text-anchor="start" class="ink" font-size="14">~5 MB / origin</text>
+  <text x="480" y="287" text-anchor="start" class="ink" font-size="14">Until tab closes</text>
+  <text x="700" y="287" text-anchor="start" class="negink" font-size="14" font-weight="700">Yes</text>
+  <text x="930" y="287" text-anchor="start" class="ink" font-size="14">No</text>
+  <rect class="sunk" x="40" y="316" width="1120" height="50" rx="10" stroke-width="0" />
+  <text x="50" y="347" text-anchor="start" class="ink mono" font-size="14" font-weight="700" xml:space="preserve">IndexedDB</text>
+  <text x="260" y="347" text-anchor="start" class="ink" font-size="14">Share of disk</text>
+  <text x="480" y="347" text-anchor="start" class="ink" font-size="14">Until evicted*</text>
+  <text x="700" y="347" text-anchor="start" class="negink" font-size="14" font-weight="700">Yes (async)</text>
+  <text x="930" y="347" text-anchor="start" class="ink" font-size="14">No</text>
+  <rect class="card" x="40" y="376" width="1120" height="50" rx="10" stroke-width="1" />
+  <text x="50" y="407" text-anchor="start" class="ink mono" font-size="14" font-weight="700" xml:space="preserve">Cache Storage</text>
+  <text x="260" y="407" text-anchor="start" class="ink" font-size="14">Share of disk</text>
+  <text x="480" y="407" text-anchor="start" class="ink" font-size="14">Until evicted*</text>
+  <text x="700" y="407" text-anchor="start" class="negink" font-size="14" font-weight="700">Yes</text>
+  <text x="930" y="407" text-anchor="start" class="ink" font-size="14">No</text>
+  <text x="40" y="452" text-anchor="start" class="muted" font-size="12.5">* Browsers can evict IndexedDB and Cache Storage under storage pressure unless navigator.storage.persist() is granted.</text>
+  <text x="40" y="482" text-anchor="start" class="ink" font-size="14" font-weight="700">Anything a script can read, an XSS bug can read. Keep session tokens in HttpOnly cookies.</text>
+</svg>

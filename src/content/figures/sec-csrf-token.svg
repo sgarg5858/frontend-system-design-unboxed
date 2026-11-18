@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" role="img" aria-labelledby="t d" font-family="'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+  <title id="t">CSRF tokens: a secret the other site can&#x27;t read</title>
+  <desc id="d">A sequence between the browser tab on shop.example, the shop server, and an attacker page on evil.example. 1: the page loads; the server creates a random token, stores it with the session, and embeds it in the page or a cookie. 2: when the user changes their address, the page sends the request with the session cookie plus the token in a header or hidden field. 3: the server compares the token with the one stored for the session using a constant-time comparison, and the request succeeds. 4: evil.example forges the same request; the browser attaches the session cookie, but the attacker could not read the token, because the same-origin policy stops it reading shop.example pages. 5: the server sees a missing or wrong token and returns 403.</desc>
+  <!--theme-->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowhead"/></marker>
+    <marker id="aa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowacc"/></marker>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="heatfill"/></marker>
+    <marker id="an" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="neg"/></marker>
+    <marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="pos"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="560" rx="18"/>
+  <text x="40" y="52" text-anchor="start" class="ink" font-size="26" font-weight="700">CSRF tokens: a secret the other site can&#x27;t read</text>
+  <text x="40" y="78" text-anchor="start" class="muted" font-size="15">The server hands your page a random token. Every state-changing request must send it back.</text>
+  <rect class="card" x="70" y="100" width="260" height="64" rx="12" stroke-width="1.5" />
+  <text x="200.0" y="129.0" text-anchor="middle" class="ink" font-size="15" font-weight="700">Your page</text>
+  <text x="200.0" y="148.0" text-anchor="middle" class="muted" font-size="12">shop.example</text>
+  <line class="thin" x1="200" y1="166" x2="200" y2="540" stroke-dasharray="4 5"/>
+  <rect class="hit" x="470" y="100" width="260" height="64" rx="12" stroke-width="1.5" />
+  <text x="600.0" y="129.0" text-anchor="middle" class="accink" font-size="15" font-weight="700">Your server</text>
+  <text x="600.0" y="148.0" text-anchor="middle" class="muted" font-size="12">session store</text>
+  <line class="thin" x1="600" y1="166" x2="600" y2="540" stroke-dasharray="4 5"/>
+  <rect class="negsoft" x="870" y="100" width="260" height="64" rx="12" stroke-width="1.5" />
+  <text x="1000.0" y="129.0" text-anchor="middle" class="negink" font-size="15" font-weight="700">Attacker page</text>
+  <text x="1000.0" y="148.0" text-anchor="middle" class="muted" font-size="12">evil.example</text>
+  <line class="thin" x1="1000" y1="166" x2="1000" y2="540" stroke-dasharray="4 5"/>
+  <line class="line" x1="600" y1="210" x2="206" y2="210" marker-end="url(#a)"/>
+  <text x="400.0" y="200" text-anchor="middle" class="ink mono" font-size="12.5" font-weight="700" xml:space="preserve">1 · page + token: a7f3…  (stored with the session)</text>
+  <line class="sacc" x1="200" y1="280" x2="594" y2="280" marker-end="url(#aa)"/>
+  <text x="400.0" y="270" text-anchor="middle" class="accink mono" font-size="12.5" font-weight="700" xml:space="preserve">2 · POST /address  Cookie: sid  X-CSRF-Token: a7f3…</text>
+  <line class="spos" x1="600" y1="340" x2="206" y2="340" marker-end="url(#ap)"/>
+  <text x="400.0" y="330" text-anchor="middle" class="posink mono" font-size="12.5" font-weight="700" xml:space="preserve">3 · token matches (constant-time compare) → 200 OK</text>
+  <line class="sneg" x1="1000" y1="420" x2="606" y2="420" marker-end="url(#an)"/>
+  <text x="800.0" y="410" text-anchor="middle" class="negink mono" font-size="12.5" font-weight="700" xml:space="preserve">4 · POST /address  Cookie: sid  (no token)</text>
+  <line class="spos" x1="600" y1="490" x2="994" y2="490" marker-end="url(#ap)"/>
+  <text x="800.0" y="480" text-anchor="middle" class="posink mono" font-size="12.5" font-weight="700" xml:space="preserve">5 · missing / wrong token → 403</text>
+  <text x="1000" y="450" text-anchor="middle" class="negink" font-size="11.5" font-style="italic">can&#x27;t read the token: same-origin policy</text>
+</svg>

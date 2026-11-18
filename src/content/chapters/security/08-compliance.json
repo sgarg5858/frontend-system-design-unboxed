@@ -173,6 +173,123 @@
           ]
         }
       ]
+    },
+    {
+      "title": "Security standards and frameworks",
+      "summary": "Laws say what must be protected. Standards and frameworks describe how, and customers often require them in contracts.",
+      "body": [
+        "Besides laws, teams meet a set of standards and frameworks, especially when selling to enterprises or governments:",
+        {
+          "ul": [
+            "<b>ISO/IEC 27001:2022</b> certifies an organisation's information security management system: risk assessment, access control, supplier security, incident handling.",
+            "<b>SOC 2</b> is an audit report (common for US SaaS) on security, availability and confidentiality controls.",
+            "<b>NIST Cybersecurity Framework 2.0</b> (2024) organises security into Govern, Identify, Protect, Detect, Respond and Recover.",
+            "<b>FISMA and FedRAMP</b> apply to US federal systems and cloud services sold to federal agencies.",
+            "<b>HIPAA</b> covers US health data: encryption, access logging, minimum necessary access.",
+            "<b>OWASP Top 10</b> is an awareness list of the most critical web risks, and <b>OWASP ASVS</b> turns it into testable requirements."
+          ]
+        },
+        "<mark>For frontend work, the OWASP Top 10 and ASVS are the most practical: they map directly to code you write and review.</mark>",
+        {
+          "note": "The OWASP Top 10 is updated every few years. Older courses still teach the 2017 list (with XXE and “Sensitive Data Exposure”); use the 2025 edition.",
+          "kind": "warn"
+        }
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "OWASP Top 10:2025",
+              "cells": [
+                {
+                  "text": "Frontend angle"
+                }
+              ]
+            },
+            {
+              "head": "A01 Broken Access Control (now includes SSRF)",
+              "cells": [
+                {
+                  "text": "Never rely on hidden UI; server checks every request"
+                }
+              ]
+            },
+            {
+              "head": "A02 Security Misconfiguration",
+              "cells": [
+                {
+                  "text": "Missing headers, verbose errors, open CORS"
+                }
+              ]
+            },
+            {
+              "head": "A03 Software Supply Chain Failures",
+              "cells": [
+                {
+                  "text": "npm packages, CDNs, build pipeline"
+                }
+              ]
+            },
+            {
+              "head": "A04 Cryptographic Failures",
+              "cells": [
+                {
+                  "text": "HTTPS everywhere, no secrets in the client"
+                }
+              ]
+            },
+            {
+              "head": "A05 Injection (includes XSS)",
+              "cells": [
+                {
+                  "text": "Encoding, sanitizing, CSP"
+                }
+              ]
+            },
+            {
+              "head": "A06 Insecure Design",
+              "cells": [
+                {
+                  "text": "Threat-model features before building"
+                }
+              ]
+            },
+            {
+              "head": "A07 Authentication Failures",
+              "cells": [
+                {
+                  "text": "Sessions, MFA, passkeys"
+                }
+              ]
+            },
+            {
+              "head": "A08 Software or Data Integrity Failures",
+              "cells": [
+                {
+                  "text": "SRI, signed updates, trusted publishing"
+                }
+              ]
+            },
+            {
+              "head": "A09 Security Logging & Alerting Failures",
+              "cells": [
+                {
+                  "text": "CSP reports, error monitoring"
+                }
+              ]
+            },
+            {
+              "head": "A10 Mishandling of Exceptional Conditions",
+              "cells": [
+                {
+                  "text": "Fail closed; don't leak details in errors"
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }

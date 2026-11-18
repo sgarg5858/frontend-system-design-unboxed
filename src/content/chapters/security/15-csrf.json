@@ -70,6 +70,88 @@
       }
     },
     {
+      "title": "Why CSRF is possible",
+      "summary": "HTTP is stateless and cookies ride along automatically, so the server can't tell a request the user meant from one another site triggered.",
+      "body": [
+        "Each HTTP request stands alone. The server recognises the user only by the credentials that arrive with it, and the browser adds cookies automatically. Many ordinary HTML features can trigger a cross-site request:",
+        {
+          "ul": [
+            "<b>An image:</b> <code>&lt;img src=\"https://forum.example/posts/9/delete\"&gt;</code> fires a GET as soon as the page or email loads.",
+            "<b>A link</b> in a chat message or email, clicked in a hurry.",
+            "<b>An auto-submitting form</b> that POSTs as soon as the page opens, possibly in a hidden iframe.",
+            "<b>A fetch with <code>credentials: 'include'</code></b> using a simple content type."
+          ]
+        },
+        "<mark>Any endpoint that changes state using only cookie authentication, and accepts a request a plain HTML page can send, is a CSRF target.</mark>",
+        {
+          "note": "A forum that deletes posts with <code>GET /posts/9/delete</code> can be attacked by an image in any web page or HTML email the moderator opens. State changes must never use GET.",
+          "kind": "example"
+        }
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Vector",
+              "cells": [
+                {
+                  "text": "Method"
+                },
+                {
+                  "text": "Needs a click?"
+                }
+              ]
+            },
+            {
+              "head": "<img>, <script>, <link>",
+              "cells": [
+                {
+                  "text": "GET"
+                },
+                {
+                  "text": "No"
+                }
+              ]
+            },
+            {
+              "head": "<a href>",
+              "cells": [
+                {
+                  "text": "GET"
+                },
+                {
+                  "text": "Yes"
+                }
+              ]
+            },
+            {
+              "head": "Auto-submitted <form>",
+              "cells": [
+                {
+                  "text": "POST (form types)"
+                },
+                {
+                  "text": "No"
+                }
+              ]
+            },
+            {
+              "head": "fetch / XHR, simple request",
+              "cells": [
+                {
+                  "text": "GET / POST"
+                },
+                {
+                  "text": "No"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "Defending against CSRF",
       "summary": "SameSite cookies are the baseline. Add a Fetch Metadata or Origin check, and tokens for anything sensitive.",
       "body": [
@@ -159,6 +241,56 @@
           ]
         }
       ]
+    },
+    {
+      "title": "The synchronizer token pattern",
+      "summary": "The server issues a random per-session token; the page sends it back with every state change; the server compares before acting.",
+      "body": [
+        "A <b>CSRF token</b> works because the attacker's page can make the browser <i>send</i> a request, but can't <i>read</i> your pages to learn the token.",
+        {
+          "ul": [
+            "Generate it with a secure random generator (32 bytes) and store it with the server-side session.",
+            "Put it in the page (a <code>&lt;meta&gt;</code> tag or hidden field), or a readable cookie for the double-submit variant.",
+            "Send it back in a custom header (<code>X-CSRF-Token</code>) on every POST, PUT, PATCH and DELETE.",
+            "Compare with a constant-time function, and reject with 403 if it's missing or wrong.",
+            "Rotate it at login, and never put it in a URL, where it leaks through logs and Referer headers."
+          ]
+        },
+        "<mark>Checking the token in the browser does nothing: the attacker's request never runs your JavaScript. The server must check it.</mark>",
+        {
+          "h": "Extra layers"
+        },
+        {
+          "ul": [
+            "<b>Origin / Referer check:</b> compare against an exact allowlist with <code>new URL()</code>, not <code>startsWith</code> (which <code>https://shop.example.evil.example</code> passes).",
+            "<b>Re-authentication or a one-time code</b> before high-value actions such as payouts.",
+            "<b>CAPTCHA</b> slows automated abuse of forms, but isn't a CSRF defence on its own."
+          ]
+        }
+      ],
+      "code": [
+        "import crypto from 'node:crypto';",
+        "",
+        "app.get('/account', (req, res) => {",
+        "  req.session.csrf ??= crypto.randomBytes(32).toString('base64url');",
+        "  res.render('account', { csrf: req.session.csrf }); // <meta name=\"csrf\" content=\"…\">",
+        "});",
+        "",
+        "app.use((req, res, next) => {",
+        "  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();",
+        "  const sent = Buffer.from(req.get('X-CSRF-Token') ?? '');",
+        "  const expected = Buffer.from(req.session.csrf ?? '');",
+        "  const ok = sent.length === expected.length && crypto.timingSafeEqual(sent, expected);",
+        "  ok ? next() : res.sendStatus(403);",
+        "});"
+      ],
+      "figure": {
+        "src": "images/sec-csrf-token-light.svg",
+        "darkSrc": "images/sec-csrf-token-dark.svg",
+        "alt": "A sequence between the browser tab on shop.example, the shop server, and an attacker page on evil.example. 1: the page loads; the server creates a random token, stores it with the session, and embeds it in the page or a cookie. 2: when the user changes their address, the page sends the request with the session cookie plus the token in a header or hidden field. 3: the server compares the token with the one stored for the session using a constant-time comparison, and the request succeeds. 4: evil.example forges the same request; the browser attaches the session cookie, but the attacker could not read the token, because the same-origin policy stops it reading shop.example pages. 5: the server sees a missing or wrong token and returns 403.",
+        "width": 1200,
+        "height": 560
+      }
     }
   ]
 }

@@ -85,6 +85,124 @@
         "width": 1200,
         "height": 470
       }
+    },
+    {
+      "title": "Allowlist syntax",
+      "summary": "Each feature takes an allowlist: *, (), self, specific origins, and for iframes, src.",
+      "body": [
+        "The header form is <code>Permissions-Policy: feature=(allowlist), feature=(allowlist)</code>. The allowlist can be:",
+        {
+          "ul": [
+            "<code>*</code>: allowed for this page and every iframe, whatever its origin. Rarely a good idea.",
+            "<code>()</code>: blocked everywhere, including your own page. The iframe <code>allow</code> equivalent is <code>'none'</code>.",
+            "<code>self</code>: your own origin and same-origin iframes only.",
+            "<code>\"https://maps.example\"</code>: a specific origin. Quoted in the header, <b>unquoted</b> in the <code>allow</code> attribute.",
+            "<code>src</code> (iframe <code>allow</code> only, and the default there): allowed if the frame's document comes from the origin in its <code>src</code>."
+          ]
+        },
+        "<code>*</code> and <code>()</code> must be used alone; <code>self</code> and <code>src</code> can be combined with origins.",
+        "<mark>An iframe gets a feature only if both the page's header and the iframe's allow attribute permit it.</mark>",
+        {
+          "note": "Example: a clinic site embeds a video-consultation widget. Only that frame needs the camera and microphone; the map frame needs geolocation; nothing else needs either.",
+          "kind": "example"
+        }
+      ],
+      "code": [
+        "Permissions-Policy: camera=(\"https://consult.videocare.example\"),",
+        "  microphone=(\"https://consult.videocare.example\"),",
+        "  geolocation=(self \"https://maps.example\"), payment=(), usb=()",
+        "",
+        "<iframe src=\"https://consult.videocare.example/room/42\"",
+        "        allow=\"camera; microphone\"></iframe>",
+        "<iframe src=\"https://maps.example/clinic\" allow=\"geolocation\"></iframe>"
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Iframe",
+              "cells": [
+                {
+                  "text": "Gets camera?"
+                },
+                {
+                  "text": "Why"
+                }
+              ]
+            },
+            {
+              "head": "consult.videocare.example + allow=\"camera\"",
+              "cells": [
+                {
+                  "text": "Yes"
+                },
+                {
+                  "text": "Header and attribute both allow it"
+                }
+              ]
+            },
+            {
+              "head": "consult.videocare.example, no allow",
+              "cells": [
+                {
+                  "text": "No"
+                },
+                {
+                  "text": "Not delegated by the attribute"
+                }
+              ]
+            },
+            {
+              "head": "maps.example + allow=\"camera\"",
+              "cells": [
+                {
+                  "text": "No"
+                },
+                {
+                  "text": "Header doesn't list this origin"
+                }
+              ]
+            },
+            {
+              "head": "sub.clinic.example (your subdomain)",
+              "cells": [
+                {
+                  "text": "No"
+                },
+                {
+                  "text": "Different origin; self doesn't cover it"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Testing a policy",
+      "summary": "Watch the console for violations, inspect the active policy in DevTools, and test in more than one browser.",
+      "body": [
+        "Imagine an embedded promo widget that quietly calls <code>navigator.geolocation.getCurrentPosition()</code>. With <code>geolocation=()</code> in your header, the call fails as if the user had denied permission, and no prompt appears.",
+        {
+          "ul": [
+            "<b>Console:</b> Chromium logs a “Permissions policy violation” message naming the feature and the frame.",
+            "<b>DevTools → Application → Frames → top:</b> the <i>Permissions Policy</i> section lists allowed and disabled features for that frame. Select an iframe to see its own effective policy.",
+            "<b>Network panel:</b> check the response headers of the document to confirm the header actually shipped.",
+            "<b>Cross-browser:</b> Chromium enforces the header for many features; Firefox and Safari mainly honour the iframe <code>allow</code> attribute, so use both."
+          ]
+        },
+        "<mark>Write code that handles a denied feature gracefully: a blocked API behaves like a user saying no.</mark>"
+      ],
+      "code": [
+        "// Promo widget, written defensively",
+        "navigator.geolocation.getCurrentPosition(",
+        "  (pos) => showNearbyStores(pos.coords),",
+        "  (err) => {",
+        "    if (err.code === err.PERMISSION_DENIED) showStoreSearchBox();",
+        "  },",
+        ");"
+      ]
     }
   ]
 }

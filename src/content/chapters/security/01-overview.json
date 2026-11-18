@@ -39,6 +39,15 @@
               "label": "<b>Availability</b>",
               "sub": "The app stays usable: no script that freezes the page or locks users out.",
               "tone": "pos"
+            },
+            {
+              "label": "<b>AI attacks</b>",
+              "sub": "Prompt injection, unsafe output, agents",
+              "tone": "neg",
+              "goto": {
+                "chapter": "ai-attacks",
+                "slide": 1
+              }
             }
           ]
         },
@@ -207,6 +216,15 @@
                 "chapter": "csrf",
                 "slide": 1
               }
+            },
+            {
+              "label": "<b>AI attacks</b>",
+              "sub": "Prompt injection, unsafe output, agents",
+              "tone": "neg",
+              "goto": {
+                "chapter": "ai-attacks",
+                "slide": 1
+              }
             }
           ]
         }
@@ -303,6 +321,17 @@
                 },
                 {
                   "text": "Allowlist + IP checks on the server"
+                }
+              ]
+            },
+            {
+              "head": "AI assistant",
+              "cells": [
+                {
+                  "text": "Prompt injection, output XSS"
+                },
+                {
+                  "text": "Sanitize output, least-privilege tools"
                 }
               ]
             }

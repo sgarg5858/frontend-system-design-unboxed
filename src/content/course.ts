@@ -93,6 +93,11 @@ export const SECTIONS: readonly SectionContent[] = [
         name: 'Cross-site request forgery (CSRF)',
         load: () => json(import('./chapters/security/15-csrf.json')),
       },
+      {
+        id: 'ai-attacks',
+        name: 'AI attacks',
+        load: () => json(import('./chapters/security/16-ai-attacks.json')),
+      },
     ],
   },
   {
