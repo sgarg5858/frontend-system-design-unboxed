@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "performance",
-  "name": "Web performance",
+  "name": "Making pages fast",
   "slides": [
     {
       "title": "Coming soon: Performance",

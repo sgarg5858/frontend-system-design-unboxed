@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "input-validation",
-  "name": "Input validation and sanitization",
+  "name": "Never trust user input",
   "slides": [
     {
       "title": "Validate on the way in, encode on the way out",

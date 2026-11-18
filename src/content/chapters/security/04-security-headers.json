@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "security-headers",
-  "name": "Security headers",
+  "name": "Hardening the browser with headers",
   "slides": [
     {
       "title": "Headers: free defence from the server",
@@ -193,7 +193,7 @@
             "chapter": "permissions-policy",
             "slide": 1
           },
-          "link": "Feature Policy | Permissions-Policy"
+          "link": "Locking down browser features"
         }
       ],
       "viz": [

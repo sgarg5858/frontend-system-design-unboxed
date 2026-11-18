@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "cors",
-  "name": "Cross-origin resource sharing (CORS)",
+  "name": "Who may read your responses (CORS)",
   "slides": [
     {
       "title": "What CORS is for",
@@ -197,7 +197,7 @@
             "chapter": "csrf",
             "slide": 1
           },
-          "link": "Cross-site request forgery (CSRF)"
+          "link": "Requests users never meant to send (CSRF)"
         },
         {
           "more": "Private Network Access is gone",

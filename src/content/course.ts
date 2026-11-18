@@ -20,82 +20,82 @@ export const SECTIONS: readonly SectionContent[] = [
     chapters: [
       {
         id: 'security-overview',
-        name: 'Security overview',
+        name: 'Thinking like an attacker',
         load: () => json(import('./chapters/security/01-overview.json')),
       },
       {
         id: 'xss',
-        name: 'Cross-site scripting (XSS)',
+        name: 'When data turns into code (XSS)',
         load: () => json(import('./chapters/security/02-xss.json')),
       },
       {
         id: 'iframe-protection',
-        name: 'iFrame protection',
+        name: 'Framing and clickjacking',
         load: () => json(import('./chapters/security/03-iframe-protection.json')),
       },
       {
         id: 'security-headers',
-        name: 'Security headers',
+        name: 'Hardening the browser with headers',
         load: () => json(import('./chapters/security/04-security-headers.json')),
       },
       {
         id: 'client-side-security',
-        name: 'Client-side security',
+        name: 'Secrets, tokens and storage',
         load: () => json(import('./chapters/security/05-client-side-security.json')),
       },
       {
         id: 'https',
-        name: 'Secure communication (HTTPS)',
+        name: 'Protecting data in transit (HTTPS)',
         load: () => json(import('./chapters/security/06-https.json')),
       },
       {
         id: 'dependency-security',
-        name: 'Dependency security',
+        name: 'Supply-chain risk',
         load: () => json(import('./chapters/security/07-dependency-security.json')),
       },
       {
         id: 'compliance',
-        name: 'Compliance & regulation',
+        name: 'Privacy law and standards',
         load: () => json(import('./chapters/security/08-compliance.json')),
       },
       {
         id: 'input-validation',
-        name: 'Input validation and sanitization',
+        name: 'Never trust user input',
         load: () => json(import('./chapters/security/09-input-validation.json')),
       },
       {
         id: 'ssrf',
-        name: 'Server-side request forgery (SSRF)',
+        name: 'Tricking your server into fetching (SSRF)',
         load: () => json(import('./chapters/security/10-ssrf.json')),
       },
       {
         id: 'ssji',
-        name: 'Server-side JavaScript injection (SSJI)',
+        name: 'Code injection on the server (SSJI)',
         load: () => json(import('./chapters/security/11-ssji.json')),
       },
       {
         id: 'permissions-policy',
-        name: 'Feature Policy | Permissions-Policy',
+        name: 'Locking down browser features',
         load: () => json(import('./chapters/security/12-permissions-policy.json')),
       },
       {
         id: 'sri',
-        name: 'Subresource Integrity (SRI)',
+        name: 'Pinning third-party scripts (SRI)',
         load: () => json(import('./chapters/security/13-sri.json')),
       },
       {
         id: 'cors',
-        name: 'Cross-origin resource sharing (CORS)',
+        name: 'Who may read your responses (CORS)',
         load: () => json(import('./chapters/security/14-cors.json')),
       },
       {
         id: 'csrf',
-        name: 'Cross-site request forgery (CSRF)',
+        name: 'Requests users never meant to send (CSRF)',
         load: () => json(import('./chapters/security/15-csrf.json')),
       },
       {
         id: 'ai-attacks',
-        name: 'AI attacks',
+        name: 'Securing LLM features',
         load: () => json(import('./chapters/security/16-ai-attacks.json')),
       },
     ],
@@ -106,7 +106,7 @@ export const SECTIONS: readonly SectionContent[] = [
     chapters: [
       {
         id: 'networking',
-        name: 'Networking for frontend engineers',
+        name: 'How bytes reach the browser',
         load: () => json(import('./chapters/networking/01-networking.json')),
         soon: true,
       },
@@ -118,7 +118,7 @@ export const SECTIONS: readonly SectionContent[] = [
     chapters: [
       {
         id: 'communication',
-        name: 'Real-time communication',
+        name: 'Live updates, from polling to sockets',
         load: () => json(import('./chapters/communication/01-communication.json')),
         soon: true,
       },
@@ -130,7 +130,7 @@ export const SECTIONS: readonly SectionContent[] = [
     chapters: [
       {
         id: 'testing',
-        name: 'Testing strategy',
+        name: 'Tests worth writing',
         load: () => json(import('./chapters/testing/01-testing.json')),
         soon: true,
       },
@@ -142,7 +142,7 @@ export const SECTIONS: readonly SectionContent[] = [
     chapters: [
       {
         id: 'performance',
-        name: 'Web performance',
+        name: 'Making pages fast',
         load: () => json(import('./chapters/performance/01-performance.json')),
         soon: true,
       },
@@ -154,7 +154,7 @@ export const SECTIONS: readonly SectionContent[] = [
     chapters: [
       {
         id: 'caching',
-        name: 'Client storage & caching',
+        name: 'Where data lives on the client',
         load: () => json(import('./chapters/caching/01-caching.json')),
         soon: true,
       },
@@ -166,7 +166,7 @@ export const SECTIONS: readonly SectionContent[] = [
     chapters: [
       {
         id: 'monitoring',
-        name: 'Logging & monitoring',
+        name: 'Seeing what happens in production',
         load: () => json(import('./chapters/monitoring/01-monitoring.json')),
         soon: true,
       },
@@ -178,7 +178,7 @@ export const SECTIONS: readonly SectionContent[] = [
     chapters: [
       {
         id: 'accessibility',
-        name: 'Accessibility',
+        name: 'Building for every user',
         load: () => json(import('./chapters/accessibility/01-accessibility.json')),
         soon: true,
       },
@@ -190,7 +190,7 @@ export const SECTIONS: readonly SectionContent[] = [
     chapters: [
       {
         id: 'offline',
-        name: 'Offline support',
+        name: 'Working without a network',
         load: () => json(import('./chapters/offline/01-offline.json')),
         soon: true,
       },
@@ -202,7 +202,7 @@ export const SECTIONS: readonly SectionContent[] = [
     chapters: [
       {
         id: 'lld',
-        name: 'Low-level design',
+        name: 'Designing components and APIs',
         load: () => json(import('./chapters/lld/01-lld.json')),
         soon: true,
       },
@@ -214,7 +214,7 @@ export const SECTIONS: readonly SectionContent[] = [
     chapters: [
       {
         id: 'hld',
-        name: 'High-level design',
+        name: 'Architecture on the whiteboard',
         load: () => json(import('./chapters/hld/01-hld.json')),
         soon: true,
       },

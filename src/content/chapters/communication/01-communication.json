@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "communication",
-  "name": "Real-time communication",
+  "name": "Live updates, from polling to sockets",
   "slides": [
     {
       "title": "Coming soon: Communication",

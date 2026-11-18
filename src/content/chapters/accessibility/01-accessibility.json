@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "accessibility",
-  "name": "Accessibility",
+  "name": "Building for every user",
   "slides": [
     {
       "title": "Coming soon: Accessibility",

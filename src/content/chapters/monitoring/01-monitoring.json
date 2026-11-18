@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "monitoring",
-  "name": "Logging & monitoring",
+  "name": "Seeing what happens in production",
   "slides": [
     {
       "title": "Coming soon: Logging & Monitoring",

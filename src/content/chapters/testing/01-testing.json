@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "testing",
-  "name": "Testing strategy",
+  "name": "Tests worth writing",
   "slides": [
     {
       "title": "Coming soon: Testing",

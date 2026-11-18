@@ -102,7 +102,16 @@ A chapter can list a few videos (`videos` in its JSON). Each covers a range of s
 - **Read mode:** a slide inside a video's range shows a "Watch this part" button (`SlideView`). It calls `ViewModeState.watchAt(seconds)`, which switches to Watch mode and asks the player to start at that slide's timestamp.
 - **Watch mode:** `CourseNav.video()` is the video that covers the current slide (`videoIndexAt` in `course/chapter-videos.ts`, a pure, unit-tested helper). `WatchView` shows it, its timestamps (`marks`) as a clickable list, and a playlist when the chapter has more than one. Back/Next and "Up next" step video by video (`CourseNav.stepVideo`), then move to the next chapter; opening a video navigates to the first slide it covers, so links and reloads land on the same video.
 - **Player:** `shared/video-player` takes `src`, `start` (applied once, then reported with `startApplied`) and `marks`, drawn as ticks on the seek bar (`video-range`); hovering names the section. It remembers where each video was stopped.
-- **Files:** `src/content/videos/` is copied to `videos/` by an `assets` glob in `angular.json`. The same file can be listed in more than one chapter. Keep files small (GitHub rejects files over 100 MB); a `src` can later point to a CDN.
+- **Files:** `src/content/videos/<chapter-id>/` is copied to `videos/` by an `assets` glob in `angular.json`. The same file can be listed in more than one chapter (it stays in the folder of the chapter it was made for). Keep files small (GitHub rejects files over 100 MB); a `src` can later point to a CDN.
+
+**Making a video: one at a time, in sequence.** Videos are narrated, animated explainers. The toolkit is kept outside the repo (as in AI, Unboxed); only the finished MP4s are committed. Voice generation and rendering each load a model or a browser and use a lot of memory, so run them strictly one after another, never in parallel. For each video, finish every step before starting the next video:
+
+1. **Script:** write the narration from the slides it covers, one sentence per beat, grouped into scenes. Keep it crisp and plain: one idea per sentence, no filler, and new examples rather than the slide's own. **No recaps and no quizzes.** Open by picking up from the previous part and close by naming the next one.
+2. **Voice:** generate one clip per sentence with Kokoro's "Heart" voice (runs locally), then join them with short pauses into one track. The join step records when each sentence starts, which drives the animation timing and the `marks`. Acronyms get a spoken spelling (CSRF → "C S R F", HttpOnly → "H T T P only").
+3. **Visuals:** build the animated page (1280×720 stage) for the timeline.
+4. **Verify before final:** check every fact against the slides and their sources, render a still at the end of every sentence, and look at each one for overlaps, cut-off text, wrong numbers and wording that doesn't match the narration. Fix and re-check until clean.
+5. **Render:** capture every frame (1920×1080, 30 fps) and pipe it into ffmpeg with the voice track. Restart the browser every ~1,500 frames and retry slow frames. Then compare two or three frames from the MP4 with their subtitles.
+6. **Ship:** copy the MP4 to `src/content/videos/<chapter-id>/`, add it to the chapter's `videos` with `slides`, `at` and `marks` taken from the timeline, then run the tests.
 
 ## Request → render walkthrough
 

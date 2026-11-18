@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "https",
-  "name": "Secure communication (HTTPS)",
+  "name": "Protecting data in transit (HTTPS)",
   "slides": [
     {
       "title": "What HTTPS gives you",

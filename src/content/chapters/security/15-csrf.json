@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "csrf",
-  "name": "Cross-site request forgery (CSRF)",
+  "name": "Requests users never meant to send (CSRF)",
   "slides": [
     {
       "title": "How CSRF works",

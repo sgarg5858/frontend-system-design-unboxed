@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "client-side-security",
-  "name": "Client-side security",
+  "name": "Secrets, tokens and storage",
   "slides": [
     {
       "title": "No secrets in the bundle",

@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "xss",
-  "name": "Cross-site scripting (XSS)",
+  "name": "When data turns into code (XSS)",
   "slides": [
     {
       "title": "What XSS is",
@@ -330,7 +330,7 @@
             "chapter": "security-headers",
             "slide": 2
           },
-          "link": "CSP in Security headers"
+          "link": "Content-Security-Policy, in depth"
         }
       ],
       "code": [

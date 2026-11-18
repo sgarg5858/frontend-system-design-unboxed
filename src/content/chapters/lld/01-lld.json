@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "lld",
-  "name": "Low-level design",
+  "name": "Designing components and APIs",
   "slides": [
     {
       "title": "Coming soon: Low Level Design",

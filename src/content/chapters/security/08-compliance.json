@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "compliance",
-  "name": "Compliance & regulation",
+  "name": "Privacy law and standards",
   "slides": [
     {
       "title": "Laws that shape frontend code",

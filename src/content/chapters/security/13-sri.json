@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "sri",
-  "name": "Subresource Integrity (SRI)",
+  "name": "Pinning third-party scripts (SRI)",
   "slides": [
     {
       "title": "Pinning third-party files by hash",
@@ -28,7 +28,7 @@
             "chapter": "compliance",
             "slide": 2
           },
-          "link": "Compliance & regulation"
+          "link": "Privacy law and standards"
         }
       ],
       "code": [

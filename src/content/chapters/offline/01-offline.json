@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "offline",
-  "name": "Offline support",
+  "name": "Working without a network",
   "slides": [
     {
       "title": "Coming soon: Offline Support",

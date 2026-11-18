@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "ai-attacks",
-  "name": "AI attacks",
+  "name": "Securing LLM features",
   "slides": [
     {
       "title": "Two kinds of AI risk",

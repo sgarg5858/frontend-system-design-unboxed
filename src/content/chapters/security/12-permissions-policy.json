@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "permissions-policy",
-  "name": "Feature Policy | Permissions-Policy",
+  "name": "Locking down browser features",
   "slides": [
     {
       "title": "Turning browser features off",

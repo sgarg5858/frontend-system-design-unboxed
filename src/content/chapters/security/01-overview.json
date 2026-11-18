@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "security-overview",
-  "name": "Security overview",
+  "name": "Thinking like an attacker",
   "slides": [
     {
       "title": "Why frontend security is different",

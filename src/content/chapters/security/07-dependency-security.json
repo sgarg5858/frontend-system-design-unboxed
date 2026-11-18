@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "dependency-security",
-  "name": "Dependency security",
+  "name": "Supply-chain risk",
   "slides": [
     {
       "title": "Your app is mostly other people's code",

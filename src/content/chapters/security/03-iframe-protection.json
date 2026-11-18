@@ -1,7 +1,7 @@
 {
   "$schema": "../../schema/chapter.schema.json",
   "id": "iframe-protection",
-  "name": "iFrame protection",
+  "name": "Framing and clickjacking",
   "slides": [
     {
       "title": "Clickjacking",
