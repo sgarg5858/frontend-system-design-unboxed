@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" role="img" aria-labelledby="t d" font-family="'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+  <title id="t">One response, many protections</title>
+  <desc id="d">An HTTP response is shown on the left with seven security headers. Each one points to what it protects against on the right: Content-Security-Policy against XSS and data exfiltration; Strict-Transport-Security against downgrade to HTTP; X-Content-Type-Options nosniff against files run as the wrong type; Referrer-Policy against leaking full URLs to other sites; Permissions-Policy against unwanted camera, microphone or location use; Cross-Origin-Opener-Policy against cross-window attacks and Spectre-style leaks; and frame-ancestors or X-Frame-Options against clickjacking.</desc>
+  <style>
+    .bg{fill:#0f1413}.card{fill:#171e1c;stroke:#2c3835}.sunk{fill:#1f2826}
+    .ink{fill:#e4ece9}.muted{fill:#9aa9a4}.onacc{fill:#0f1413}
+    .acc{fill:#4db3d1}.accink{fill:#8fd3e6}.accsoft{fill:#163742}
+    .pos{fill:#3fc4a3}.posink{fill:#3fc4a3}.possoft{fill:#123a30;stroke:#3fc4a3}
+    .neg{fill:#f07d60}.negink{fill:#f07d60}.negsoft{fill:#42221a;stroke:#f07d60}
+    .heat{fill:#3d2e14;stroke:#f0ac40}.heatink{fill:#f0ac40}.heatfill{fill:#f0ac40}
+    .line{stroke:#9aa9a4;fill:none;stroke-width:2}.thin{stroke:#2c3835;fill:none;stroke-width:1.5}
+    .dash{stroke:#4db3d1;fill:none;stroke-width:2;stroke-dasharray:6 5}
+    .sacc{stroke:#4db3d1;fill:none;stroke-width:2.5}.sheat{stroke:#f0ac40;fill:none;stroke-width:2.5}
+    .spos{stroke:#3fc4a3;fill:none;stroke-width:2.5}.sneg{stroke:#f07d60;fill:none;stroke-width:2.5}
+    .edge{stroke:#4db3d1;fill:none;stroke-width:1;opacity:.45}
+    .stream{stroke:#4db3d1;fill:none;stroke-width:14;stroke-linecap:round;opacity:.35}
+    .row{fill:#1f2826}.hit{fill:#163742;stroke:#4db3d1}
+    .mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace}
+    .head{font-size:13px;font-weight:700;letter-spacing:.08em}
+    .arrowhead{fill:#9aa9a4}.arrowacc{fill:#4db3d1}
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowhead"/></marker>
+    <marker id="aa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowacc"/></marker>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="heatfill"/></marker>
+    <marker id="an" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="neg"/></marker>
+    <marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="pos"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="560" rx="18"/>
+  <text x="40" y="52" text-anchor="start" class="ink" font-size="26" font-weight="700">One response, many protections</text>
+  <text x="40" y="78" text-anchor="start" class="muted" font-size="15">Each header switches on a browser defence. Set them at the CDN or server so every response gets them.</text>
+  <rect class="card" x="40" y="100" width="600" height="430" rx="14" stroke-width="1.5" />
+  <text x="60" y="132" text-anchor="start" class="muted mono" font-size="14" font-weight="700" xml:space="preserve">HTTP/2 200</text>
+  <rect class="sunk" x="56" y="146" width="568" height="36" rx="8" stroke-width="0" />
+  <text x="70" y="169" text-anchor="start" class="ink mono" font-size="13.5" xml:space="preserve">content-security-policy: script-src &#x27;nonce-…&#x27;</text>
+  <line class="line" x1="626" y1="164" x2="726" y2="164" marker-end="url(#a)"/>
+  <rect class="negsoft" x="730" y="146" width="430" height="36" rx="10" stroke-width="1.5" />
+  <text x="750" y="169" text-anchor="start" class="negink" font-size="14" font-weight="700">XSS, data exfiltration</text>
+  <rect class="sunk" x="56" y="196" width="568" height="36" rx="8" stroke-width="0" />
+  <text x="70" y="219" text-anchor="start" class="ink mono" font-size="13.5" xml:space="preserve">strict-transport-security: max-age=63072000</text>
+  <line class="line" x1="626" y1="214" x2="726" y2="214" marker-end="url(#a)"/>
+  <rect class="heat" x="730" y="196" width="430" height="36" rx="10" stroke-width="1.5" />
+  <text x="750" y="219" text-anchor="start" class="heatink" font-size="14" font-weight="700">Downgrade to HTTP</text>
+  <rect class="sunk" x="56" y="246" width="568" height="36" rx="8" stroke-width="0" />
+  <text x="70" y="269" text-anchor="start" class="ink mono" font-size="13.5" xml:space="preserve">x-content-type-options: nosniff</text>
+  <line class="line" x1="626" y1="264" x2="726" y2="264" marker-end="url(#a)"/>
+  <rect class="hit" x="730" y="246" width="430" height="36" rx="10" stroke-width="1.5" />
+  <text x="750" y="269" text-anchor="start" class="accink" font-size="14" font-weight="700">Files run as the wrong type</text>
+  <rect class="sunk" x="56" y="296" width="568" height="36" rx="8" stroke-width="0" />
+  <text x="70" y="319" text-anchor="start" class="ink mono" font-size="13.5" xml:space="preserve">referrer-policy: strict-origin-when-cross-origin</text>
+  <line class="line" x1="626" y1="314" x2="726" y2="314" marker-end="url(#a)"/>
+  <rect class="hit" x="730" y="296" width="430" height="36" rx="10" stroke-width="1.5" />
+  <text x="750" y="319" text-anchor="start" class="accink" font-size="14" font-weight="700">Full URLs leaking to other sites</text>
+  <rect class="sunk" x="56" y="346" width="568" height="36" rx="8" stroke-width="0" />
+  <text x="70" y="369" text-anchor="start" class="ink mono" font-size="13.5" xml:space="preserve">permissions-policy: camera=(), microphone=()</text>
+  <line class="line" x1="626" y1="364" x2="726" y2="364" marker-end="url(#a)"/>
+  <rect class="hit" x="730" y="346" width="430" height="36" rx="10" stroke-width="1.5" />
+  <text x="750" y="369" text-anchor="start" class="accink" font-size="14" font-weight="700">Unwanted camera / mic / location</text>
+  <rect class="sunk" x="56" y="396" width="568" height="36" rx="8" stroke-width="0" />
+  <text x="70" y="419" text-anchor="start" class="ink mono" font-size="13.5" xml:space="preserve">cross-origin-opener-policy: same-origin</text>
+  <line class="line" x1="626" y1="414" x2="726" y2="414" marker-end="url(#a)"/>
+  <rect class="hit" x="730" y="396" width="430" height="36" rx="10" stroke-width="1.5" />
+  <text x="750" y="419" text-anchor="start" class="accink" font-size="14" font-weight="700">Cross-window attacks, Spectre</text>
+  <rect class="sunk" x="56" y="446" width="568" height="36" rx="8" stroke-width="0" />
+  <text x="70" y="469" text-anchor="start" class="ink mono" font-size="13.5" xml:space="preserve">frame-ancestors &#x27;none&#x27; / x-frame-options: DENY</text>
+  <line class="line" x1="626" y1="464" x2="726" y2="464" marker-end="url(#a)"/>
+  <rect class="heat" x="730" y="446" width="430" height="36" rx="10" stroke-width="1.5" />
+  <text x="750" y="469" text-anchor="start" class="heatink" font-size="14" font-weight="700">Clickjacking</text>
+  <text x="60" y="518" text-anchor="start" class="muted" font-size="12.5">Obsolete: X-XSS-Protection (omit it or send 0)</text>
+</svg>

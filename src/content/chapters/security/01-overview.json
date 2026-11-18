@@ -7,17 +7,17 @@
       "title": "Why frontend security is different",
       "summary": "Your code runs on a machine you don't control, next to code you didn't write. The browser is the security boundary.",
       "body": [
-        "On the server, you control the machine. In the browser, you ship your code to the user and it runs alongside extensions, other tabs, third-party scripts and whatever an attacker can get onto the page.",
+        "On the server, you control the machine. In the browser, you ship your code to the user, and it runs next to npm packages, third-party scripts, browser extensions and whatever content an attacker manages to get onto the page.",
         {
           "ul": [
-            "<b>Nothing in the bundle is secret.</b> Anyone can read your JavaScript, API keys and feature flags in DevTools.",
-            "<b>Every check can be skipped.</b> A user can edit requests, call your API directly or change any value in memory.",
-            "<b>The page mixes trust levels.</b> Your code, user content, ads, analytics and npm packages all share one origin."
+            "<b>Nothing in the bundle is secret.</b> Anyone can read your JavaScript, keys and feature flags in DevTools.",
+            "<b>Every check can be skipped.</b> A user can edit requests, call your API directly, or change any value in memory.",
+            "<b>The page mixes trust levels.</b> Your code, user content and third-party code all run in one origin with the same powers."
           ]
         },
         "<mark>Client-side checks are for user experience. Every security decision must be enforced again on the server.</mark>",
         {
-          "note": "A shop window: you decide what's on display, but anyone walking past can look at it, and the till must still be behind the counter.",
+          "note": "A shop window: you decide what's on display, but anyone walking past can look at it. The till still has to be behind the counter.",
           "kind": "analogy"
         }
       ],
@@ -27,17 +27,17 @@
           "items": [
             {
               "label": "<b>Confidentiality</b>",
-              "sub": "Keep data away from people who shouldn't see it: tokens, PII, other users' data.",
+              "sub": "Keep data away from people who shouldn't see it: tokens, personal data, other users' records.",
               "tone": "accent"
             },
             {
               "label": "<b>Integrity</b>",
-              "sub": "Make sure only the user and your code can change things: no injected scripts, no forged requests.",
+              "sub": "Only the user and your code can change things: no injected scripts, no forged requests.",
               "tone": "heat"
             },
             {
               "label": "<b>Availability</b>",
-              "sub": "Keep the app usable: no malicious script that freezes the page or locks users out.",
+              "sub": "The app stays usable: no script that freezes the page or locks users out.",
               "tone": "pos"
             }
           ]
@@ -46,24 +46,25 @@
           "type": "caption",
           "html": "The classic CIA triad applies in the browser too."
         }
-      ]
+      ],
+      "figure": {
+        "src": "images/sec-threat-model-light.svg",
+        "darkSrc": "images/sec-threat-model-dark.svg",
+        "alt": "A browser tab for app.example.com contains five kinds of code that all share the same origin: your own code, npm packages bundled into it, third-party scripts such as analytics and chat widgets, user content that may be rendered as HTML, and browser extensions that can read the page. In another tab, an attacker site at evil.example can frame your page and send forged requests that carry the user's cookies. On the right, your API server is outside the browser: it is the only place where authorisation and validation can be enforced, because every request reaching it may have been forged or edited.",
+        "width": 1200,
+        "height": 560
+      }
     },
     {
       "title": "Origins: the browser's unit of trust",
-      "summary": "An origin is scheme + host + port. The same-origin policy stops one origin reading another's data.",
+      "summary": "An origin is scheme + host + port. The same-origin policy lets a page send almost anything, but only read its own origin's data.",
       "body": [
         "Browsers isolate sites by <b>origin</b>: the scheme, host and port of a URL. Two URLs share an origin only if all three match.",
-        "The <b>same-origin policy (SOP)</b> lets a page freely read data from its own origin, but blocks it from reading responses, storage and DOM that belong to another origin.",
-        {
-          "ul": [
-            "<b>Blocked:</b> reading a cross-origin <code>fetch</code> response, another origin's <code>localStorage</code>, or the DOM of a cross-origin iframe.",
-            "<b>Allowed:</b> <i>sending</i> requests, form posts, and embedding images, scripts, styles and iframes from other origins."
-          ]
-        },
-        "<mark>The SOP stops reads, not writes. That gap is why CSRF exists, and why CORS is needed to relax reads safely.</mark>",
+        "The <b>same-origin policy (SOP)</b> lets a page read data from its own origin, but blocks it from reading responses, storage and DOM that belong to another origin.",
+        "<mark>The same-origin policy stops reads, not writes. That gap is why CSRF exists, and why CORS is needed to allow reads safely.</mark>",
         {
           "more": "Origin vs site",
-          "text": "A <b>site</b> is the scheme plus the registrable domain (eTLD+1), so <code>app.example.com</code> and <code>api.example.com</code> are the same site but different origins. Cookies' <code>SameSite</code> attribute works on sites; the SOP works on origins."
+          "text": "A <b>site</b> is the scheme plus the registrable domain (eTLD+1), so <code>app.example.com</code> and <code>api.example.com</code> are the <i>same site</i> but <i>different origins</i>. Cookies' <code>SameSite</code> attribute and the <code>Sec-Fetch-Site</code> header work on sites; the same-origin policy and CORS work on origins."
         }
       ],
       "viz": [
@@ -71,7 +72,7 @@
           "type": "table",
           "rows": [
             {
-              "head": "URL compared with https://app.example.com",
+              "head": "Compared with https://app.example.com",
               "cells": [
                 {
                   "text": "Same origin?"
@@ -98,7 +99,7 @@
               "head": "https://api.example.com",
               "cells": [
                 {
-                  "text": "No: different host"
+                  "text": "No: different host (but same site)"
                 }
               ]
             },
@@ -109,31 +110,30 @@
                   "text": "No: different port"
                 }
               ]
-            },
-            {
-              "head": "https://example.com",
-              "cells": [
-                {
-                  "text": "No: different host"
-                }
-              ]
             }
           ]
         }
-      ]
+      ],
+      "figure": {
+        "src": "images/sec-origin-light.svg",
+        "darkSrc": "images/sec-origin-dark.svg",
+        "alt": "The URL https://app.example.com:443/settings is split into its parts. The scheme https, the host app.example.com and the port 443 together form the origin; the path /settings is not part of it. Below, two lists show what the same-origin policy does. A page can send: form posts to any origin, fetch requests to any origin, and embed images, scripts, styles and iframes from anywhere. It cannot read: a cross-origin fetch response unless the server allows it with CORS, another origin's cookies or localStorage, or the DOM inside a cross-origin iframe.",
+        "width": 1200,
+        "height": 540
+      }
     },
     {
-      "title": "The map of this section",
-      "summary": "Frontend security is defence in depth: several independent layers, so one mistake isn't fatal.",
+      "title": "Defence in depth",
+      "summary": "No single control stops every attack. Stack independent layers so one mistake isn't fatal.",
       "body": [
-        "No single control stops every attack. Good frontends stack layers, so an attacker has to beat several of them at once.",
+        "Good frontends stack layers, so an attacker has to beat several of them at once:",
         {
           "ul": [
             "<b>Keep attackers' code out:</b> encode output, sanitize HTML, validate input.",
             "<b>Limit what injected code can do:</b> CSP, Trusted Types, Permissions-Policy, HttpOnly cookies.",
-            "<b>Control who can embed or call you:</b> frame-ancestors, CORS, SameSite cookies, CSRF tokens.",
-            "<b>Trust your supply chain:</b> lockfiles, audits, SRI.",
-            "<b>Protect data in transit and at rest:</b> HTTPS, HSTS, careful client storage, and the law around personal data."
+            "<b>Control who can embed or call you:</b> frame-ancestors, CORS, SameSite cookies, CSRF checks.",
+            "<b>Trust your supply chain:</b> lockfiles, audits, trusted publishing, SRI.",
+            "<b>Protect data in transit and at rest:</b> HTTPS and HSTS, careful client storage, and privacy law."
           ]
         },
         {
@@ -165,7 +165,7 @@
             },
             {
               "label": "<b>Security headers</b>",
-              "sub": "CSP, HSTS, nosniff and friends",
+              "sub": "CSP, HSTS, nosniff and more",
               "tone": "accent",
               "goto": {
                 "chapter": "security-headers",
@@ -174,7 +174,7 @@
             },
             {
               "label": "<b>Client-side security</b>",
-              "sub": "Storage, tokens, secrets",
+              "sub": "Secrets, tokens, OAuth",
               "tone": "accent",
               "goto": {
                 "chapter": "client-side-security",
@@ -182,16 +182,7 @@
               }
             },
             {
-              "label": "<b>HTTPS</b>",
-              "sub": "Secure communication",
-              "tone": "pos",
-              "goto": {
-                "chapter": "https",
-                "slide": 1
-              }
-            },
-            {
-              "label": "<b>Dependencies</b>",
+              "label": "<b>Dependency security</b>",
               "sub": "npm and the supply chain",
               "tone": "heat",
               "goto": {
@@ -200,13 +191,120 @@
               }
             },
             {
-              "label": "<b>CORS & CSRF</b>",
-              "sub": "Who may call you, and with whose cookies",
-              "tone": "neg",
+              "label": "<b>CORS</b>",
+              "sub": "Who may read your responses",
+              "tone": "accent",
               "goto": {
                 "chapter": "cors",
                 "slide": 1
               }
+            },
+            {
+              "label": "<b>CSRF</b>",
+              "sub": "Requests made with your users' cookies",
+              "tone": "neg",
+              "goto": {
+                "chapter": "csrf",
+                "slide": 1
+              }
+            }
+          ]
+        }
+      ],
+      "figure": {
+        "src": "images/sec-defence-layers-light.svg",
+        "darkSrc": "images/sec-defence-layers-dark.svg",
+        "alt": "Four attacks travel from left to right through four layers of defence. Layer 1 is encoding and sanitizing output; layer 2 is a Content Security Policy with Trusted Types; layer 3 is cookie settings (HttpOnly, SameSite) and CSRF checks; layer 4 is the server enforcing authentication and authorisation. An XSS payload in a comment is stopped at layer 1, and if it slips through, at layer 2. A malicious third-party script is not stopped by encoding but is limited by CSP and can't read HttpOnly cookies. A forged cross-site request is stopped by SameSite cookies and CSRF checks. A tampered API call made with curl bypasses the browser entirely and is only stopped by the server.",
+        "width": 1200,
+        "height": 560
+      }
+    },
+    {
+      "title": "Security in a system design interview",
+      "summary": "Interviewers want to see that you think about threats as part of the design, not as an afterthought.",
+      "body": [
+        "In a frontend system design round, spend a few minutes on security once the architecture is clear. A good answer walks through the data and the trust boundaries:",
+        {
+          "ul": [
+            "<b>Who are the users and attackers?</b> Logged-in users, anonymous visitors, other sites, compromised dependencies.",
+            "<b>Where does untrusted data enter?</b> User content, URLs, <code>postMessage</code>, third-party APIs. How is it rendered safely?",
+            "<b>How do users authenticate?</b> Where do tokens live, how long do they last, and how are they refreshed?",
+            "<b>Which headers ship?</b> CSP, HSTS, frame-ancestors, Permissions-Policy.",
+            "<b>What leaves the browser?</b> Logs, analytics and error reports without personal data or tokens.",
+            "<b>How would you notice an attack?</b> CSP and integrity reports, error monitoring, dependency alerts."
+          ]
+        },
+        "<mark>Name the specific threat, then the specific control that stops it. That pairing is what shows depth.</mark>"
+      ],
+      "viz": [
+        {
+          "type": "table",
+          "rows": [
+            {
+              "head": "Feature in the design",
+              "cells": [
+                {
+                  "text": "Threat"
+                },
+                {
+                  "text": "Control"
+                }
+              ]
+            },
+            {
+              "head": "Comments with formatting",
+              "cells": [
+                {
+                  "text": "Stored XSS"
+                },
+                {
+                  "text": "Sanitize + Trusted Types + CSP"
+                }
+              ]
+            },
+            {
+              "head": "Embeddable widget",
+              "cells": [
+                {
+                  "text": "Clickjacking, message spoofing"
+                },
+                {
+                  "text": "frame-ancestors allowlist, origin checks"
+                }
+              ]
+            },
+            {
+              "head": "Login + API calls",
+              "cells": [
+                {
+                  "text": "Token theft, CSRF"
+                },
+                {
+                  "text": "BFF + HttpOnly SameSite cookie"
+                }
+              ]
+            },
+            {
+              "head": "Analytics / chat scripts",
+              "cells": [
+                {
+                  "text": "Supply-chain compromise"
+                },
+                {
+                  "text": "CSP, SRI, vendor review"
+                }
+              ]
+            },
+            {
+              "head": "Link previews",
+              "cells": [
+                {
+                  "text": "SSRF"
+                },
+                {
+                  "text": "Allowlist + IP checks on the server"
+                }
+              ]
             }
           ]
         }

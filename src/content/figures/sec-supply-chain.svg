@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" role="img" aria-labelledby="t d" font-family="'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+  <title id="t">One compromised package, two targets</title>
+  <desc id="d">A dependency tree: your app depends on a few direct packages, which pull in many transitive packages. One transitive package, deep in the tree, is compromised. Two red paths lead out of it. Into the bundle: the code ships to users&#x27; browsers and can, for example, rewrite crypto wallet addresses or steal form data, as in the September 2025 chalk and debug compromise. Into install scripts: a postinstall script runs on developer laptops and CI, steals npm, GitHub and cloud tokens, and uses them to publish infected versions of more packages, which is how the Shai-Hulud worm spread to hundreds of packages in 2025.</desc>
+  <!--theme-->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowhead"/></marker>
+    <marker id="aa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowacc"/></marker>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="heatfill"/></marker>
+    <marker id="an" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="neg"/></marker>
+    <marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="pos"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="560" rx="18"/>
+  <text x="40" y="52" text-anchor="start" class="ink" font-size="26" font-weight="700">One compromised package, two targets</text>
+  <text x="40" y="78" text-anchor="start" class="muted" font-size="15">Malicious code can hit your users through the bundle, and your developers and CI through install scripts.</text>
+  <rect class="hit" x="60" y="250" width="170" height="70" rx="12" stroke-width="1.5" />
+  <text x="145.0" y="291.5" text-anchor="middle" class="accink" font-size="17" font-weight="700">your-app</text>
+  <rect class="card" x="300" y="115" width="150" height="50" rx="12" stroke-width="1.5" />
+  <text x="375.0" y="145.0" text-anchor="middle" class="ink" font-size="14" font-weight="700">react</text>
+  <path class="line" d="M232 285 C266 285 266 140 296 140" marker-end="url(#a)"/>
+  <rect class="card" x="300" y="260" width="150" height="50" rx="12" stroke-width="1.5" />
+  <text x="375.0" y="290.0" text-anchor="middle" class="ink" font-size="14" font-weight="700">date-lib</text>
+  <path class="line" d="M232 285 C266 285 266 285 296 285" marker-end="url(#a)"/>
+  <rect class="card" x="300" y="405" width="150" height="50" rx="12" stroke-width="1.5" />
+  <text x="375.0" y="435.0" text-anchor="middle" class="ink" font-size="14" font-weight="700">ui-kit</text>
+  <path class="line" d="M232 285 C266 285 266 430 296 430" marker-end="url(#a)"/>
+  <path class="thin" d="M452 140 C490 140 490 110 526 110"/>
+  <path class="thin" d="M452 140 C490 140 490 170 526 170"/>
+  <path class="thin" d="M452 285 C490 285 490 230 526 230"/>
+  <path class="thin" d="M452 285 C490 285 490 300 526 300"/>
+  <path class="thin" d="M452 285 C490 285 490 360 526 360"/>
+  <path class="thin" d="M452 430 C490 430 490 420 526 420"/>
+  <path class="thin" d="M452 430 C490 430 490 480 526 480"/>
+  <rect class="sunk" x="530" y="88" width="150" height="44" rx="12" stroke-width="1.5" />
+  <text x="605.0" y="114.5" text-anchor="middle" class="muted" font-size="13" font-weight="700">scheduler</text>
+  <rect class="sunk" x="530" y="148" width="150" height="44" rx="12" stroke-width="1.5" />
+  <text x="605.0" y="174.5" text-anchor="middle" class="muted" font-size="13" font-weight="700">loose-env</text>
+  <rect class="sunk" x="530" y="208" width="150" height="44" rx="12" stroke-width="1.5" />
+  <text x="605.0" y="234.5" text-anchor="middle" class="muted" font-size="13" font-weight="700">color-fmt</text>
+  <rect class="negsoft" x="530" y="278" width="150" height="44" rx="12" stroke-width="1.5" />
+  <text x="605.0" y="304.5" text-anchor="middle" class="negink" font-size="13" font-weight="700">tiny-parse</text>
+  <rect class="sunk" x="530" y="338" width="150" height="44" rx="12" stroke-width="1.5" />
+  <text x="605.0" y="364.5" text-anchor="middle" class="muted" font-size="13" font-weight="700">debug-ish</text>
+  <rect class="sunk" x="530" y="398" width="150" height="44" rx="12" stroke-width="1.5" />
+  <text x="605.0" y="424.5" text-anchor="middle" class="muted" font-size="13" font-weight="700">is-thing</text>
+  <rect class="sunk" x="530" y="458" width="150" height="44" rx="12" stroke-width="1.5" />
+  <text x="605.0" y="484.5" text-anchor="middle" class="muted" font-size="13" font-weight="700">left-pad-x</text>
+  <text x="605" y="540" text-anchor="middle" class="muted" font-size="12.5">…often 500–1,500 packages</text>
+  <path class="sneg" d="M682 300 C760 300 760 180 830 180" marker-end="url(#an)"/>
+  <path class="sneg" d="M682 300 C760 300 760 400 830 400" marker-end="url(#an)"/>
+  <rect class="negsoft" x="834" y="110" width="326" height="140" rx="12" stroke-width="1.5" />
+  <text x="997.0" y="159.25" text-anchor="middle" class="negink" font-size="15" font-weight="700">Into the bundle</text>
+  <text x="997.0" y="178.75" text-anchor="middle" class="muted" font-size="12.5">runs in users&#x27; browsers</text>
+  <text x="997.0" y="196.25" text-anchor="middle" class="muted" font-size="12.5">e.g. swaps crypto wallet addresses</text>
+  <text x="997.0" y="213.75" text-anchor="middle" class="muted" font-size="12.5">(chalk / debug, Sept 2025)</text>
+  <rect class="negsoft" x="834" y="330" width="326" height="160" rx="12" stroke-width="1.5" />
+  <text x="997.0" y="380.5" text-anchor="middle" class="negink" font-size="15" font-weight="700">Into install scripts</text>
+  <text x="997.0" y="400.0" text-anchor="middle" class="muted" font-size="12.5">postinstall runs on laptops &amp; CI</text>
+  <text x="997.0" y="417.5" text-anchor="middle" class="muted" font-size="12.5">steals npm / GitHub / cloud tokens</text>
+  <text x="997.0" y="435.0" text-anchor="middle" class="muted" font-size="12.5">publishes more infected packages</text>
+  <text x="997.0" y="452.5" text-anchor="middle" class="muted" font-size="12.5">(Shai-Hulud worm, 2025)</text>
+  <path class="sneg" d="M1000 492 C1000 540 700 545 640 504" stroke-dasharray="6 5" marker-end="url(#an)"/>
+  <text x="1012" y="522" text-anchor="start" class="negink" font-size="12" font-weight="700">spreads</text>
+</svg>

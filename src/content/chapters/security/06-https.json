@@ -11,13 +11,13 @@
         {
           "ul": [
             "<b>Confidentiality:</b> nobody on the network (café Wi-Fi, ISP) can read the traffic.",
-            "<b>Integrity:</b> nobody can change it in flight, e.g. inject ads or scripts.",
+            "<b>Integrity:</b> nobody can change it in flight, e.g. to inject ads or scripts.",
             "<b>Authentication:</b> the certificate proves you're talking to the real domain."
           ]
         },
-        "<mark>Many modern browser features (service workers, geolocation, camera, HTTP/2 in practice) only work on secure origins.</mark>",
+        "<mark>Service workers, geolocation, camera, clipboard and most modern APIs only work on secure origins.</mark>",
         {
-          "note": "TLS 1.3 needs only one round trip to set up a new connection, and session resumption can make repeat visits faster still.",
+          "note": "TLS 1.3 sets up a new connection in one round trip, and HTTP/3 runs over QUIC, which builds TLS 1.3 into the transport.",
           "kind": "dev"
         }
       ],
@@ -38,7 +38,7 @@
             {
               "item": {
                 "label": "<b>ServerHello + certificate</b>",
-                "sub": "Key share, cert chain, signature",
+                "sub": "Key share, certificate chain, signature",
                 "tone": "accent"
               },
               "caption": "The server proves who it is."
@@ -46,7 +46,7 @@
             {
               "item": {
                 "label": "<b>Verify</b>",
-                "sub": "Chain to a trusted CA, name matches, not expired",
+                "sub": "Chains to a trusted CA, name matches, not expired",
                 "tone": "heat"
               },
               "caption": "The browser checks the certificate."
@@ -65,18 +65,22 @@
     },
     {
       "title": "Getting HTTPS right",
-      "summary": "Redirect to HTTPS, add HSTS, avoid mixed content and keep cookies Secure.",
+      "summary": "Redirect to HTTPS, add HSTS, avoid mixed content, keep cookies Secure and automate certificates.",
       "body": [
         {
           "ul": [
             "<b>Redirect</b> every <code>http://</code> request to <code>https://</code>.",
-            "<b>HSTS</b> tells browsers never to try HTTP again; add the domain to the preload list to protect the very first visit.",
-            "<b>No mixed content:</b> an HTTPS page loading <code>http://</code> scripts undoes the protection. Browsers block or auto-upgrade most of it.",
+            "<b>HSTS</b> tells browsers never to try HTTP again. Submit the domain to the preload list to protect the very first visit.",
+            "<b>No mixed content:</b> an HTTPS page loading <code>http://</code> resources undoes the protection. Browsers upgrade or block it.",
             "<b>Secure cookies:</b> mark them <code>Secure</code> so they're never sent over HTTP.",
-            "<b>Automate certificates</b> (e.g. Let's Encrypt / ACME) so they never expire unnoticed."
+            "<b>Automate certificates</b> with ACME (e.g. Let's Encrypt) or your CDN."
           ]
         },
-        "<mark>Without HSTS, the first plain-HTTP request can be intercepted and the user kept on a fake HTTP version of your site.</mark>"
+        "<mark>Without HSTS, the first plain-HTTP request can be intercepted and the user kept on a fake HTTP copy of your site.</mark>",
+        {
+          "more": "Certificates are getting shorter",
+          "text": "The CA/Browser Forum voted in 2025 to cut maximum certificate lifetimes: 200 days from March 2026, 100 days from March 2027, and 47 days from March 2029. Manual renewal stops being practical, so automate it now."
+        }
       ],
       "viz": [
         {
@@ -84,14 +88,21 @@
           "title": "Response headers",
           "source": [
             "Strict-Transport-Security: max-age=63072000; includeSubDomains; preload",
-            "Set-Cookie: session=…; Secure; HttpOnly; SameSite=Lax"
+            "Set-Cookie: __Host-session=…; Secure; HttpOnly; SameSite=Lax; Path=/"
           ]
         },
         {
           "type": "caption",
           "html": "<code>upgrade-insecure-requests</code> in your CSP rewrites leftover http:// subresource URLs to https://."
         }
-      ]
+      ],
+      "figure": {
+        "src": "images/sec-hsts-light.svg",
+        "darkSrc": "images/sec-hsts-dark.svg",
+        "alt": "Two rows. Without HSTS: the user types bank.example, the browser sends http://bank.example over café Wi-Fi, an attacker on the network intercepts it and keeps the user on a plain-HTTP copy of the site (SSL stripping), reading passwords and cookies. With HSTS: the browser remembers, or has preloaded, that bank.example is HTTPS-only, upgrades the request internally before anything is sent, and connects with TLS; the attacker sees only encrypted traffic, and certificate errors cannot be clicked through.",
+        "width": 1200,
+        "height": 470
+      }
     }
   ]
 }

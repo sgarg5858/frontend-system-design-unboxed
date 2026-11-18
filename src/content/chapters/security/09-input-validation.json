@@ -5,7 +5,7 @@
   "slides": [
     {
       "title": "Validate on the way in, encode on the way out",
-      "summary": "Validation rejects bad data; sanitization cleans it; encoding makes it safe for where it's displayed.",
+      "summary": "Validation rejects bad data, sanitization cleans it, and encoding makes it safe where it's shown.",
       "body": [
         "Three different jobs that are often confused:",
         {
@@ -17,7 +17,7 @@
         },
         "<mark>Frontend validation is for user experience. The server must validate again, because attackers skip your UI.</mark>",
         {
-          "note": "Prefer allowlists (what's permitted) over blocklists (what's forbidden). Attackers are better at finding things you forgot to block.",
+          "note": "Prefer allowlists (what's permitted) to blocklists (what's forbidden). Attackers are better at finding what you forgot to block.",
           "kind": "key"
         }
       ],
@@ -47,30 +47,40 @@
             }
           ]
         }
-      ]
+      ],
+      "figure": {
+        "src": "images/sec-trust-boundary-light.svg",
+        "darkSrc": "images/sec-trust-boundary-dark.svg",
+        "alt": "Data flows left to right through four stages. Browser: an untrusted zone where validation gives fast feedback but can be skipped. The API at the trust boundary validates again against a schema, the authoritative check, rejecting a value like an email of 5,000 characters. Storage uses parameterised queries so input is never part of the SQL text. Output encodes the value for its context, HTML, attribute or URL, so a stored name like <script> is shown as text. A dashed line marks the trust boundary between the browser and the API.",
+        "width": 1200,
+        "height": 470
+      }
     },
     {
       "title": "Validating in practice",
-      "summary": "Use one schema for both client and server, and validate everything that crosses a trust boundary.",
+      "summary": "Share one schema between client and server, and validate everything that crosses a trust boundary.",
       "body": [
         {
           "ul": [
-            "<b>Share a schema</b> (Zod, Valibot, JSON Schema) between frontend and backend so rules don't drift.",
+            "<b>Share a schema</b> (Zod, Valibot, JSON Schema) between frontend and backend so the rules can't drift.",
             "<b>Validate all inputs</b>, not just form fields: URL parameters, <code>postMessage</code> data, <code>localStorage</code>, and API responses.",
             "<b>Constrain URLs</b> by parsing them with <code>new URL()</code> and checking the protocol and host.",
-            "<b>Limit sizes</b> of text and files, and check file types by content on the server, not by extension."
+            "<b>Limit sizes</b> of text and files, and check file types by their content on the server, not by extension."
           ]
-        }
+        },
+        "<mark>Parse, don't just check: turn unknown input into a typed value once, at the boundary, and use only that value afterwards.</mark>"
       ],
       "code": [
+        "import { z } from 'zod'; // v4",
+        "",
         "const Signup = z.object({",
-        "  email: z.string().email().max(254),",
+        "  email: z.email().max(254),",
         "  name: z.string().trim().min(1).max(80),",
-        "  website: z.string().url()",
-        "    .refine((u) => ['https:', 'http:'].includes(new URL(u).protocol)),",
+        "  website: z.url({ protocol: /^https?$/ }).optional(),",
         "});",
         "",
-        "const result = Signup.safeParse(formValue);"
+        "const result = Signup.safeParse(formValue);",
+        "if (!result.success) showErrors(z.flattenError(result.error));"
       ],
       "viz": [
         {
@@ -112,7 +122,7 @@
               "head": "localStorage",
               "cells": [
                 {
-                  "text": "No: XSS or users can change it"
+                  "text": "No: users and XSS can change it"
                 }
               ]
             },
@@ -120,7 +130,7 @@
               "head": "Your own API responses",
               "cells": [
                 {
-                  "text": "Mostly, but still validate shape"
+                  "text": "Mostly, but validate the shape"
                 }
               ]
             }

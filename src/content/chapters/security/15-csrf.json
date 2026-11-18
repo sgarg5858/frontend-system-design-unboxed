@@ -7,12 +7,16 @@
       "title": "How CSRF works",
       "summary": "Another site makes the user's browser send a request to yours, and the browser attaches the user's cookies.",
       "body": [
-        "Browsers attach cookies to requests based on where they're <i>going</i>, not where they came from. A malicious page can submit a form to your site, and the logged-in user's session cookie goes with it.",
+        "Browsers attach cookies based on where a request is <i>going</i>, not where it came from. A malicious page can submit a form to your site, and the logged-in user's session cookie goes with it.",
         "The attacker can't read the response (the same-origin policy stops that), but they don't need to: the damage is the action itself.",
         "<mark>Any state-changing request authenticated only by cookies is a CSRF target.</mark>",
         {
-          "note": "Using GET for actions (<code>/delete?id=5</code>) makes it worse: a simple <code>&lt;img&gt;</code> tag is enough to trigger it.",
+          "note": "Using GET for actions (<code>/delete?id=5</code>) makes it worse: an <code>&lt;img&gt;</code> tag is enough to trigger it.",
           "kind": "warn"
+        },
+        {
+          "more": "Login CSRF",
+          "text": "Forging the <i>login</i> form signs the victim into the attacker's account. Anything they then save (cards, searches) goes to the attacker. Protect login forms too."
         }
       ],
       "viz": [
@@ -24,7 +28,7 @@
             {
               "item": {
                 "label": "<b>User is logged in</b>",
-                "sub": "bank.example sets session cookie",
+                "sub": "bank.example has set a session cookie",
                 "tone": "muted"
               },
               "caption": "A normal session in another tab."
@@ -52,29 +56,46 @@
                 "sub": "Transfer done",
                 "tone": "neg"
               },
-              "caption": "Nothing in the request tells the bank it was forged."
+              "caption": "Nothing in the cookie tells the bank the request was forged."
             }
           ]
         }
-      ]
+      ],
+      "figure": {
+        "src": "images/sec-csrf-light.svg",
+        "darkSrc": "images/sec-csrf-dark.svg",
+        "alt": "Top row, the attack: a page on evil.example contains a hidden form that auto-submits a POST to bank.example/transfer. The browser attaches the user's session cookie for bank.example, and the bank, seeing a valid session, performs the transfer. Bottom row, defended: the same forged POST arrives, but the cookie is SameSite=Lax so the browser does not attach it on a cross-site POST, and the request carries Sec-Fetch-Site: cross-site, which the server rejects; a CSRF token check would also fail because the attacker cannot read the token.",
+        "width": 1200,
+        "height": 520
+      }
     },
     {
       "title": "Defending against CSRF",
-      "summary": "SameSite cookies are the baseline; add tokens or origin checks for anything sensitive.",
+      "summary": "SameSite cookies are the baseline. Add a Fetch Metadata or Origin check, and tokens for anything sensitive.",
       "body": [
         {
           "ul": [
-            "<b>SameSite cookies:</b> <code>Lax</code> stops cookies on cross-site POSTs and subresource requests; <code>Strict</code> also drops them on cross-site links. Set it explicitly rather than relying on browser defaults.",
+            "<b>SameSite cookies:</b> <code>Lax</code> withholds cookies on cross-site POSTs, iframes and <code>fetch</code>; <code>Strict</code> also drops them on cross-site links. Set it explicitly: only Chromium defaults to Lax.",
+            "<b>Fetch Metadata:</b> reject unsafe methods when <code>Sec-Fetch-Site</code> is <code>cross-site</code> (all major browsers send it). Go 1.25's <code>CrossOriginProtection</code> does exactly this. Fall back to an <code>Origin</code> check when the header is missing.",
             "<b>CSRF tokens:</b> a random value tied to the session, sent in a header or hidden field. A cross-site page can't read it, so it can't include it.",
-            "<b>Check <code>Origin</code> / <code>Sec-Fetch-Site</code>:</b> reject state-changing requests from other sites.",
             "<b>Never change state on GET.</b>"
           ]
         },
-        "<mark>Combine SameSite cookies with tokens or origin checks: each covers gaps in the other.</mark>",
+        "<mark>SameSite protects against other sites, not your own subdomains. A compromised subdomain is same-site, so pair it with tokens or origin checks.</mark>",
         {
           "more": "Angular's built-in support",
-          "text": "Angular's <code>HttpClient</code> reads an <code>XSRF-TOKEN</code> cookie and sends it back as an <code>X-XSRF-TOKEN</code> header on mutating requests to the same origin (the double-submit pattern). The server sets the cookie and checks they match."
+          "text": "Angular's <code>HttpClient</code> reads an <code>XSRF-TOKEN</code> cookie and sends it as an <code>X-XSRF-TOKEN</code> header on mutating same-origin requests (the double-submit pattern). Configure names with <code>withXsrfConfiguration()</code>; the server sets the cookie and checks they match."
         }
+      ],
+      "code": [
+        "// Express middleware: Fetch Metadata + Origin fallback",
+        "app.use((req, res, next) => {",
+        "  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();",
+        "  const site = req.get('Sec-Fetch-Site');",
+        "  if (site && site !== 'same-origin' && site !== 'none') return res.sendStatus(403);",
+        "  if (!site && req.get('Origin') !== 'https://app.example.com') return res.sendStatus(403);",
+        "  next();",
+        "});"
       ],
       "viz": [
         {
@@ -98,7 +119,18 @@
                   "text": "Cross-site POST, iframes, fetch"
                 },
                 {
-                  "text": "Same-site subdomains can still attack"
+                  "text": "Same-site subdomains"
+                }
+              ]
+            },
+            {
+              "head": "Sec-Fetch-Site check",
+              "cells": [
+                {
+                  "text": "Cross-site requests"
+                },
+                {
+                  "text": "Older clients: fall back to Origin"
                 }
               ]
             },
@@ -110,17 +142,6 @@
                 },
                 {
                   "text": "Must not leak via XSS or URLs"
-                }
-              ]
-            },
-            {
-              "head": "Origin / Sec-Fetch-Site check",
-              "cells": [
-                {
-                  "text": "Cross-site requests"
-                },
-                {
-                  "text": "Handle missing headers carefully"
                 }
               ]
             },

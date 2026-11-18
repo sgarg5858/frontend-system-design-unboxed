@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-labelledby="t d" font-family="'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+  <title id="t">Backend-for-frontend (BFF): no tokens in the browser</title>
+  <desc id="d">Four parties. The browser holds only an HttpOnly, Secure, SameSite session cookie: no access or refresh tokens, so XSS cannot steal them. The BFF is a small server on the app&#x27;s own origin; it runs the OAuth authorization code flow with PKCE as a confidential client, stores the access and refresh tokens server-side, and proxies API calls, attaching the access token. The identity provider issues the tokens to the BFF. The resource API receives requests with a Bearer token from the BFF only.</desc>
+  <!--theme-->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowhead"/></marker>
+    <marker id="aa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowacc"/></marker>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="heatfill"/></marker>
+    <marker id="an" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="neg"/></marker>
+    <marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="pos"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="520" rx="18"/>
+  <text x="40" y="52" text-anchor="start" class="ink" font-size="26" font-weight="700">Backend-for-frontend (BFF): no tokens in the browser</text>
+  <text x="40" y="78" text-anchor="start" class="muted" font-size="15">RFC 10017 (2026) recommends this pattern for business apps, sensitive apps and apps handling personal data.</text>
+  <rect class="card" x="40" y="170" width="250" height="200" rx="12" stroke-width="1.5" />
+  <text x="165.0" y="239.5" text-anchor="middle" class="ink" font-size="15" font-weight="700">Browser</text>
+  <text x="165.0" y="259.5" text-anchor="middle" class="muted" font-size="13">session cookie only:</text>
+  <text x="165.0" y="277.5" text-anchor="middle" class="muted" font-size="13">HttpOnly · Secure</text>
+  <text x="165.0" y="295.5" text-anchor="middle" class="muted" font-size="13">SameSite=Strict</text>
+  <text x="165.0" y="313.5" text-anchor="middle" class="muted" font-size="13">no tokens in JS</text>
+  <rect class="hit" x="420" y="150" width="300" height="240" rx="12" stroke-width="1.5" />
+  <text x="570.0" y="230.5" text-anchor="middle" class="accink" font-size="15" font-weight="700">BFF (same origin)</text>
+  <text x="570.0" y="250.5" text-anchor="middle" class="muted" font-size="13">confidential OAuth client</text>
+  <text x="570.0" y="268.5" text-anchor="middle" class="muted" font-size="13">code flow + PKCE</text>
+  <text x="570.0" y="286.5" text-anchor="middle" class="muted" font-size="13">stores access + refresh</text>
+  <text x="570.0" y="304.5" text-anchor="middle" class="muted" font-size="13">tokens server-side</text>
+  <text x="570.0" y="322.5" text-anchor="middle" class="muted" font-size="13">proxies /api calls</text>
+  <rect class="card" x="860" y="110" width="300" height="140" rx="12" stroke-width="1.5" />
+  <text x="1010.0" y="176.5" text-anchor="middle" class="ink" font-size="15" font-weight="700">Identity provider</text>
+  <text x="1010.0" y="196.5" text-anchor="middle" class="muted" font-size="13">/authorize, /token</text>
+  <rect class="card" x="860" y="300" width="300" height="140" rx="12" stroke-width="1.5" />
+  <text x="1010.0" y="366.5" text-anchor="middle" class="ink" font-size="15" font-weight="700">Resource API</text>
+  <text x="1010.0" y="386.5" text-anchor="middle" class="muted mono" font-size="13" xml:space="preserve">Authorization: Bearer …</text>
+  <line class="sacc" x1="292" y1="250" x2="416" y2="250" marker-end="url(#aa)"/>
+  <line class="line" x1="416" y1="290" x2="292" y2="290" marker-end="url(#a)"/>
+  <text x="354" y="240" text-anchor="middle" class="accink" font-size="12.5" font-weight="700">cookie</text>
+  <text x="354" y="312" text-anchor="middle" class="muted" font-size="12.5">JSON</text>
+  <line class="line" x1="722" y1="210" x2="856" y2="180" marker-end="url(#a)"/>
+  <text x="790" y="178" text-anchor="middle" class="muted" font-size="12">code + PKCE</text>
+  <line class="sacc" x1="722" y1="330" x2="856" y2="370" marker-end="url(#aa)"/>
+  <text x="790" y="380" text-anchor="middle" class="accink" font-size="12" font-weight="700">access token</text>
+  <text x="600" y="470" text-anchor="middle" class="muted" font-size="13">Lighter options in RFC 10017: a token-mediating backend, or a browser-only client (most exposed to XSS).</text>
+</svg>

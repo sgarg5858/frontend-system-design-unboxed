@@ -7,16 +7,20 @@
       "title": "No secrets in the bundle",
       "summary": "Anything shipped to the browser is public: API keys, internal URLs, feature flags and comments.",
       "body": [
-        "Build tools inline environment variables into JavaScript. If a variable is in the bundle, it's public.",
+        "Build tools inline environment variables into JavaScript. If a value is in the bundle, it's public.",
         {
           "ul": [
-            "<b>Publishable keys only:</b> keys meant to be public (Stripe publishable key, a map key restricted by referrer) are fine.",
-            "<b>Secret keys stay on a server:</b> proxy calls through your backend, which adds the key.",
+            "<b>Publishable keys only:</b> keys designed to be public (a Stripe publishable key, a maps key restricted by referrer) are fine.",
+            "<b>Secret keys stay on a server:</b> call the API through your backend, which adds the key. This includes LLM API keys.",
             "<b>Source maps</b> expose your original code. Upload them to your error tracker instead of serving them publicly, if that matters to you.",
             "<b>Hidden UI isn't access control:</b> hiding an admin button doesn't stop someone calling the admin API."
           ]
         },
-        "<mark>If the browser can read a value, so can the user and any script on the page.</mark>"
+        "<mark>If the browser can read a value, so can the user and any script on the page.</mark>",
+        {
+          "note": "Vite exposes only <code>VITE_</code>-prefixed variables and Next.js only <code>NEXT_PUBLIC_</code> ones, but anything you import into client code ships. Run a secret scanner (e.g. gitleaks) on the built output in CI.",
+          "kind": "dev"
+        }
       ],
       "viz": [
         {
@@ -31,7 +35,7 @@
               ]
             },
             {
-              "head": "Publishable / restricted API key",
+              "head": "Publishable / restricted key",
               "cells": [
                 {
                   "text": "Yes"
@@ -39,7 +43,7 @@
               ]
             },
             {
-              "head": "OpenAI / AWS / database secret",
+              "head": "LLM, cloud or database secret",
               "cells": [
                 {
                   "text": "No: proxy through a server"
@@ -64,24 +68,35 @@
             }
           ]
         }
-      ]
+      ],
+      "figure": {
+        "src": "images/sec-secrets-light.svg",
+        "darkSrc": "images/sec-secrets-dark.svg",
+        "alt": "Two designs. Wrong: the browser bundle contains a secret API key, sk-live-…, and calls the third-party API directly; anyone can open DevTools, copy the key and use it for their own requests, running up your bill or reading your data. Right: the browser calls your own endpoint /api/summary with its session cookie; your server checks the user is allowed, applies rate limits, adds the secret key from an environment variable and calls the third-party API. The key never leaves the server.",
+        "width": 1200,
+        "height": 520
+      }
     },
     {
       "title": "Where to keep auth tokens",
       "summary": "localStorage is readable by any XSS. HttpOnly cookies aren't, but need CSRF protection.",
       "body": [
-        "Every storage option is a trade-off between XSS and CSRF exposure.",
+        "Every storage option trades XSS exposure against CSRF exposure.",
         {
           "ul": [
             "<b>localStorage / sessionStorage:</b> easy, but any script on the page can read the token and send it anywhere.",
-            "<b>In memory:</b> gone on reload; still usable by XSS while the page is open, but not easily stolen for later.",
+            "<b>In memory:</b> gone on reload; XSS can still use it while the page is open, but can't easily take it away for later.",
             "<b>HttpOnly cookie:</b> JavaScript can't read it at all. The browser sends it automatically, so you must defend against CSRF."
           ]
         },
-        "<mark>Prefer HttpOnly, Secure, SameSite cookies for session tokens, and keep tokens short-lived.</mark>",
+        "<mark>Prefer HttpOnly, Secure, SameSite cookies for sessions, and keep any tokens short-lived.</mark>",
         {
-          "more": "The backend-for-frontend (BFF) pattern",
-          "text": "A small server on your own origin does the OAuth flow, keeps the access and refresh tokens server-side, and gives the browser only an HttpOnly session cookie. Current OAuth guidance for browser apps recommends this as the most secure option."
+          "more": "The best cookie settings",
+          "text": "<code>Set-Cookie: __Host-session=…; Secure; HttpOnly; SameSite=Lax; Path=/</code>. The <code>__Host-</code> prefix forces Secure, Path=/ and no Domain, so a subdomain can't overwrite it. Use <code>SameSite=Strict</code> where cross-site links don't need to arrive logged in."
+        },
+        {
+          "more": "Third-party cookies in 2026",
+          "text": "Safari and Firefox block or partition third-party cookies by default. Chrome dropped its plan to remove them (2025), but users can block them. For an embedded widget that needs its own state, use <b>partitioned cookies</b> (CHIPS, the <code>Partitioned</code> attribute), which are keyed to the top-level site."
         }
       ],
       "viz": [
@@ -128,7 +143,7 @@
                   "text": "No"
                 },
                 {
-                  "text": "Yes, unless SameSite / token"
+                  "text": "Yes, unless SameSite / CSRF check"
                 }
               ]
             }
@@ -138,16 +153,24 @@
     },
     {
       "title": "OAuth in single-page apps",
-      "summary": "Use the Authorization Code flow with PKCE. The implicit flow is deprecated.",
+      "summary": "Use the Authorization Code flow with PKCE, ideally through a backend-for-frontend so tokens never reach JavaScript.",
       "body": [
-        "A browser app can't keep a client secret, so it uses <b>PKCE</b> (Proof Key for Code Exchange) to prove the app that started the login is the one finishing it.",
+        "<b>RFC 10017</b> (OAuth 2.0 for Browser-Based Applications, August 2026) is the current best practice. It describes three architectures, from most to least secure:",
         {
           "ul": [
-            "Never use the old <b>implicit flow</b>, which put tokens in the URL.",
-            "Keep access tokens short-lived (minutes) and use <b>refresh token rotation</b>.",
-            "Validate the <code>state</code> parameter to stop login CSRF."
+            "<b>Backend-for-frontend (BFF):</b> a server on your origin runs OAuth and keeps all tokens; the browser only has a session cookie.",
+            "<b>Token-mediating backend:</b> the backend gets tokens and hands access tokens to the browser.",
+            "<b>Browser-only client:</b> the SPA does OAuth itself with PKCE; tokens live in JavaScript, exposed to any XSS."
           ]
-        }
+        },
+        {
+          "ul": [
+            "Never use the <b>implicit flow</b> (tokens in the URL); RFC 9700 deprecates it.",
+            "Always use <b>PKCE</b> and check the <code>state</code> parameter.",
+            "Keep access tokens short-lived and use <b>refresh token rotation</b>."
+          ]
+        },
+        "<mark>If an XSS bug can read your tokens, it can use them from anywhere. A BFF keeps them out of reach.</mark>"
       ],
       "viz": [
         {
@@ -171,7 +194,7 @@
                 "tone": "accent",
                 "mono": true
               },
-              "caption": "The user signs in on the identity provider."
+              "caption": "The user signs in with the identity provider."
             },
             {
               "item": {
@@ -189,11 +212,18 @@
                 "tone": "pos",
                 "mono": true
               },
-              "caption": "Only the app holding the verifier can turn the code into tokens."
+              "caption": "Only the holder of the verifier can turn the code into tokens."
             }
           ]
         }
-      ]
+      ],
+      "figure": {
+        "src": "images/sec-bff-light.svg",
+        "darkSrc": "images/sec-bff-dark.svg",
+        "alt": "Four parties. The browser holds only an HttpOnly, Secure, SameSite session cookie: no access or refresh tokens, so XSS cannot steal them. The BFF is a small server on the app's own origin; it runs the OAuth authorization code flow with PKCE as a confidential client, stores the access and refresh tokens server-side, and proxies API calls, attaching the access token. The identity provider issues the tokens to the BFF. The resource API receives requests with a Bearer token from the BFF only.",
+        "width": 1200,
+        "height": 520
+      }
     }
   ]
 }

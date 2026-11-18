@@ -11,12 +11,19 @@
         {
           "ul": [
             "<b>Known vulnerabilities</b> in an old version of a library.",
-            "<b>Compromised maintainers:</b> a stolen npm token publishes a malicious version of a popular package.",
-            "<b>Typosquatting:</b> <code>reqeusts</code> instead of <code>requests</code>.",
-            "<b>Install scripts</b> that run code on developer and CI machines during <code>npm install</code>."
+            "<b>Compromised maintainers:</b> a phished or stolen npm token publishes a malicious version of a popular package.",
+            "<b>Self-spreading worms:</b> an install script steals tokens and uses them to infect more packages.",
+            "<b>Typosquatting:</b> <code>reqeusts</code> instead of <code>requests</code>."
           ]
         },
-        "<mark>Every dependency is code you ship with full access to your page. Add them as deliberately as you'd add your own code.</mark>"
+        "<mark>Every dependency is code you ship with full access to your page and, at install time, to your machines.</mark>",
+        {
+          "more": "2025: the year npm got attacked at scale",
+          "text": [
+            "<b>September 8:</b> a phished maintainer account pushed malicious versions of <code>chalk</code>, <code>debug</code> and other packages with billions of weekly downloads. The payload ran in browsers and swapped crypto wallet addresses.",
+            "<b>From September 14:</b> the <b>Shai-Hulud</b> worm used postinstall scripts to steal npm and cloud tokens and publish infected versions of other packages; GitHub removed 500+ packages. In response npm moved publishing towards trusted publishing, short-lived tokens and mandatory 2FA."
+          ]
+        }
       ],
       "viz": [
         {
@@ -24,7 +31,7 @@
           "items": [
             {
               "label": "<b>your-app</b>",
-              "sub": "12 direct dependencies",
+              "sub": "about a dozen direct dependencies",
               "tone": "accent"
             },
             {
@@ -34,36 +41,56 @@
             },
             {
               "label": "<b>one compromised package</b>",
-              "sub": "runs in your users' browsers or your CI",
+              "sub": "runs in users' browsers and on your CI",
               "tone": "neg"
             }
           ]
         }
-      ]
+      ],
+      "figure": {
+        "src": "images/sec-supply-chain-light.svg",
+        "darkSrc": "images/sec-supply-chain-dark.svg",
+        "alt": "A dependency tree: your app depends on a few direct packages, which pull in many transitive packages. One transitive package, deep in the tree, is compromised. Two red paths lead out of it. Into the bundle: the code ships to users' browsers and can, for example, rewrite crypto wallet addresses or steal form data, as in the September 2025 chalk and debug compromise. Into install scripts: a postinstall script runs on developer laptops and CI, steals npm, GitHub and cloud tokens, and uses them to publish infected versions of more packages, which is how the Shai-Hulud worm spread to hundreds of packages in 2025.",
+        "width": 1200,
+        "height": 560
+      }
     },
     {
       "title": "Keeping dependencies safe",
-      "summary": "Lock versions, audit continuously, update in small steps and limit what installs can do.",
+      "summary": "Lock versions, delay brand-new releases, limit install scripts, audit continuously and publish with trusted publishing.",
       "body": [
         {
+          "h": "Consuming packages"
+        },
+        {
           "ul": [
-            "<b>Commit the lockfile</b> and install with <code>npm ci</code> in CI, so builds use exactly the reviewed versions.",
-            "<b>Audit:</b> <code>npm audit</code>, Dependabot or Renovate flag known vulnerabilities and open update PRs.",
-            "<b>Update often, in small steps</b>, so a fix is never stuck behind a painful major upgrade.",
-            "<b>Review new packages:</b> maintenance, downloads, number of maintainers, install scripts, size.",
-            "<b>Limit install scripts</b> (<code>--ignore-scripts</code> where possible) and use a delay before adopting brand-new releases."
+            "<b>Commit the lockfile</b> and install with <code>npm ci</code>, so CI uses exactly the reviewed versions.",
+            "<b>Don't run install scripts you don't need.</b> pnpm 10+ skips dependency lifecycle scripts unless you allow them; with npm, use <code>--ignore-scripts</code> where you can.",
+            "<b>Wait before adopting new releases.</b> Most malicious versions are caught within days; pnpm's <code>minimumReleaseAge</code> and Renovate's release-age settings enforce a delay.",
+            "<b>Audit continuously</b> with Dependabot, Renovate or <code>npm audit</code>, and update in small steps."
           ]
         },
         {
-          "note": "npm audit reports a lot of noise from dev-only tools. Triage by whether the vulnerable code actually ships to users or runs in CI.",
+          "h": "Publishing packages"
+        },
+        {
+          "ul": [
+            "Use <b>trusted publishing</b> (OIDC from CI) instead of long-lived npm tokens, and phishing-resistant 2FA.",
+            "Publish with <b>provenance</b>, so users can check which repo and workflow built the package (<code>npm audit signatures</code>)."
+          ]
+        },
+        {
+          "note": "npm audit reports a lot of noise from dev-only tools. Triage by whether the vulnerable code ships to users or runs in CI.",
           "kind": "dev"
         }
       ],
       "code": [
-        "npm ci                   # exact lockfile versions",
-        "npm audit --omit=dev     # what ships to users",
-        "npm outdated             # what's behind",
-        "npx npm-check-updates    # plan upgrades"
+        "npm ci --ignore-scripts      # exact lockfile, no install scripts",
+        "npm audit --omit=dev         # what ships to users",
+        "npm audit signatures         # verify registry signatures + provenance",
+        "",
+        "# pnpm-workspace.yaml",
+        "minimumReleaseAge: 1440      # minutes: skip versions < 1 day old"
       ],
       "viz": [
         {
@@ -77,16 +104,23 @@
               "text": "npm ci"
             },
             {
+              "text": "no install scripts"
+            },
+            {
+              "text": "release-age delay"
+            },
+            {
               "text": "Dependabot / Renovate"
             },
             {
-              "text": "npm audit"
-            },
-            {
-              "text": "SRI for CDN scripts"
+              "text": "trusted publishing",
+              "hot": true
             },
             {
               "text": "provenance"
+            },
+            {
+              "text": "SRI for CDN files"
             }
           ]
         }

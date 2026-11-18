@@ -7,7 +7,7 @@
       "title": "What SSRF is",
       "summary": "The attacker makes your server fetch a URL of their choice, reaching systems only your server can see.",
       "body": [
-        "Features like “import from URL”, link previews, webhooks and image proxies make the server fetch a URL the user supplies. In <b>SSRF</b>, the attacker points that URL inwards:",
+        "Features like “import from URL”, link previews, webhooks, PDF renderers and image proxies make a server fetch a URL the user supplies. In <b>SSRF</b>, the attacker points that URL inwards:",
         {
           "ul": [
             "<code>http://169.254.169.254/</code>: the cloud metadata service, which can hand out credentials;",
@@ -15,7 +15,7 @@
             "<code>http://10.0.0.5/admin</code>: services behind the firewall."
           ]
         },
-        "It matters to frontend engineers because SSR servers, BFFs and edge functions all fetch URLs, often from request data.",
+        "It matters to frontend engineers because SSR servers, BFFs, edge functions and Next.js/Angular image optimisers all fetch URLs, often built from request data.",
         "<mark>Your server is inside the network. An SSRF bug lets an outsider borrow that position.</mark>"
       ],
       "viz": [
@@ -45,7 +45,7 @@
             {
               "item": {
                 "label": "<b>Server fetches it</b>",
-                "sub": "Request comes from inside the cloud network",
+                "sub": "The request comes from inside the cloud network",
                 "tone": "neg"
               },
               "caption": "Firewalls don't stop requests from your own server."
@@ -53,31 +53,42 @@
             {
               "item": {
                 "label": "<b>Credentials leak</b>",
-                "sub": "Response shown back as the “preview”",
+                "sub": "The response is shown back as the “preview”",
                 "tone": "neg"
               },
               "caption": "The attacker reads cloud keys."
             }
           ]
         }
-      ]
+      ],
+      "figure": {
+        "src": "images/sec-ssrf-light.svg",
+        "darkSrc": "images/sec-ssrf-dark.svg",
+        "alt": "On the left, on the internet, an attacker cannot reach internal systems directly: a firewall blocks them. Instead they call your link-preview endpoint with url=http://169.254.169.254/latest/meta-data/. Your server, inside the private network, fetches that URL. From there it can reach the cloud metadata service, which can return credentials, an internal admin panel at 10.0.0.5 and a Redis database on localhost. The response comes back to the attacker as the \"preview\".",
+        "width": 1200,
+        "height": 520
+      }
     },
     {
       "title": "Defending against SSRF",
-      "summary": "Allowlist destinations, resolve and check IPs, and block redirects to private ranges.",
+      "summary": "Allowlist destinations, resolve and check IPs, re-check redirects, and isolate the fetcher.",
       "body": [
         {
           "ul": [
             "<b>Allowlist</b> hosts when you can (e.g. only your image CDN).",
             "<b>Parse the URL</b> and allow only <code>https:</code>.",
-            "<b>Resolve DNS and check the IP</b> isn't private, loopback or link-local, then connect to that IP, so DNS rebinding can't swap it.",
-            "<b>Re-check on every redirect</b>, or turn redirects off.",
-            "<b>Isolate the fetcher</b> in a network segment with no access to internal services, and require IMDSv2 on AWS."
+            "<b>Resolve DNS and check the IP</b> isn't private, loopback or link-local, then connect to that exact IP, so DNS rebinding can't swap it.",
+            "<b>Re-check every redirect</b>, or turn redirects off.",
+            "<b>Isolate the fetcher</b> in a network segment with no route to internal services, and require IMDSv2 on AWS."
           ]
         },
         {
-          "note": "Blocking the string “localhost” isn't enough: <code>127.1</code>, <code>[::1]</code>, decimal IPs and DNS names that resolve to internal addresses all get around it.",
+          "note": "Blocking the string “localhost” isn't enough: <code>127.1</code>, <code>[::1]</code>, decimal IPs like <code>2130706433</code>, and DNS names that resolve to internal addresses all get around it.",
           "kind": "warn"
+        },
+        {
+          "more": "The browser version: Local Network Access",
+          "text": "Browsers have the same problem in reverse: a public website asking the user's browser to call their router or a local dev server. Since Chrome 142, a public site must get the user's permission before making requests to local network or loopback addresses."
         }
       ],
       "viz": [
@@ -109,7 +120,7 @@
               ]
             },
             {
-              "head": "169.254.0.0/16",
+              "head": "169.254.0.0/16, fe80::/10",
               "cells": [
                 {
                   "text": "Link-local, cloud metadata"
@@ -117,10 +128,18 @@
               ]
             },
             {
-              "head": "fc00::/7, fe80::/10",
+              "head": "fc00::/7",
               "cells": [
                 {
-                  "text": "IPv6 private and link-local"
+                  "text": "IPv6 private"
+                }
+              ]
+            },
+            {
+              "head": "0.0.0.0, ::",
+              "cells": [
+                {
+                  "text": "Can reach local services on some systems"
                 }
               ]
             }

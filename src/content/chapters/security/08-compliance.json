@@ -5,10 +5,10 @@
   "slides": [
     {
       "title": "Laws that shape frontend code",
-      "summary": "Privacy, accessibility and payment rules all have concrete requirements for the UI.",
+      "summary": "Privacy, payment, accessibility and product-security rules all have concrete requirements for the UI.",
       "body": [
-        "Compliance isn't only a legal team's job. Many requirements land directly in frontend code: what you store, what you track, and how you ask for consent.",
-        "<mark>Collect the least personal data you need, and don't load trackers before the user agrees.</mark>",
+        "Compliance isn't only a legal team's job. Many requirements land directly in frontend code: what you store, what you load, and how you ask for consent.",
+        "<mark>Collect the least personal data you need, and don't load trackers before the user agrees where consent is required.</mark>",
         {
           "note": "This is an engineering overview, not legal advice. Check what applies to your product and users with your legal team.",
           "kind": "warn"
@@ -36,7 +36,7 @@
                   "text": "EU / UK"
                 },
                 {
-                  "text": "Consent, data minimisation, right to delete and export"
+                  "text": "Consent, minimisation, export and delete"
                 }
               ]
             },
@@ -52,66 +52,94 @@
               ]
             },
             {
-              "head": "CCPA / CPRA",
+              "head": "CCPA/CPRA + ~20 US state laws",
               "cells": [
                 {
-                  "text": "California"
+                  "text": "US"
                 },
                 {
-                  "text": "“Do not sell or share” link, honour Global Privacy Control"
+                  "text": "“Do not sell or share”; honour Global Privacy Control"
                 }
               ]
             },
             {
-              "head": "PCI DSS",
+              "head": "DPDP Act + 2025 Rules",
+              "cells": [
+                {
+                  "text": "India"
+                },
+                {
+                  "text": "Clear consent notices; rules phase in to 2027"
+                }
+              ]
+            },
+            {
+              "head": "PCI DSS 4.0.1",
               "cells": [
                 {
                   "text": "Card payments"
                 },
                 {
-                  "text": "Use hosted payment fields; control scripts on payment pages"
+                  "text": "Script inventory + tamper detection on payment pages"
                 }
               ]
             },
             {
-              "head": "HIPAA",
+              "head": "European Accessibility Act",
               "cells": [
                 {
-                  "text": "US health data"
+                  "text": "EU, since June 2025"
                 },
                 {
-                  "text": "No PHI in URLs, logs or analytics"
+                  "text": "Accessible UI (EN 301 549 / WCAG AA)"
                 }
               ]
             },
             {
-              "head": "WCAG / EAA / ADA",
+              "head": "Cyber Resilience Act",
               "cells": [
                 {
-                  "text": "Accessibility"
+                  "text": "EU, from 2026–27"
                 },
                 {
-                  "text": "Accessible UI is a legal requirement in many markets"
+                  "text": "Vulnerability handling for software products"
                 }
               ]
             }
           ]
         }
-      ]
+      ],
+      "figure": {
+        "src": "images/sec-compliance-map-light.svg",
+        "darkSrc": "images/sec-compliance-map-dark.svg",
+        "alt": "A sketch of a shop web page with five areas, each labelled with the rules that apply. The cookie banner: GDPR and ePrivacy require consent before non-essential cookies and trackers, with reject as easy as accept. Analytics and ad scripts: CCPA/CPRA and other US state laws require honouring Global Privacy Control; India's DPDP rules require consent notices. The checkout payment page: PCI DSS 4.0.1 requirements 6.4.3 and 11.6.1, mandatory since March 2025, require an inventory of every script with a justification and detection of unauthorised changes to scripts and headers. The sign-up form: data minimisation, and no personal data in URLs or logs. The whole page: the European Accessibility Act, in force since June 2025, and the ADA require accessible UI, typically WCAG 2.1 or 2.2 AA.",
+        "width": 1200,
+        "height": 600
+      }
     },
     {
-      "title": "Privacy by design in the UI",
-      "summary": "Consent before tracking, no personal data in URLs or logs, and clear controls for users.",
+      "title": "Privacy and payment pages in practice",
+      "summary": "Consent before tracking, no personal data in URLs or logs, and a controlled, monitored set of scripts on payment pages.",
       "body": [
         {
           "ul": [
-            "<b>Consent first:</b> load analytics and ad scripts only after opt-in where required, and make “reject” as easy as “accept”.",
-            "<b>Keep PII out of URLs:</b> URLs end up in logs, analytics and <code>Referer</code> headers.",
-            "<b>Scrub logs and error reports:</b> mask emails, tokens and form values before they leave the browser.",
-            "<b>Short retention</b> for anything you keep client-side; clear it on logout.",
-            "<b>Payment pages:</b> PCI DSS 4.0 asks you to inventory and justify every script on them and detect unauthorised changes, which CSP and SRI help with."
+            "<b>Consent first:</b> load analytics and ad scripts only after opt-in where required, and make “Reject” as easy as “Accept”.",
+            "<b>Honour Global Privacy Control:</b> read <code>navigator.globalPrivacyControl</code> or the <code>Sec-GPC</code> header and treat it as an opt-out.",
+            "<b>Keep personal data out of URLs:</b> URLs end up in logs, analytics and <code>Referer</code> headers.",
+            "<b>Scrub logs and error reports</b> before they leave the browser: emails, tokens, form values.",
+            "<b>Clear client storage on logout.</b>"
           ]
-        }
+        },
+        {
+          "h": "PCI DSS 4.0.1 on payment pages (mandatory since 31 March 2025)"
+        },
+        {
+          "ul": [
+            "<b>6.4.3:</b> keep an inventory of every script on payment pages, with a reason for each, and confirm each is authorised and unmodified.",
+            "<b>11.6.1:</b> detect unauthorised changes to those scripts and to security headers, at least weekly."
+          ]
+        },
+        "<mark>The simplest way to shrink PCI scope is a hosted payment page or the provider's iframe fields, plus a strict CSP and SRI on whatever remains.</mark>"
       ],
       "viz": [
         {
@@ -124,13 +152,18 @@
             },
             {
               "label": "<b>Ask first</b>",
-              "sub": "Consent before trackers",
+              "sub": "Consent before trackers; honour GPC",
               "tone": "accent"
             },
             {
               "label": "<b>Leak less</b>",
-              "sub": "No PII in URLs, logs or analytics",
+              "sub": "No personal data in URLs, logs or analytics",
               "tone": "heat"
+            },
+            {
+              "label": "<b>Control payment pages</b>",
+              "sub": "Script inventory, CSP, SRI, change detection",
+              "tone": "neg"
             },
             {
               "label": "<b>Let users control it</b>",

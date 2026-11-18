@@ -5,18 +5,31 @@
   "slides": [
     {
       "title": "Pinning third-party files by hash",
-      "summary": "SRI lets the browser refuse a script or stylesheet whose contents don't match the hash you expected.",
+      "summary": "SRI makes the browser refuse a script or stylesheet whose contents don't match the hash you expected.",
       "body": [
         "When you load a script from a CDN, you trust whoever controls that CDN. If it's compromised, every site using it runs the attacker's code.",
-        "<b>Subresource Integrity</b> adds an <code>integrity</code> attribute with a cryptographic hash of the file. The browser downloads it, hashes it, and refuses to run it if the hash doesn't match.",
+        "<b>Subresource Integrity</b> adds an <code>integrity</code> attribute with a cryptographic hash of the file. The browser hashes what it downloads and refuses to run it if the hash doesn't match.",
         {
           "ul": [
             "Use <code>sha384</code> or <code>sha512</code>.",
-            "Add <code>crossorigin=\"anonymous\"</code>, so the browser can read a cross-origin response to check it.",
+            "Add <code>crossorigin=\"anonymous\"</code> so the browser can check a cross-origin file.",
             "Pin exact versions in the URL. A floating <code>@latest</code> URL changes, and the hash then blocks it."
           ]
         },
-        "<mark>SRI only works for files that never change. It suits versioned library builds, not analytics tags that update themselves.</mark>"
+        "<mark>SRI only works for files that never change. It suits versioned library builds, not tags that update themselves.</mark>",
+        {
+          "more": "Requiring SRI everywhere: Integrity-Policy",
+          "text": "The newer <code>Integrity-Policy: blocked-destinations=(script)</code> header makes the browser block any script that has no integrity metadata. Roll it out with <code>Integrity-Policy-Report-Only</code> first. It's newer than SRI itself, so check browser support."
+        },
+        {
+          "more": "Why this matters for compliance",
+          "text": "PCI DSS 4.0.1 requirement 6.4.3 asks you to confirm every script on a payment page is unmodified. SRI is one of the simplest ways to show that.",
+          "goto": {
+            "chapter": "compliance",
+            "slide": 2
+          },
+          "link": "Compliance & regulation"
+        }
       ],
       "code": [
         "<script",
@@ -27,47 +40,13 @@
         "# generate a hash",
         "curl -s URL | openssl dgst -sha384 -binary | openssl base64 -A"
       ],
-      "viz": [
-        {
-          "type": "stepper",
-          "accumulate": true,
-          "nextLabel": "Next step",
-          "steps": [
-            {
-              "item": {
-                "label": "<b>Download</b>",
-                "sub": "lodash.min.js from the CDN",
-                "tone": "muted"
-              },
-              "caption": "The browser fetches the file as usual."
-            },
-            {
-              "item": {
-                "label": "<b>Hash</b>",
-                "sub": "sha384 of the bytes received",
-                "tone": "accent"
-              },
-              "caption": "It computes the hash itself."
-            },
-            {
-              "item": {
-                "label": "<b>Match → run</b>",
-                "sub": "Same as integrity attribute",
-                "tone": "pos"
-              },
-              "caption": "Unchanged files run normally."
-            },
-            {
-              "item": {
-                "label": "<b>Mismatch → block</b>",
-                "sub": "Network error, script never runs",
-                "tone": "neg"
-              },
-              "caption": "A tampered file is refused."
-            }
-          ]
-        }
-      ]
+      "figure": {
+        "src": "images/sec-sri-light.svg",
+        "darkSrc": "images/sec-sri-dark.svg",
+        "alt": "Your HTML pins a script from a CDN with integrity sha384-oqVu… . Top row: the CDN serves the genuine file; the browser computes its SHA-384 hash, it matches the pinned value, and the script runs. Bottom row: the CDN has been compromised and serves a modified file; the computed hash is different, so the browser refuses to run it and reports a network error. A newer Integrity-Policy header can require SRI on every script.",
+        "width": 1200,
+        "height": 500
+      }
     }
   ]
 }

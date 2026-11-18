@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 470" role="img" aria-labelledby="t d" font-family="'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+  <title id="t">Check data every time it crosses a boundary</title>
+  <desc id="d">Data flows left to right through four stages. Browser: an untrusted zone where validation gives fast feedback but can be skipped. The API at the trust boundary validates again against a schema, the authoritative check, rejecting a value like an email of 5,000 characters. Storage uses parameterised queries so input is never part of the SQL text. Output encodes the value for its context, HTML, attribute or URL, so a stored name like &lt;script&gt; is shown as text. A dashed line marks the trust boundary between the browser and the API.</desc>
+  <!--theme-->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowhead"/></marker>
+    <marker id="aa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowacc"/></marker>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="heatfill"/></marker>
+    <marker id="an" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="neg"/></marker>
+    <marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="pos"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="470" rx="18"/>
+  <text x="40" y="52" text-anchor="start" class="ink" font-size="26" font-weight="700">Check data every time it crosses a boundary</text>
+  <text x="40" y="78" text-anchor="start" class="muted" font-size="15">Validate where data comes in, parameterise where it is stored, encode where it is shown.</text>
+  <rect class="sunk" x="40" y="130" width="250" height="160" rx="12" stroke-width="1.5" />
+  <text x="165.0" y="179.5" text-anchor="middle" class="muted" font-size="15" font-weight="700">Browser</text>
+  <text x="165.0" y="199.5" text-anchor="middle" class="muted" font-size="13">untrusted zone</text>
+  <text x="165.0" y="217.5" text-anchor="middle" class="muted" font-size="13"></text>
+  <text x="165.0" y="235.5" text-anchor="middle" class="muted" font-size="13">validate for UX</text>
+  <text x="165.0" y="253.5" text-anchor="middle" class="muted" font-size="13">can be skipped</text>
+  <line class="line" x1="292" y1="210" x2="321" y2="210" marker-end="url(#a)"/>
+  <rect class="hit" x="325" y="130" width="250" height="160" rx="12" stroke-width="1.5" />
+  <text x="450.0" y="179.5" text-anchor="middle" class="accink" font-size="15" font-weight="700">API</text>
+  <text x="450.0" y="199.5" text-anchor="middle" class="muted" font-size="13">trust boundary</text>
+  <text x="450.0" y="217.5" text-anchor="middle" class="muted" font-size="13"></text>
+  <text x="450.0" y="235.5" text-anchor="middle" class="muted" font-size="13">validate with a schema</text>
+  <text x="450.0" y="253.5" text-anchor="middle" class="muted" font-size="13">authoritative</text>
+  <line class="line" x1="577" y1="210" x2="606" y2="210" marker-end="url(#a)"/>
+  <rect class="card" x="610" y="130" width="250" height="160" rx="12" stroke-width="1.5" />
+  <text x="735.0" y="179.5" text-anchor="middle" class="ink" font-size="15" font-weight="700">Storage</text>
+  <text x="735.0" y="199.5" text-anchor="middle" class="muted" font-size="13">query</text>
+  <text x="735.0" y="217.5" text-anchor="middle" class="muted" font-size="13"></text>
+  <text x="735.0" y="235.5" text-anchor="middle" class="muted" font-size="13">parameterised</text>
+  <text x="735.0" y="253.5" text-anchor="middle" class="muted" font-size="13">never string-built SQL</text>
+  <line class="line" x1="862" y1="210" x2="891" y2="210" marker-end="url(#a)"/>
+  <rect class="possoft" x="895" y="130" width="250" height="160" rx="12" stroke-width="1.5" />
+  <text x="1020.0" y="179.5" text-anchor="middle" class="posink" font-size="15" font-weight="700">Output</text>
+  <text x="1020.0" y="199.5" text-anchor="middle" class="muted" font-size="13">render</text>
+  <text x="1020.0" y="217.5" text-anchor="middle" class="muted" font-size="13"></text>
+  <text x="1020.0" y="235.5" text-anchor="middle" class="muted" font-size="13">encode for the context</text>
+  <text x="1020.0" y="253.5" text-anchor="middle" class="muted" font-size="13">HTML · attribute · URL</text>
+  <line class="dash" x1="307" y1="104" x2="307" y2="420"/>
+  <text x="312" y="116" text-anchor="start" class="accink head" font-size="11">TRUST BOUNDARY</text>
+  <rect class="negsoft" x="40" y="320" width="250" height="44" rx="10" stroke-width="1.5" />
+  <text x="165" y="348" text-anchor="middle" class="ink mono" font-size="12.5" xml:space="preserve">email: &quot;a…a@x&quot; (5,000 chars)</text>
+  <rect class="negsoft" x="325" y="320" width="250" height="44" rx="10" stroke-width="1.5" />
+  <text x="450" y="348" text-anchor="middle" class="ink mono" font-size="12.5" xml:space="preserve">✕ 400: too long</text>
+  <rect class="possoft" x="610" y="320" width="250" height="44" rx="10" stroke-width="1.5" />
+  <text x="735" y="348" text-anchor="middle" class="ink mono" font-size="12.5" xml:space="preserve">WHERE id = $1</text>
+  <rect class="possoft" x="895" y="320" width="250" height="44" rx="10" stroke-width="1.5" />
+  <text x="1020" y="348" text-anchor="middle" class="ink mono" font-size="12.5" xml:space="preserve">&lt;script&gt; shown as text</text>
+  <text x="600" y="420" text-anchor="middle" class="muted" font-size="13.5">Prefer allowlists (what is allowed) to blocklists (what is forbidden).</text>
+</svg>

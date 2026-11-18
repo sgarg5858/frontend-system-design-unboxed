@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 480" role="img" aria-labelledby="t d" font-family="'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+  <title id="t">postMessage: check both ends</title>
+  <desc id="d">A parent page at app.example.com embeds an iframe from widget.example. The parent calls postMessage with targetOrigin https://widget.example, so the browser only delivers the message if the frame really is that origin. The widget&#x27;s message listener checks event.origin equals https://app.example.com before using the data. A third window at evil.example also posts a message to the widget; the widget&#x27;s origin check rejects it. Using &#x27;*&#x27; as targetOrigin or skipping the origin check lets any site send or receive these messages.</desc>
+  <!--theme-->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowhead"/></marker>
+    <marker id="aa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowacc"/></marker>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="heatfill"/></marker>
+    <marker id="an" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="neg"/></marker>
+    <marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="pos"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="480" rx="18"/>
+  <text x="40" y="52" text-anchor="start" class="ink" font-size="26" font-weight="700">postMessage: check both ends</text>
+  <text x="40" y="78" text-anchor="start" class="muted" font-size="15">The sender names exactly who may receive; the receiver checks exactly who sent.</text>
+  <rect class="card" x="40" y="100" width="700" height="360" rx="16" stroke-width="1.5" />
+  <text x="60" y="128" text-anchor="start" class="ink mono" font-size="15" font-weight="700" xml:space="preserve">app.example.com  (parent)</text>
+  <rect class="sunk" x="70" y="150" width="290" height="120" rx="10" stroke-width="1.5" />
+  <text x="86" y="176" text-anchor="start" class="ink mono" font-size="13" xml:space="preserve">frame.contentWindow</text>
+  <text x="86" y="198" text-anchor="start" class="ink mono" font-size="13" xml:space="preserve">  .postMessage(data,</text>
+  <text x="86" y="220" text-anchor="start" class="accink mono" font-size="13" font-weight="700" xml:space="preserve">  &#x27;https://widget.example&#x27;)</text>
+  <text x="86" y="252" text-anchor="start" class="posink" font-size="12.5" font-weight="700">✓ exact targetOrigin, never *</text>
+  <rect class="hit" x="410" y="150" width="300" height="290" rx="12" stroke-width="1.5" />
+  <text x="560" y="178" text-anchor="middle" class="accink mono" font-size="14" font-weight="700" xml:space="preserve">iframe: widget.example</text>
+  <rect class="card" x="428" y="198" width="264" height="150" rx="10" stroke-width="1.5" />
+  <text x="442" y="222" text-anchor="start" class="ink mono" font-size="12" xml:space="preserve">addEventListener(&#x27;message&#x27;,</text>
+  <text x="442" y="242" text-anchor="start" class="ink mono" font-size="12" xml:space="preserve">  (e) =&gt; {</text>
+  <text x="442" y="262" text-anchor="start" class="accink mono" font-size="12" font-weight="700" xml:space="preserve">  if (e.origin !==</text>
+  <text x="442" y="282" text-anchor="start" class="accink mono" font-size="12" font-weight="700" xml:space="preserve">  &#x27;https://app.example.com&#x27;)</text>
+  <text x="442" y="302" text-anchor="start" class="accink mono" font-size="12" font-weight="700" xml:space="preserve">    return;</text>
+  <text x="442" y="322" text-anchor="start" class="ink mono" font-size="12" xml:space="preserve">  use(validate(e.data)); })</text>
+  <text x="430" y="384" text-anchor="middle" class="posink" font-size="13" font-weight="700">✓</text>
+  <text x="448" y="384" text-anchor="start" class="ink" font-size="13">from app.example.com: accepted</text>
+  <text x="430" y="410" text-anchor="middle" class="negink" font-size="13" font-weight="700">✕</text>
+  <text x="448" y="410" text-anchor="start" class="ink" font-size="13">from evil.example: ignored</text>
+  <line class="spos" x1="362" y1="210" x2="424" y2="240" marker-end="url(#ap)"/>
+  <rect class="negsoft" x="820" y="230" width="340" height="120" rx="14" stroke-width="1.5" />
+  <text x="990" y="268" text-anchor="middle" class="negink mono" font-size="16" font-weight="700" xml:space="preserve">evil.example</text>
+  <text x="990" y="294" text-anchor="middle" class="muted" font-size="12.5">opens or frames the widget</text>
+  <text x="990" y="318" text-anchor="middle" class="ink mono" font-size="12.5" xml:space="preserve">w.postMessage(payload, &#x27;*&#x27;)</text>
+  <line class="sneg" x1="818" y1="300" x2="714" y2="400" stroke-dasharray="6 5" marker-end="url(#an)"/>
+</svg>

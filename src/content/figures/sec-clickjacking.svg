@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-labelledby="t d" font-family="'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+  <title id="t">Clickjacking: the click goes somewhere else</title>
+  <desc id="d">Three panels. Left, what the user sees: a page on evil.example offering a prize with a big Claim prize button. Middle, what is really there: the same decoy page, with your banking page loaded in an iframe set to opacity 0 exactly on top of it, so its Confirm transfer button sits over the Claim prize button; the click goes to your page, with the user&#x27;s cookies. Right, with Content-Security-Policy frame-ancestors none: the browser refuses to render your page in the frame, the iframe is empty and the click does nothing.</desc>
+  <!--theme-->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowhead"/></marker>
+    <marker id="aa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowacc"/></marker>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="heatfill"/></marker>
+    <marker id="an" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="neg"/></marker>
+    <marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="pos"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="520" rx="18"/>
+  <text x="40" y="52" text-anchor="start" class="ink" font-size="26" font-weight="700">Clickjacking: the click goes somewhere else</text>
+  <text x="40" y="78" text-anchor="start" class="muted" font-size="15">The attacker stacks your real page, invisible, on top of a decoy. frame-ancestors stops your page rendering in their frame.</text>
+  <text x="40" y="120" text-anchor="start" class="muted head" font-size="12.5">WHAT THE USER SEES</text>
+  <rect class="card" x="40" y="136" width="360" height="340" rx="14" stroke-width="1.5" />
+  <text x="56" y="162" text-anchor="start" class="muted mono" font-size="12" xml:space="preserve">evil.example</text>
+  <text x="220" y="214" text-anchor="middle" class="ink" font-size="20" font-weight="700">🎁 You won a prize!</text>
+  <rect class="acc" x="130" y="300" width="180" height="54" rx="12" stroke-width="0" />
+  <text x="220" y="333" text-anchor="middle" class="onacc" font-size="17" font-weight="700">Claim prize</text>
+  <text x="420" y="120" text-anchor="start" class="negink head" font-size="12.5">WHAT&#x27;S REALLY THERE</text>
+  <rect class="card" x="420" y="136" width="360" height="340" rx="14" stroke-width="1.5" />
+  <text x="436" y="162" text-anchor="start" class="muted mono" font-size="12" xml:space="preserve">evil.example</text>
+  <text x="600" y="214" text-anchor="middle" class="ink" font-size="20" font-weight="700">🎁 You won a prize!</text>
+  <rect class="acc" x="510" y="300" width="180" height="54" rx="12" stroke-width="0" opacity=".35"/>
+  <rect class="negsoft" x="444" y="236" width="312" height="200" rx="10" stroke-width="2" stroke-dasharray="7 5" fill-opacity=".55"/>
+  <text x="456" y="256" text-anchor="start" class="negink mono" font-size="11.5" font-weight="700" xml:space="preserve">&lt;iframe src=&quot;bank.example&quot;&gt; opacity: 0</text>
+  <rect class="neg" x="500" y="294" width="200" height="66" rx="12" stroke-width="0" opacity=".9"/>
+  <text x="600" y="333" text-anchor="middle" class="onacc" font-size="16" font-weight="700">Confirm transfer</text>
+  <text x="600" y="410" text-anchor="middle" class="negink" font-size="12.5" font-weight="700">your page, logged in, invisible</text>
+  <text x="680" y="368" text-anchor="middle" class="ink" font-size="26">👆</text>
+  <text x="800" y="120" text-anchor="start" class="posink head" font-size="12.5">WITH FRAME-ANCESTORS &#x27;NONE&#x27;</text>
+  <rect class="card" x="800" y="136" width="360" height="340" rx="14" stroke-width="1.5" />
+  <text x="816" y="162" text-anchor="start" class="muted mono" font-size="12" xml:space="preserve">evil.example</text>
+  <text x="980" y="214" text-anchor="middle" class="ink" font-size="20" font-weight="700">🎁 You won a prize!</text>
+  <rect class="acc" x="890" y="300" width="180" height="54" rx="12" stroke-width="0" opacity=".35"/>
+  <rect class="possoft" x="824" y="236" width="312" height="200" rx="10" stroke-width="2" stroke-dasharray="7 5" fill-opacity=".55"/>
+  <text x="980" y="264" text-anchor="middle" class="posink" font-size="15" font-weight="700">Refused to display</text>
+  <text x="980" y="284" text-anchor="middle" class="posink" font-size="15" font-weight="700">bank.example in a frame</text>
+  <text x="980" y="333" text-anchor="middle" class="onacc" font-size="17" font-weight="700">Claim prize</text>
+  <text x="980" y="400" text-anchor="middle" class="ink" font-size="13">The click hits nothing of yours.</text>
+  <text x="40" y="506" text-anchor="start" class="muted mono" font-size="13" xml:space="preserve">Content-Security-Policy: frame-ancestors &#x27;none&#x27;   (X-Frame-Options: DENY for old browsers)</text>
+</svg>

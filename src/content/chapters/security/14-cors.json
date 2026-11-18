@@ -12,10 +12,14 @@
           "ul": [
             "The browser sends an <code>Origin</code> header with the request.",
             "The server answers with <code>Access-Control-Allow-Origin</code>.",
-            "If it matches, the browser hands the response to your JavaScript. If not, the request may still have reached the server, but your code can't read the result."
+            "If it matches, the browser gives the response to your JavaScript. If not, the request may still have reached the server, but your code can't read the result."
           ]
         },
-        "<mark>CORS is enforced by the browser to protect users. It doesn't protect your API from curl, scripts or other servers.</mark>"
+        "<mark>CORS is enforced by the browser to protect users. It doesn't protect your API from curl, scripts or other servers.</mark>",
+        {
+          "note": "A same-origin setup avoids CORS entirely: serve the API under the app's origin (e.g. <code>/api</code> through a reverse proxy or BFF).",
+          "kind": "dev"
+        }
       ],
       "viz": [
         {
@@ -30,7 +34,7 @@
               ]
             },
             {
-              "head": "GET, HEAD or form-style POST with simple headers",
+              "head": "GET, HEAD, or POST with form content types and simple headers",
               "cells": [
                 {
                   "text": "Sends it, then checks the response headers"
@@ -59,51 +63,19 @@
     },
     {
       "title": "Preflight requests",
-      "summary": "For non-simple requests, the browser asks permission with OPTIONS before sending the real request.",
+      "summary": "For non-simple requests, the browser asks with OPTIONS before sending the real request.",
       "body": [
-        "A <b>preflight</b> is an <code>OPTIONS</code> request describing the real one. The server answers with what it allows, and the browser only sends the real request if it fits.",
-        "<code>Access-Control-Max-Age</code> lets the browser cache the answer, saving a round trip on later requests.",
-        {
-          "note": "If a request works in curl or Postman but fails in the browser with a CORS error, look at the preflight response in DevTools first.",
-          "kind": "dev"
-        }
+        "A <b>preflight</b> is an <code>OPTIONS</code> request describing the real one. The server answers with what it allows, and the browser sends the real request only if it fits.",
+        "<code>Access-Control-Max-Age</code> lets the browser cache the answer, saving a round trip on later requests. Browsers cap it (Chrome at 2 hours).",
+        "<mark>If a request works in curl but fails in the browser with a CORS error, look at the preflight response in DevTools first.</mark>"
       ],
-      "viz": [
-        {
-          "type": "stepper",
-          "accumulate": true,
-          "nextLabel": "Next step",
-          "steps": [
-            {
-              "item": {
-                "label": "<b>Preflight</b>",
-                "sub": "OPTIONS /orders  Origin: https://app.example  Access-Control-Request-Method: PUT",
-                "tone": "muted",
-                "mono": true
-              },
-              "caption": "The browser asks before sending a PUT with JSON."
-            },
-            {
-              "item": {
-                "label": "<b>Server allows</b>",
-                "sub": "Access-Control-Allow-Origin: https://app.example  Allow-Methods: PUT  Max-Age: 600",
-                "tone": "accent",
-                "mono": true
-              },
-              "caption": "The API approves this origin and method."
-            },
-            {
-              "item": {
-                "label": "<b>Real request</b>",
-                "sub": "PUT /orders  Content-Type: application/json",
-                "tone": "pos",
-                "mono": true
-              },
-              "caption": "Now the actual request goes out, and its response is readable."
-            }
-          ]
-        }
-      ]
+      "figure": {
+        "src": "images/sec-cors-preflight-light.svg",
+        "darkSrc": "images/sec-cors-preflight-dark.svg",
+        "alt": "A sequence diagram with three lifelines: your JavaScript on app.example, the browser, and api.example. 1: your code calls fetch with method PUT and a JSON body. 2: the browser sends an OPTIONS preflight with Origin https://app.example and Access-Control-Request-Method PUT. 3: the API replies 204 with Access-Control-Allow-Origin https://app.example, Allow-Methods PUT and Max-Age 600. 4: the browser sends the real PUT. 5: the API replies 200 with Access-Control-Allow-Origin again. 6: the browser hands the response to your code. If step 3 or 5 lacks the right headers, the browser blocks your code from reading the response.",
+        "width": 1200,
+        "height": 580
+      }
     },
     {
       "title": "CORS mistakes",
@@ -111,28 +83,33 @@
       "body": [
         {
           "ul": [
-            "<b>Reflecting the Origin header</b> back with <code>Allow-Credentials: true</code> lets any site read logged-in users' data. Check against an allowlist.",
-            "<b>Allowing <code>null</code></b>: sandboxed iframes and local files send <code>Origin: null</code>, so attackers can too.",
-            "<b>Loose matching</b>: <code>endsWith('example.com')</code> also matches <code>evil-example.com</code>.",
-            "<b>Forgetting <code>Vary: Origin</code></b> when the header changes per origin, so caches serve the wrong one."
+            "<b>Reflecting the <code>Origin</code> header</b> back with <code>Allow-Credentials: true</code> lets any site read logged-in users' data. Check against an exact allowlist.",
+            "<b>Allowing <code>null</code>:</b> sandboxed iframes and local files send <code>Origin: null</code>, so attackers can too.",
+            "<b>Loose matching:</b> <code>endsWith('example.com')</code> also matches <code>evil-example.com</code>.",
+            "<b>Forgetting <code>Vary: Origin</code></b> when the header changes per origin, so caches serve one origin's answer to another."
           ]
         },
         "<mark>Access-Control-Allow-Origin: * is fine for truly public data, and browsers never send cookies with it.</mark>",
         {
           "more": "Does CORS stop CSRF?",
-          "text": "No. A simple cross-origin POST is still sent; CORS only hides the response. See the next chapter.",
+          "text": "No. A simple cross-origin POST is still sent; CORS only hides the response.",
           "goto": {
             "chapter": "csrf",
             "slide": 1
           },
           "link": "Cross-site request forgery (CSRF)"
+        },
+        {
+          "more": "Private Network Access is gone",
+          "text": "Chrome's earlier plan to add CORS preflights for requests to local networks (<code>Access-Control-Allow-Private-Network</code>) was replaced by the Local Network Access permission prompt in Chrome 142."
         }
       ],
       "code": [
-        "const ALLOWED = new Set(['https://app.example', 'https://admin.example']);",
+        "const ALLOWED = new Set(['https://app.example.com', 'https://admin.example.com']);",
         "",
-        "if (ALLOWED.has(req.headers.origin)) {",
-        "  res.set('Access-Control-Allow-Origin', req.headers.origin);",
+        "const origin = req.headers.origin;",
+        "if (origin && ALLOWED.has(origin)) {",
+        "  res.set('Access-Control-Allow-Origin', origin);",
         "  res.set('Access-Control-Allow-Credentials', 'true');",
         "}",
         "res.set('Vary', 'Origin');"

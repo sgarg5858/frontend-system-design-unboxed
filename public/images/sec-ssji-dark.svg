@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" role="img" aria-labelledby="t d" font-family="'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+  <title id="t">SSJI: user input becomes server code</title>
+  <desc id="d">A request with ?expr=require(&quot;fs&quot;).readFileSync(&quot;.env&quot;) arrives at a Node server whose handler calls eval on the query parameter. The evaluated code runs with the process&#x27;s permissions, shown as four red boxes: the file system (read source and .env files), environment variables (database passwords and API keys), child_process (run shell commands), and the internal network. The fix: never evaluate input; use a real parser or a lookup table, and run Node with least privilege.</desc>
+  <style>
+    .bg{fill:#0f1413}.card{fill:#171e1c;stroke:#2c3835}.sunk{fill:#1f2826}
+    .ink{fill:#e4ece9}.muted{fill:#9aa9a4}.onacc{fill:#0f1413}
+    .acc{fill:#4db3d1}.accink{fill:#8fd3e6}.accsoft{fill:#163742}
+    .pos{fill:#3fc4a3}.posink{fill:#3fc4a3}.possoft{fill:#123a30;stroke:#3fc4a3}
+    .neg{fill:#f07d60}.negink{fill:#f07d60}.negsoft{fill:#42221a;stroke:#f07d60}
+    .heat{fill:#3d2e14;stroke:#f0ac40}.heatink{fill:#f0ac40}.heatfill{fill:#f0ac40}
+    .line{stroke:#9aa9a4;fill:none;stroke-width:2}.thin{stroke:#2c3835;fill:none;stroke-width:1.5}
+    .dash{stroke:#4db3d1;fill:none;stroke-width:2;stroke-dasharray:6 5}
+    .sacc{stroke:#4db3d1;fill:none;stroke-width:2.5}.sheat{stroke:#f0ac40;fill:none;stroke-width:2.5}
+    .spos{stroke:#3fc4a3;fill:none;stroke-width:2.5}.sneg{stroke:#f07d60;fill:none;stroke-width:2.5}
+    .edge{stroke:#4db3d1;fill:none;stroke-width:1;opacity:.45}
+    .stream{stroke:#4db3d1;fill:none;stroke-width:14;stroke-linecap:round;opacity:.35}
+    .row{fill:#1f2826}.hit{fill:#163742;stroke:#4db3d1}
+    .mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace}
+    .head{font-size:13px;font-weight:700;letter-spacing:.08em}
+    .arrowhead{fill:#9aa9a4}.arrowacc{fill:#4db3d1}
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowhead"/></marker>
+    <marker id="aa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowacc"/></marker>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="heatfill"/></marker>
+    <marker id="an" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="neg"/></marker>
+    <marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="pos"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="500" rx="18"/>
+  <text x="40" y="52" text-anchor="start" class="ink" font-size="26" font-weight="700">SSJI: user input becomes server code</text>
+  <text x="40" y="78" text-anchor="start" class="muted" font-size="15">Once input reaches eval, the attacker has everything your Node process has.</text>
+  <rect class="heat" x="40" y="190" width="300" height="120" rx="12" stroke-width="1.5" />
+  <text x="190.0" y="238.5" text-anchor="middle" class="heatink" font-size="15" font-weight="700">Request</text>
+  <text x="190.0" y="257.5" text-anchor="middle" class="muted mono" font-size="12" xml:space="preserve">/calc?expr=require(&quot;fs&quot;)</text>
+  <text x="190.0" y="274.5" text-anchor="middle" class="muted mono" font-size="12" xml:space="preserve">.readFileSync(&quot;.env&quot;)</text>
+  <line class="sneg" x1="342" y1="250" x2="418" y2="250" marker-end="url(#an)"/>
+  <rect class="negsoft" x="422" y="170" width="300" height="160" rx="12" stroke-width="1.5" />
+  <text x="572.0" y="219.5" text-anchor="middle" class="negink" font-size="15" font-weight="700">Node handler</text>
+  <text x="572.0" y="239.5" text-anchor="middle" class="muted" font-size="13">eval(req.query.expr)</text>
+  <text x="572.0" y="257.5" text-anchor="middle" class="muted" font-size="13"></text>
+  <text x="572.0" y="275.5" text-anchor="middle" class="muted" font-size="13">runs with the</text>
+  <text x="572.0" y="293.5" text-anchor="middle" class="muted" font-size="13">process&#x27;s permissions</text>
+  <rect class="negsoft" x="860" y="100" width="300" height="76" rx="12" stroke-width="1.5" />
+  <text x="1010.0" y="134.75" text-anchor="middle" class="negink" font-size="15" font-weight="700">File system</text>
+  <text x="1010.0" y="154.25" text-anchor="middle" class="muted" font-size="12.5">read source, .env, keys</text>
+  <line class="sneg" x1="724" y1="250" x2="856" y2="138" marker-end="url(#an)"/>
+  <rect class="negsoft" x="860" y="192" width="300" height="76" rx="12" stroke-width="1.5" />
+  <text x="1010.0" y="226.75" text-anchor="middle" class="negink" font-size="15" font-weight="700">process.env</text>
+  <text x="1010.0" y="246.25" text-anchor="middle" class="muted" font-size="12.5">DB passwords, API keys</text>
+  <line class="sneg" x1="724" y1="250" x2="856" y2="230" marker-end="url(#an)"/>
+  <rect class="negsoft" x="860" y="284" width="300" height="76" rx="12" stroke-width="1.5" />
+  <text x="1010.0" y="318.75" text-anchor="middle" class="negink" font-size="15" font-weight="700">child_process</text>
+  <text x="1010.0" y="338.25" text-anchor="middle" class="muted" font-size="12.5">run shell commands</text>
+  <line class="sneg" x1="724" y1="250" x2="856" y2="322" marker-end="url(#an)"/>
+  <rect class="negsoft" x="860" y="376" width="300" height="76" rx="12" stroke-width="1.5" />
+  <text x="1010.0" y="410.75" text-anchor="middle" class="negink" font-size="15" font-weight="700">Internal network</text>
+  <text x="1010.0" y="430.25" text-anchor="middle" class="muted" font-size="12.5">pivot to other services</text>
+  <line class="sneg" x1="724" y1="250" x2="856" y2="414" marker-end="url(#an)"/>
+  <rect class="possoft" x="40" y="400" width="682" height="64" rx="12" stroke-width="1.5" />
+  <text x="60" y="428" text-anchor="start" class="posink" font-size="13.5" font-weight="700">Fix: never eval input. Use a parser (e.g. mathjs) or a lookup table;</text>
+  <text x="60" y="450" text-anchor="start" class="posink" font-size="13.5" font-weight="700">run with --permission and least privilege. vm is not a sandbox.</text>
+</svg>

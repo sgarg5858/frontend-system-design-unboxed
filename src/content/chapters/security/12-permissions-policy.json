@@ -5,12 +5,12 @@
   "slides": [
     {
       "title": "Turning browser features off",
-      "summary": "Permissions-Policy declares which powerful features your page and its iframes may use.",
+      "summary": "Permissions-Policy declares which powerful features your page and each iframe may use.",
       "body": [
         "<b>Permissions-Policy</b> (formerly <b>Feature-Policy</b>) is a response header that enables or disables browser features such as the camera, microphone, geolocation, payment and fullscreen, for your page and for each iframe.",
         {
           "ul": [
-            "<b>Least privilege:</b> if your app never uses the camera, turn it off. An XSS payload or a third-party script then can't ask for it.",
+            "<b>Least privilege:</b> if your app never uses the camera, turn it off. An XSS payload or third-party script then can't ask for it.",
             "<b>Control embeds:</b> a feature disabled for your page is disabled for every iframe inside it too.",
             "<b>Per-frame grants:</b> the iframe <code>allow</code> attribute delegates a feature to one specific frame."
           ]
@@ -18,7 +18,11 @@
         "<mark>Disable every powerful feature you don't use, and delegate the rest only to the frames that need them.</mark>",
         {
           "more": "Feature-Policy vs Permissions-Policy",
-          "text": "Feature-Policy was the original name with a different syntax (<code>camera 'none'</code>). It was renamed to Permissions-Policy with structured-header syntax (<code>camera=()</code>). Use the new header; the old one is legacy."
+          "text": "Feature-Policy was the original name, with a different syntax (<code>camera 'none'</code>). It was renamed Permissions-Policy with structured-header syntax (<code>camera=()</code>). Use the new header; the old one is legacy."
+        },
+        {
+          "more": "Browser support",
+          "text": "Chromium browsers support the header for many features. Firefox and Safari support the iframe <code>allow</code> attribute but only part of the header, so check each feature on MDN and don't rely on the header alone."
         }
       ],
       "code": [
@@ -73,7 +77,14 @@
             }
           ]
         }
-      ]
+      ],
+      "figure": {
+        "src": "images/sec-permissions-policy-light.svg",
+        "darkSrc": "images/sec-permissions-policy-dark.svg",
+        "alt": "A page at shop.example sends Permissions-Policy: camera=(), geolocation=(self), payment=(self \"https://pay.example\"). Inside the page, the shop's own code can use geolocation and payment, but not the camera. An iframe from pay.example with allow=\"payment\" can use payment, because the header lists that origin and the attribute delegates it; it cannot use geolocation. An iframe from ads.example gets nothing: no camera, no geolocation, no payment, even if it asks.",
+        "width": 1200,
+        "height": 470
+      }
     }
   ]
 }
