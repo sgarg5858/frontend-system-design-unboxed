@@ -147,7 +147,9 @@ describe('CourseShell', () => {
     const withoutVideo = COURSE.find((c) => !c.videos?.length)!;
 
     it("shows the slide's video, then steps video by video and on to the next chapter", async () => {
-      const { el, router, settle } = await open(`/${withVideo.id}/3?mode=watch`);
+      const { el, router, settle } = await open(
+        `/${withVideo.id}/${withVideo.videos![0].slides?.[0] ?? 1}?mode=watch`,
+      );
       const vids = withVideo.videos!;
       expect(el.querySelector('article h2')?.textContent).toBe(vids[0].title);
       expect(el.querySelector('app-video-player video')?.getAttribute('src')).toBe(vids[0].src);
@@ -223,6 +225,36 @@ describe('CourseShell', () => {
       await router.navigateByUrl(`/${withoutVideo.id}/1`);
       await settle();
       expect(el.querySelector('article h2')?.textContent).toBe(withoutVideo.slides[0].title);
+    });
+
+    it('shows the video beside the slide in Combined mode, and Next still moves a slide', async () => {
+      const v = withVideo.videos![0];
+      const first = (v.slides?.[0] ?? 1) - 1;
+      const { el, router, settle } = await open(`/${withVideo.id}/${first + 1}?mode=combined`);
+      expect(el.querySelector('app-split-view app-video-player video')?.getAttribute('src')).toBe(
+        v.src,
+      );
+      expect(el.querySelector('app-split-view article h2')?.textContent).toBe(
+        withVideo.slides[first].title,
+      );
+      (el.querySelector('.foot .next') as HTMLButtonElement).click();
+      await settle();
+      expect(router.url).toBe(`/${withVideo.id}/${first + 2}?mode=combined`);
+      expect(el.querySelector('app-split-view article h2')?.textContent).toBe(
+        withVideo.slides[first + 1].title,
+      );
+    });
+
+    it('hides the video in Combined mode and brings it back', async () => {
+      const v = withVideo.videos![0];
+      const { el, settle } = await open(`/${withVideo.id}/${v.slides?.[0] ?? 1}?mode=combined`);
+      (el.querySelector('app-split-view button.hide') as HTMLButtonElement).click();
+      await settle();
+      expect(el.querySelector('app-split-view .media.off')).not.toBeNull();
+      (el.querySelector('app-split-view button.show') as HTMLButtonElement).click();
+      await settle();
+      expect(el.querySelector('app-split-view .media.off')).toBeNull();
+      expect(el.querySelector('app-split-view button.show')).toBeNull();
     });
   });
 });
